@@ -13,6 +13,26 @@ struct LoginView: View {
     var body: some View {
         NavigationStack {
             Form {
+                // 品牌头：登录页是唯一一屏没有数据可显示的地方，
+                // 给个图标+一句话，比一张空表单像个产品
+                Section {
+                    VStack(spacing: 9) {
+                        ZStack {
+                            Circle().fill(Theme.accentSoft).frame(width: 68, height: 68)
+                            Image(systemName: "figure.strengthtraining.traditional")
+                                .font(.system(size: 30, weight: .medium))
+                                .foregroundStyle(Theme.accent)
+                        }
+                        Text("私教课时").font(.title3.weight(.semibold))
+                            .foregroundStyle(Theme.ink)
+                        Text("课包余额 · 排课 · 成长记录")
+                            .font(.caption).foregroundStyle(Theme.ink3)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .listRowBackground(Color.clear)
+                }
+
                 Picker("", selection: $mode) {
                     Text("教练登录").tag(0)
                     Text("学员查看").tag(1)
@@ -72,7 +92,8 @@ struct LoginView: View {
                         .font(.footnote)
                 }
             }
-            .navigationTitle("私教课时")
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showServer) { ServerSheet() }
         }
     }

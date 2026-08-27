@@ -246,6 +246,96 @@ struct StudentView: Codable {
     let history: [StudentSessionView]
     let upcoming_cancelled: [StudentSessionView]
     let today: String
+    let growth: [StudentGrowthView]      // v3：给家长看的成长展示
+}
+
+
+// ── 成长数据（schema v3）────────────────────────────────────────────────────
+// 字段名逐字照 domain.py 的 dataclass：Metric / Measurement / MetricProgress /
+// GrowthPoint / StudentGrowthView / Attendance。禁猜、禁改名。
+//
+// ⚠ 判据不在这一侧：「进步了没有」要过 higher_is_better（50 米跑变快 = 数值变小），
+// 那个判断**只在 domain._progress 里有一份**，结论经 `improved` 送过来。
+// 客户端一律读 `improved`，**禁止**在任何地方写 `delta > 0` 这种第二实现。
+
+struct Metric: Codable, Hashable, Identifiable {
+    let id: Int
+    let name: String
+    let unit: String
+    let higher_is_better: Int
+    let sort_order: Int
+    let is_active: Int
+}
+
+struct Measurement: Codable, Hashable, Identifiable {
+    let id: Int
+    let student_id: Int
+    let metric_id: Int
+    let metric_name: String
+    let unit: String
+    let taken_on: String
+    let value: Double
+    let note: String          // 教练自用，学员端结构上拿不到
+}
+
+struct GrowthPoint: Codable, Hashable, Identifiable {
+    var id: String { taken_on }
+    let taken_on: String
+    let value: Double
+}
+
+struct MetricProgress: Codable, Hashable, Identifiable {
+    var id: Int { metric_id }
+    let metric_id: Int
+    let name: String
+    let unit: String
+    let higher_is_better: Int
+    let n_points: Int
+    let first_on: String
+    let first_value: Double
+    let latest_on: String
+    let latest_value: Double
+    let delta: Double         // latest - first（原始差，带符号）
+    let improved: Bool?       // nil = 只测过一次，还没有「变化」可言
+    let pct: Double?          // 相对首测的变化幅度（%）；首测为 0 时 nil
+    let best_value: Double
+    let best_on: String
+}
+
+struct Attendance: Codable, Hashable {
+    let total: Int
+    let completed: Int
+    let no_show: Int
+    let cancelled: Int
+    let rate: Int             // 到课率 %，无分母时 100
+}
+
+struct GrowthResp: Codable {
+    let metrics: [Metric]
+    let progress: [MetricProgress]
+    let series: [String: [GrowthPoint]]   // 键 = metric_id 的字符串形式
+    let measurements: [Measurement]
+    let attendance: Attendance
+    let today: String
+}
+
+struct MetricsResp: Codable {
+    let today: String
+    let metrics: [Metric]                 // 含停用项（停用不删）
+}
+
+/// 学员端（家长）看到的成长条目。窄 dataclass —— **没有 note 字段**，
+/// 教练备注在结构上进不来（后端 INV-7 的延伸）。要加字段先改 domain 那侧。
+struct StudentGrowthView: Codable, Hashable, Identifiable {
+    var id: String { name }
+    let name: String
+    let unit: String
+    let latest_value: Double
+    let latest_on: String
+    let delta: Double
+    let improved: Bool?
+    let n_points: Int
+    let points: [GrowthPoint]
 }
 
 // ── 写路径的通用响应 ────────────────────────────────────────────────────────
@@ -260,6 +350,7 @@ struct MutationResp: Codable {
     let cancelled: Int?
     let link_url: String?
 }
+
 
 // ── 词表：与 domain.REASON_CODES / _STATUS_LABELS 逐字一致 ──────────────────
 

@@ -39,6 +39,11 @@ enum TZ {
         return dateString(d)
     }
 
+    /// 'YYYY-MM-DD' → 'MM-DD'（分组标题用，年份在日程里是噪音）
+    static func md(_ ymd: String) -> String {
+        ymd.count >= 10 ? String(ymd.dropFirst(5).prefix(5)) : ymd
+    }
+
     /// 'YYYY-MM-DD HH:MM' → 'HH:MM'
     static func hm(_ stamp: String) -> String {
         stamp.count >= 16 ? String(stamp.suffix(5)) : stamp

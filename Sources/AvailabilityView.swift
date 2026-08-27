@@ -10,30 +10,60 @@ struct AvailabilityView: View {
 
     var body: some View {
         List {
-            if let e = err { ErrorBar(text: e).listRowBackground(Color.clear) }
-            if data == nil { Loading().listRowBackground(Color.clear) }
+            if let e = err { ErrorBar(text: e).cardRow() }
 
-            Picker("", selection: $tab) {
-                Text("每周规则").tag(0)
-                Text("例外").tag(1)
-                Text("未来两周").tag(2)
+            CardBox(padding: 10) {
+                Picker("", selection: $tab) {
+                    Text("每周规则").tag(0)
+                    Text("例外").tag(1)
+                    Text("未来两周").tag(2)
+                }
+                .pickerStyle(.segmented)
             }
-            .pickerStyle(.segmented)
-            .listRowBackground(Color.clear)
+            .cardRow(top: 8)
+
+            if data == nil { Loading().cardRow() }
 
             if let d = data {
                 if tab == 0 {
-                    ForEach(0..<7, id: \.self) { w in
-                        let rules = d.rules_by_wd[String(w)] ?? []
-                        Section(d.wd_names.indices.contains(w) ? d.wd_names[w] : "周\(w)") {
+                    let empty = (0..<7).allSatisfy { (d.rules_by_wd[String($0)] ?? []).isEmpty }
+                    if empty {
+                        CardBox {
+                            EmptyState(icon: "calendar.badge.clock",
+                                       title: "还没有设置可排时段",
+                                       detail: "定好每周几点到几点能排课，排课时超出这个范围会提醒你。",
+                                       tone: .accent,
+                                       action: ("加每周规则", { newRule = true }))
+                        }
+                        .cardRow(top: 10)
+                    } else {
+                        ForEach(0..<7, id: \.self) { w in
+                            let rules = d.rules_by_wd[String(w)] ?? []
+                            let name = d.wd_names.indices.contains(w) ? d.wd_names[w] : "周\(w)"
+                            GroupTitle(text: name,
+                                       trailing: rules.isEmpty ? "不排课" : "\(rules.count) 段",
+                                       icon: rules.isEmpty ? "moon.zzz" : "calendar")
+                                .cardRow(top: 12, bottom: 2)
                             if rules.isEmpty {
-                                Text("不排课").font(.footnote).foregroundStyle(.secondary)
+                                CardBox(padding: 12) {
+                                    Text("不排课").font(.footnote).foregroundStyle(Theme.ink3)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                .cardRow(top: 2, bottom: 2)
                             }
                             ForEach(rules) { r in
-                                HStack {
-                                    Text("\(r.start_time) – \(r.end_time)").monospacedDigit()
-                                    Spacer()
+                                CardBox(padding: 13, tint: Theme.accent.opacity(0.75)) {
+                                    HStack {
+                                        Image(systemName: "clock")
+                                            .font(.caption).foregroundStyle(Theme.ink3)
+                                        Text("\(r.start_time) – \(r.end_time)")
+                                            .font(.subheadline.weight(.medium))
+                                            .monospacedDigit().foregroundStyle(Theme.ink)
+                                        Spacer()
+                                    }
+                                    .padding(.leading, 2)
                                 }
+                                .cardRow(top: 2, bottom: 2)
                                 .swipeActions {
                                     Button("删除", role: .destructive) {
                                         Task { await del("rules/\(r.id)") }
@@ -43,59 +73,91 @@ struct AvailabilityView: View {
                         }
                     }
                 } else if tab == 1 {
-                    Section {
-                        if d.exceptions.isEmpty { EmptyHint(text: "没有例外") }
+                    if d.exceptions.isEmpty {
+                        CardBox {
+                            EmptyState(icon: "calendar.badge.exclamationmark",
+                                       title: "没有例外",
+                                       detail: "临时停排（出差、放假）或临时加开，都在这里加。",
+                                       tone: .accent,
+                                       action: ("加一条例外", { newExc = true }))
+                        }
+                        .cardRow(top: 10)
+                    } else {
+                        GroupTitle(text: "例外", trailing: "\(d.exceptions.count) 条",
+                                   icon: "calendar.badge.exclamationmark")
+                            .cardRow(top: 12, bottom: 2)
                         ForEach(d.exceptions) { e in
-                            VStack(alignment: .leading, spacing: 3) {
-                                HStack {
-                                    Text(e.on_date).monospacedDigit()
-                                    Text(e.kind == "block" ? "停排" : "加开")
-                                        .font(.caption2).bold()
-                                        .padding(.horizontal, 6).padding(.vertical, 2)
-                                        .background((e.kind == "block" ? Color.red : Color.green).opacity(0.14))
-                                        .foregroundStyle(e.kind == "block" ? .red : .green)
-                                        .clipShape(Capsule())
-                                    Spacer()
-                                    if let s = e.start_time, let t = e.end_time {
-                                        Text("\(s) – \(t)").font(.footnote).monospacedDigit()
-                                    } else {
-                                        Text("整天").font(.footnote).foregroundStyle(.secondary)
+                            let block = e.kind == "block"
+                            CardBox(padding: 13,
+                                    tint: (block ? Theme.danger : Theme.ok).opacity(0.75)) {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    HStack(spacing: 7) {
+                                        Text(e.on_date).font(.subheadline.weight(.medium))
+                                            .monospacedDigit().foregroundStyle(Theme.ink)
+                                        Pill(text: block ? "停排" : "加开",
+                                             tone: block ? .danger : .ok)
+                                        Spacer(minLength: 4)
+                                        if let st = e.start_time, let t = e.end_time {
+                                            Text("\(st) – \(t)").font(.footnote)
+                                                .monospacedDigit().foregroundStyle(Theme.ink2)
+                                        } else {
+                                            Text("整天").font(.footnote).foregroundStyle(Theme.ink3)
+                                        }
+                                    }
+                                    if !e.reason.isEmpty {
+                                        Text(e.reason).font(.caption).foregroundStyle(Theme.ink3)
                                     }
                                 }
-                                if !e.reason.isEmpty {
-                                    Text(e.reason).font(.caption).foregroundStyle(.secondary)
-                                }
+                                .padding(.leading, 2)
                             }
+                            .cardRow(top: 3, bottom: 3)
                             .swipeActions {
                                 Button("删除", role: .destructive) {
                                     Task { await del("exceptions/\(e.id)") }
                                 }
                             }
                         }
-                    } footer: {
                         Text("例外压过每周规则：停排整天可不填时段；加开必须带时段。")
+                            .font(.caption).foregroundStyle(Theme.ink3)
+                            .cardRow(top: 12)
                     }
                 } else {
-                    Section("未来两周实际可排") {
-                        ForEach(d.preview) { p in
-                            HStack(alignment: .top) {
-                                Text("\(p.date_) \(p.wd_name)").font(.subheadline).monospacedDigit()
-                                Spacer()
+                    GroupTitle(text: "未来两周实际可排", icon: "eye")
+                        .cardRow(top: 12, bottom: 2)
+                    ForEach(d.preview) { p in
+                        CardBox(padding: 12,
+                                tint: p.windows.isEmpty ? Theme.ink3.opacity(0.35)
+                                                        : Theme.ok.opacity(0.75)) {
+                            HStack(alignment: .top, spacing: 8) {
+                                VStack(alignment: .leading, spacing: 1) {
+                                    Text(TZ.md(p.date_)).font(.subheadline.weight(.medium))
+                                        .monospacedDigit().foregroundStyle(Theme.ink)
+                                    Text(p.wd_name).font(.caption2).foregroundStyle(Theme.ink3)
+                                }
+                                .frame(width: 54, alignment: .leading)
+                                Spacer(minLength: 4)
                                 if p.windows.isEmpty {
                                     Text(p.empty_reason ?? "不排课")
-                                        .font(.footnote).foregroundStyle(.secondary)
+                                        .font(.footnote).foregroundStyle(Theme.ink3)
                                 } else {
-                                    Text(p.windows.map { $0.joined(separator: "–") }
-                                            .joined(separator: "\n"))
-                                        .font(.footnote).monospacedDigit()
-                                        .multilineTextAlignment(.trailing)
+                                    VStack(alignment: .trailing, spacing: 3) {
+                                        ForEach(p.windows, id: \.self) { w in
+                                            Text(w.joined(separator: " – "))
+                                                .font(.footnote).monospacedDigit()
+                                                .foregroundStyle(Theme.ink2)
+                                        }
+                                    }
                                 }
                             }
+                            .padding(.leading, 2)
                         }
+                        .cardRow(top: 3, bottom: 3)
                     }
                 }
             }
         }
+        .listStyle(.plain)
+        .pageBackground()
         .navigationTitle("档期")
         .navigationBarTitleDisplayMode(.inline)
         .refreshable { await load() }
@@ -104,7 +166,7 @@ struct AvailabilityView: View {
                 Menu {
                     Button("加每周规则") { newRule = true }
                     Button("加例外") { newExc = true }
-                } label: { Image(systemName: "plus") }
+                } label: { Image(systemName: "plus.circle.fill").font(.title3) }
             }
         }
         .task { if data == nil { await load() } }

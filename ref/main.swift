@@ -71,7 +71,11 @@ func runContract() async {
         ok("  locations 含刚建的地点", f.locations.contains { $0.id == locId })
     } catch { ok("session-form", false, "\(error)") }
 
-    let d = TZ.dateString(Date())
+    // ⚠ 排在**昨天**，不是今天。
+    // 后端硬拒「把未来的课记成已上/未到」（force 也不放行），而「今天 10:00」在
+    // 凌晨跑的时候仍是未来 —— 2026-08-28 00:34 实测，这条 harness 半夜必红，
+    // 白天必绿。用相对当下的固定过去时刻，任何时刻跑结论都一样。
+    let d = TZ.dateString(TZ.calendar.date(byAdding: .day, value: -1, to: Date())!)
     do {
         // 无档期规则时排课会有 no_availability 软警告 → 409（可 force）
         do {
@@ -109,9 +113,10 @@ func runContract() async {
 
     print("── 读端点逐个解码 ──")
     do {
-        let sch: ScheduleResp = try await api.get("/coach/api/schedule", query: ["range": "today"])
+        let sch: ScheduleResp = try await api.get(
+            "/coach/api/schedule", query: ["range": "today", "date": d])
         ok("GET schedule 解码", true)
-        ok("  今天能看到刚排的课", sch.days.contains { $0.sessions.contains { $0.id == sesId } })
+        ok("  指定那天能看到刚排的课", sch.days.contains { $0.sessions.contains { $0.id == sesId } })
         let stus: StudentsResp = try await api.get("/coach/api/students")
         ok("GET students 解码", stus.rows.contains { $0.id == stuId })
         let det: StudentDetailResp = try await api.get("/coach/api/students/\(stuId)")

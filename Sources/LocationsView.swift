@@ -9,33 +9,54 @@ struct LocationsView: View {
 
     var body: some View {
         List {
-            if let e = err { ErrorBar(text: e).listRowBackground(Color.clear) }
-            if data == nil { Loading().listRowBackground(Color.clear) }
+            if let e = err { ErrorBar(text: e).cardRow() }
+            if data == nil { Loading().cardRow() }
             if let d = data {
                 let active = d.locations.filter { $0.is_active == 1 }
                 let off = d.locations.filter { $0.is_active == 0 }
-                Section("启用中") {
-                    if active.isEmpty { EmptyHint(text: "还没有地点") }
-                    ForEach(active) { l in
-                        Button { editing = l } label: { LocationCell(l: l) }.buttonStyle(.plain)
+
+                if d.locations.isEmpty {
+                    CardBox {
+                        EmptyState(icon: "mappin.and.ellipse",
+                                   title: "还没有上课地点",
+                                   detail: "加一个地点，排课时就能选它。",
+                                   tone: .accent,
+                                   action: ("加第一个地点", { showNew = true }))
                     }
-                }
-                if !off.isEmpty {
-                    Section("已停用") {
+                    .cardRow(top: 10)
+                } else {
+                    GroupTitle(text: "启用中", trailing: "\(active.count)", icon: "mappin.circle.fill")
+                        .cardRow(top: 10, bottom: 2)
+                    ForEach(active) { l in
+                        Button { editing = l } label: { LocationCell(l: l) }
+                            .buttonStyle(.plain)
+                            .cardRow(top: 3, bottom: 3)
+                    }
+                    if !off.isEmpty {
+                        GroupTitle(text: "已停用", trailing: "\(off.count)", icon: "eye.slash")
+                            .cardRow(top: 14, bottom: 2)
                         ForEach(off) { l in
                             Button { editing = l } label: { LocationCell(l: l).opacity(0.55) }
                                 .buttonStyle(.plain)
+                                .cardRow(top: 3, bottom: 3)
                         }
+                        Text("停用不删：历史课次上的地点名照旧显示，只是排新课时不再出现。")
+                            .font(.caption).foregroundStyle(Theme.ink3)
+                            .cardRow(top: 12)
                     }
                 }
             }
         }
+        .listStyle(.plain)
+        .pageBackground()
         .navigationTitle("上课地点")
         .navigationBarTitleDisplayMode(.inline)
         .refreshable { await load() }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button { showNew = true } label: { Image(systemName: "plus") }
+                Button { showNew = true } label: {
+                    Image(systemName: "plus.circle.fill").font(.title3)
+                }
             }
         }
         .task { if data == nil { await load() } }
@@ -54,10 +75,23 @@ struct LocationsView: View {
 struct LocationCell: View {
     let l: Location
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(l.name).font(.headline)
-            if !l.address.isEmpty {
-                Text(l.address).font(.caption).foregroundStyle(.secondary)
+        CardBox(padding: 13) {
+            HStack(spacing: 11) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .fill(Theme.okSoft).frame(width: 34, height: 34)
+                    Image(systemName: "mappin.and.ellipse")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Theme.ok)
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(l.name).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
+                    if !l.address.isEmpty {
+                        Text(l.address).font(.caption).foregroundStyle(Theme.ink3).lineLimit(1)
+                    }
+                }
+                Spacer(minLength: 4)
+                Image(systemName: "chevron.right").font(.caption2).foregroundStyle(Theme.ink3)
             }
         }
     }

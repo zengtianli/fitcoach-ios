@@ -14,35 +14,62 @@ struct StudentsView: View {
 
     var body: some View {
         List {
-            if let e = err { ErrorBar(text: e).listRowBackground(Color.clear) }
-            if data == nil { Loading().listRowBackground(Color.clear) }
+            if let e = err { ErrorBar(text: e).cardRow() }
+            if data == nil { CardBox { Loading() }.cardRow() }
 
             if let d = data {
-                Section("在册（\(d.rows.count)）") {
-                    if filter(d.rows).isEmpty { EmptyHint(text: "没有匹配的学员") }
-                    ForEach(filter(d.rows)) { r in
-                        NavigationLink { StudentDetailView(studentId: r.id) } label: {
-                            StudentCell(r: r)
+                let active = filter(d.rows)
+                GroupTitle(text: "在册", trailing: "\(d.rows.count) 人", icon: "person.2.fill")
+                    .cardRow(top: 8, bottom: 2)
+
+                if active.isEmpty {
+                    CardBox {
+                        if d.rows.isEmpty {
+                            EmptyState(icon: "person.crop.circle.badge.plus",
+                                       title: "还没有学员",
+                                       detail: "先建一个学员，再给他录课包，就能开始排课了。",
+                                       tone: .accent,
+                                       action: ("新建学员", { showNew = true }))
+                        } else {
+                            EmptyState(icon: "magnifyingglass",
+                                       title: "没有匹配的学员",
+                                       detail: "换个关键词试试，或者清空搜索框。",
+                                       tone: .neutral)
                         }
                     }
+                    .cardRow()
                 }
+                ForEach(active) { r in
+                    NavigationLink { StudentDetailView(studentId: r.id) } label: {
+                        StudentCell(r: r)
+                    }
+                    .buttonStyle(.plain)
+                    .cardRow()
+                }
+
                 if !d.inactive.isEmpty {
-                    Section("已停用（\(d.inactive.count)）") {
-                        ForEach(filter(d.inactive)) { r in
-                            NavigationLink { StudentDetailView(studentId: r.id) } label: {
-                                StudentCell(r: r).opacity(0.55)
-                            }
+                    GroupTitle(text: "已停用", trailing: "\(d.inactive.count) 人", icon: "pause.circle")
+                        .cardRow(top: 14, bottom: 2)
+                    ForEach(filter(d.inactive)) { r in
+                        NavigationLink { StudentDetailView(studentId: r.id) } label: {
+                            StudentCell(r: r, dimmed: true)
                         }
+                        .buttonStyle(.plain)
+                        .cardRow()
                     }
                 }
             }
         }
+        .listStyle(.plain)
+        .pageBackground()
         .navigationTitle("学员")
         .searchable(text: $q, prompt: "找学员")
         .refreshable { await load() }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button { showNew = true } label: { Image(systemName: "person.badge.plus") }
+                Button { showNew = true } label: {
+                    Image(systemName: "person.badge.plus").font(.body.weight(.semibold))
+                }
             }
         }
         .task { if data == nil { await load() } }
@@ -59,34 +86,61 @@ struct StudentsView: View {
 
 struct StudentCell: View {
     let r: StudentListRow
+    var dimmed: Bool = false
+
+    /// 头像占位：名字最后一个字。个位数学员，一眼就能认出是谁。
+    private var initial: String {
+        r.name.last.map(String.init) ?? "?"
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(r.name).font(.headline)
-                if r.has_link == 1 {
-                    Image(systemName: "link").font(.caption2).foregroundStyle(.blue)
+        let tone: Theme.Tone = r.n_packages == 0 ? .neutral
+            : (r.available_total <= 0 ? .danger : .accent)
+        let (fg, bg) = Theme.pair(tone)
+        return CardBox(padding: 13) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle().fill(bg).frame(width: 42, height: 42)
+                    Text(initial)
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(fg)
                 }
-                Spacer()
-                if r.n_packages == 0 {
-                    Text("未录课包").font(.caption).foregroundStyle(.secondary)
-                } else {
-                    Text("可用 \(r.available_total)")
-                        .font(.subheadline).monospacedDigit()
-                        .foregroundStyle(r.available_total <= 0 ? .red : .primary)
+                VStack(alignment: .leading, spacing: 5) {
+                    HStack(spacing: 5) {
+                        Text(r.name).font(.headline).foregroundStyle(Theme.ink)
+                        if r.has_link == 1 {
+                            Image(systemName: "link")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundStyle(Theme.accent)
+                        }
+                    }
+                    HStack(spacing: 5) {
+                        if r.n_packages == 0 {
+                            Pill(text: "未录课包", tone: .neutral, icon: "exclamationmark")
+                        } else {
+                            Pill(text: "还能排 \(r.min_bookable)", tone: .neutral, icon: "calendar")
+                        }
+                        if r.lapsed_total > 0 {
+                            Pill(text: "过期 \(r.lapsed_total)", tone: .warn)
+                        }
+                        if r.expiring_soon > 0 {
+                            Pill(text: "将到期 \(r.expiring_soon)", tone: .warn, icon: "hourglass")
+                        }
+                    }
                 }
-            }
-            HStack(spacing: 10) {
-                if r.lapsed_total > 0 {
-                    Text("过期未用 \(r.lapsed_total)").font(.caption).foregroundStyle(.orange)
-                }
-                if r.expiring_soon > 0 {
-                    Text("即将到期 \(r.expiring_soon)").font(.caption).foregroundStyle(.orange)
-                }
+                Spacer(minLength: 4)
                 if r.n_packages > 0 {
-                    Text("还能排 \(r.min_bookable)").font(.caption).foregroundStyle(.secondary)
+                    VStack(alignment: .trailing, spacing: 0) {
+                        Text("\(r.available_total)")
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .monospacedDigit()
+                            .foregroundStyle(r.available_total <= 0 ? Theme.danger : Theme.ink)
+                        Text("可用").font(.system(size: 10)).foregroundStyle(Theme.ink3)
+                    }
                 }
             }
         }
+        .opacity(dimmed ? 0.6 : 1)
     }
 }
 
@@ -108,7 +162,13 @@ struct StudentFormSheet: View {
             Form {
                 if let e = err { Section { ErrorBar(text: e) } }
                 if let w = warn {
-                    Section { Text(w).font(.footnote).foregroundStyle(.orange) }
+                    Section {
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: "exclamationmark.circle.fill")
+                                .foregroundStyle(Theme.warn).font(.footnote)
+                            Text(w).font(.footnote).foregroundStyle(Theme.warn)
+                        }
+                    }
                 }
                 Section {
                     TextField("姓名", text: $name)

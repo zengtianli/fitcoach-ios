@@ -1,47 +1,42 @@
 import SwiftUI
 
 // ── 状态徽标 ────────────────────────────────────────────────────────────────
+// 颜色一律从 Theme.pair 取 —— 这里曾经各写各的 .green/.orange，与卡片、空态、
+// 统计块的同名色对不上（同一个「橙」有三个值）。别再写字面量色。
 
 struct StatusTag: View {
     let status: String
     var label: String? = nil
 
-    private var color: Color {
+    static func tone(_ status: String) -> Theme.Tone {
         switch status {
-        case "completed": return .green
-        case "no_show": return .orange
-        case "cancelled": return .secondary
-        default: return .blue
+        case "completed": return .ok
+        case "no_show":   return .warn
+        case "cancelled": return .neutral
+        default:          return .accent
         }
     }
 
     var body: some View {
-        Text(label ?? Vocab.statusShort[status] ?? status)
-            .font(.caption2).bold()
-            .padding(.horizontal, 7).padding(.vertical, 3)
-            .background(color.opacity(0.14))
-            .foregroundStyle(color)
-            .clipShape(Capsule())
+        Pill(text: label ?? Vocab.statusShort[status] ?? status,
+             tone: Self.tone(status))
     }
 }
 
 struct BucketTag: View {
     let bucket: String
-    private var color: Color {
+
+    static func tone(_ bucket: String) -> Theme.Tone {
         switch bucket {
-        case "active": return .green
-        case "lapsed": return .orange
-        case "voided": return .red
-        default: return .secondary
+        case "active": return .ok
+        case "lapsed": return .warn
+        case "voided": return .danger
+        default:       return .neutral
         }
     }
+
     var body: some View {
-        Text(Vocab.bucketLabels[bucket] ?? bucket)
-            .font(.caption2).bold()
-            .padding(.horizontal, 7).padding(.vertical, 3)
-            .background(color.opacity(0.14))
-            .foregroundStyle(color)
-            .clipShape(Capsule())
+        Pill(text: Vocab.bucketLabels[bucket] ?? bucket, tone: Self.tone(bucket))
     }
 }
 
@@ -56,7 +51,7 @@ struct Loading: View {
 struct EmptyHint: View {
     let text: String
     var body: some View {
-        Text(text).font(.subheadline).foregroundStyle(.secondary)
+        Text(text).font(.subheadline).foregroundStyle(Theme.ink3)
             .frame(maxWidth: .infinity, alignment: .center).padding(.vertical, 18)
     }
 }
@@ -65,30 +60,38 @@ struct ErrorBar: View {
     let text: String
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.red)
-            Text(text).font(.footnote).foregroundStyle(.red)
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(Theme.danger).font(.footnote)
+            Text(text).font(.footnote).foregroundStyle(Theme.danger)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(10)
-        .background(Color.red.opacity(0.08))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .padding(11)
+        .background(Theme.dangerSoft)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.rInner, style: .continuous))
     }
 }
 
 /// 教练端顶部的告警条（domain.coach_warnings）。红=过时未处理，橙/黄=余额或到期。
 struct WarningRow: View {
     let w: CoachWarning
-    private var color: Color {
+    private var tone: Theme.Tone {
         switch w.level {
-        case "red": return .red
-        case "orange": return .orange
-        default: return .yellow
+        case "red": return .danger
+        case "orange": return .warn
+        default: return .accent
         }
     }
     var body: some View {
-        HStack(spacing: 8) {
-            Circle().fill(color).frame(width: 8, height: 8)
-            Text(w.text).font(.footnote)
+        let (fg, bg) = Theme.pair(tone)
+        HStack(spacing: 9) {
+            ZStack {
+                Circle().fill(bg).frame(width: 24, height: 24)
+                Image(systemName: w.level == "red" ? "exclamationmark" : "bell.fill")
+                    .font(.system(size: 10, weight: .bold)).foregroundStyle(fg)
+            }
+            Text(w.text).font(.footnote).foregroundStyle(Theme.ink)
+            Spacer(minLength: 4)
+            Image(systemName: "chevron.right").font(.caption2).foregroundStyle(Theme.ink3)
         }
     }
 }
