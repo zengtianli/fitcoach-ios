@@ -68,7 +68,11 @@ struct CardBox<Content: View>: View {
             if let t = tint {
                 Rectangle().fill(t).frame(width: 4)
             }
-            content.padding(padding)
+            // 内容必须撑满卡片宽度：否则内容窄的卡（如「下一节课」只有一行时间）
+            // 会缩成半张，和同屏其它卡右边缘对不齐（2026-08-28 学员端截图实证）。
+            content
+                .padding(padding)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(Theme.cardBG)
         .clipShape(RoundedRectangle(cornerRadius: Theme.rCard, style: .continuous))
