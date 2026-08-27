@@ -6,6 +6,12 @@ struct StudentsView: View {
     @State private var err: String?
     @State private var showNew = false
     @State private var q = ""
+    /// 点开哪个学员。**刻意不用 List 里的 NavigationLink** —— List 会给
+    /// NavigationLink 行加一个系统 disclosure 箭头，并为它在右边留出留白，
+    /// 于是卡片右边缘比同屏其它卡短一截（2026-08-28 截图实证：学员卡右边缘
+    /// 830px，日程卡 877px）。其余卡片屏（体测项目 / 学员详情）走的就是
+    /// 「onTapGesture + navigationDestination」这条路，这里对齐它们。
+    @State private var open: StudentListRow?
 
     private func filter(_ rows: [StudentListRow]) -> [StudentListRow] {
         let k = q.trimmingCharacters(in: .whitespaces)
@@ -40,27 +46,36 @@ struct StudentsView: View {
                     .cardRow()
                 }
                 ForEach(active) { r in
-                    NavigationLink { StudentDetailView(studentId: r.id) } label: {
-                        StudentCell(r: r)
-                    }
-                    .buttonStyle(.plain)
-                    .cardRow()
+                    StudentCell(r: r)
+                        .contentShape(Rectangle())
+                        .onTapGesture { open = r }
+                        .cardRow()
                 }
 
                 if !d.inactive.isEmpty {
                     GroupTitle(text: "已停用", trailing: "\(d.inactive.count) 人", icon: "pause.circle")
                         .cardRow(top: 14, bottom: 2)
                     ForEach(filter(d.inactive)) { r in
-                        NavigationLink { StudentDetailView(studentId: r.id) } label: {
-                            StudentCell(r: r, dimmed: true)
-                        }
-                        .buttonStyle(.plain)
-                        .cardRow()
+                        StudentCell(r: r, dimmed: true)
+                            .contentShape(Rectangle())
+                            .onTapGesture { open = r }
+                            .cardRow()
                     }
                 }
             }
         }
         .listStyle(.plain)
+        .navigationDestination(item: $open) { r in StudentDetailView(studentId: r.id) }
+        // `-fitcoach.openStudent <id>` —— 模拟器点不了屏幕，这条把「点某个学员」
+        // 那一下**真的走一遍** navigationDestination，否则改了跳转机制只能靠
+        // 「编译过了」自我安慰（上面那条注释里的坑就是这么来的）。只在启动时生效一次。
+        .task {
+            let want = UserDefaults.standard.integer(forKey: "fitcoach.openStudent")
+            guard want > 0, open == nil else { return }
+            if data == nil { await load() }
+            let all = (data.map { $0.rows + $0.inactive }) ?? []
+            open = all.first { $0.id == want }
+        }
         .pageBackground()
         .navigationTitle("学员")
         .searchable(text: $q, prompt: "找学员")
@@ -138,6 +153,11 @@ struct StudentCell: View {
                         Text("可用").font(.system(size: 10)).foregroundStyle(Theme.ink3)
                     }
                 }
+                // 卡片**内**的箭头。系统那个 disclosure 指示器已经不要了（见上面
+                // navigationDestination 的注释），可点的暗示得由卡片自己给出。
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Theme.ink3)
             }
         }
         .opacity(dimmed ? 0.6 : 1)

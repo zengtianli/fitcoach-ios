@@ -32,7 +32,7 @@
 
 ```bash
 xcodegen generate --spec project.yml   # 增删了 Sources 下的文件才需要
-./ref/run                              # 契约对账，38 项，必须全绿
+./ref/run                              # 契约对账，49 项，必须全绿
 ```
 
 `ref/run` 自己起一台临时后端（临时库，跑完删），并且**端口被占用就拒绝跑** ——

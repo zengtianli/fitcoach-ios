@@ -9,6 +9,18 @@ let base = ProcessInfo.processInfo.environment["FC_BASE"] ?? "http://127.0.0.1:8
 let email = ProcessInfo.processInfo.environment["FC_EMAIL"] ?? "t@e.com"
 let pass = ProcessInfo.processInfo.environment["FC_PASS"] ?? "Passw0rd!234"
 
+/// 学员端公开面的**放宽探针**：只在 harness 里用，故意比 Sources/Models.swift 的
+/// StudentGrowthView 宽一格（多一个可选的 note）。作用是让「后端有没有多发字段」
+/// 变成一条会红的断言 —— 拿窄模型去编码再 grep 是恒真的，验不出任何东西。
+struct StudentGrowthProbe: Codable {
+    let name: String
+    let unit: String?
+    let note: String?
+}
+struct StudentViewProbe: Codable {
+    let growth: [StudentGrowthProbe]
+}
+
 var failures: [String] = []
 var checks = 0
 
@@ -174,6 +186,44 @@ func runContract() async {
         ok("  默认只列纠错/通融（比 all 少）", corr.rows.count < aud.rows.count)
     } catch { ok("audit", false, "\(error)") }
 
+    print("── 成长数据（schema v3）──")
+    var runMetricId = 0
+    do {
+        // 一键灌默认项目 → 读回来。停用项也在列表里（停用不删）。
+        _ = try await api.post("/coach/api/metrics/seed", [:])
+        let mr: MetricsResp = try await api.get("/coach/api/metrics")
+        ok("GET /coach/api/metrics 解码", !mr.metrics.isEmpty)
+        // 「越低越好」的项目必须真的存在，否则下面那条判据验的是个恒真式
+        guard let run = mr.metrics.first(where: { $0.higher_is_better == 0 }) else {
+            ok("  默认项目里有『越低越好』的项", false, "一个都没有"); report(); return
+        }
+        runMetricId = run.id
+        ok("  默认项目里有『越低越好』的项（\(run.name)）", true)
+
+        // 成绩一次比一次小 = 越低越好的项目上「在进步」。
+        // 这条是整个成长面唯一容易两处实现的判据（客户端若按 delta>0 判好坏就会反）。
+        for (d, v) in [("2026-05-10", "9.8"), ("2026-06-14", "9.2"), ("2026-08-23", "8.6")] {
+            _ = try await api.post("/coach/api/students/\(stuId)/measurements",
+                                   ["metric_id": "\(runMetricId)", "taken_on": d,
+                                    "value": v, "note": "harness"])
+        }
+        let g: GrowthResp = try await api.get("/coach/api/students/\(stuId)/growth")
+        guard let pr = g.progress.first(where: { $0.metric_id == runMetricId }) else {
+            ok("GET growth 里有该项目的 progress", false); report(); return
+        }
+        ok("GET /coach/api/students/{id}/growth 解码", true)
+        ok("  越低越好：数值降了，delta 为负而 improved = true",
+           pr.delta < 0 && pr.improved == true,
+           "delta=\(pr.delta) improved=\(String(describing: pr.improved))")
+        ok("  first/latest/best 三个值都对", pr.first_value == 9.8
+           && pr.latest_value == 8.6 && pr.best_value == 8.6)
+        ok("  n_points = 3 且序列点数一致", pr.n_points == 3
+           && (g.series["\(runMetricId)"]?.count ?? 0) == 3)
+        ok("  attendance 解码（到课率 0–100）", g.attendance.rate >= 0 && g.attendance.rate <= 100)
+        ok("  measurements 带 metric_name / unit（列表直接可渲）",
+           g.measurements.contains { $0.metric_id == runMetricId && !$0.metric_name.isEmpty })
+    } catch { ok("成长数据", false, "\(error)") }
+
     print("── 学员端链接与只读面 ──")
     do {
         let r = try await api.post("/coach/api/students/\(stuId)/token",
@@ -187,6 +237,23 @@ func runContract() async {
             .get("/s/api/view", student: true)
         ok("GET /s/api/view 用 X-Student-Token 头解码", sv.student_name == "张三")
         ok("  9 键窄视图：可用合计 = 10", sv.available_total == 10)
+
+        // 学员端成长：窄 dataclass，**结构上没有 note** —— 教练那条 note="harness"
+        // 不能出现在公开面的任何角落（INV-7 的延伸，客户端只是不该把它变宽）。
+        ok("  学员端 growth 有条目且带趋势点",
+           sv.growth.contains { $0.n_points == 3 && $0.points.count == 3 })
+        // 「公开面没有教练备注」必须验**后端到底发没发**，不能验客户端把它重新编码出来的
+        // 结果 —— 客户端模型里本来就没有 note，编码出来当然没有，那种断言恒真、永远
+        // 不会红（2026-08-28 变异实测：给 StudentGrowthView 加上 note 字段，那条仍全绿）。
+        // 这里改用一个**故意放宽**的探针：note 声明成可选，能收到就说明后端漏了。
+        // probeUnit 是同一探针打在一个后端确实会发的字段上，用来证明探针本身有效
+        // —— 否则「note 是 nil」也可能只是探针根本没在解析。
+        let probe: StudentViewProbe = try await API(s, studentToken: token)
+            .get("/s/api/view", student: true)
+        ok("  探针有效性：同结构能收到后端真发的 unit",
+           probe.growth.contains { ($0.unit ?? "").isEmpty == false })
+        ok("  学员端 growth 后端未下发 note（教练备注进不了公开面）",
+           probe.growth.allSatisfy { $0.note == nil })
 
         // token 不进列表/详情响应 —— 结构性保护，验一次
         let det: StudentDetailResp = try await api.get("/coach/api/students/\(stuId)")
