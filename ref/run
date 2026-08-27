@@ -1,0 +1,54 @@
+#!/bin/bash
+# 契约对账：拿 app **自己的** Sources/Models.swift + Sources/API.swift 去打真后端。
+# 默认自己起一台干净的本地 fitcoach（临时 DB，跑完删），所以可重复、不脏任何库。
+# 打线上/别处：FC_BASE=https://… FC_EMAIL=… FC_PASS=… ./ref/run
+set -euo pipefail
+cd "$(dirname "$0")/.."
+BACKEND=/Users/tianli/Dev/services/fitcoach
+
+source /Users/tianli/Dev/tools/dev/lib/tools/macapp/xcode_env.sh
+xcode_env_use macosx
+xcrun swiftc -O -swift-version 5 \
+  Sources/Models.swift Sources/TimeKit.swift Sources/API.swift ref/main.swift \
+  -o ref/.contract-bin
+
+if [ -n "${FC_BASE:-}" ]; then
+  exec ./ref/.contract-bin
+fi
+
+[ -d "$BACKEND" ] || { echo "❌ 找不到后端 $BACKEND —— 无法起本地实例；要打别处请给 FC_BASE" >&2; exit 1; }
+TMP=$(mktemp -d)
+PORT=${FC_PORT:-8799}
+# fail-closed：端口已被占用就停手。
+# 2026-08-27 实测：上一轮遗留的 uvicorn 还占着 8799，新实例起不来，healthz 打到
+# **旧那台**上，于是 harness 对着一个陈旧的库全绿。哑掉的守卫和它要防的 bug 同类。
+if lsof -nP -iTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1; then
+  echo "❌ 端口 $PORT 已被占用 —— 拒绝在别人的服务器上跑契约对账（换 FC_PORT= 或先杀掉它）" >&2
+  lsof -nP -iTCP:"$PORT" -sTCP:LISTEN >&2
+  exit 1
+fi
+# uv run 会再 fork 一层，只 kill $PID 杀不掉真正监听的那个 python
+# （上一轮就因此留下僵尸进程占着端口）。按命令行精确收，不用裸 pkill uvicorn。
+cleanup() {
+  pkill -f "uvicorn api:app --port $PORT" 2>/dev/null || true
+  [ -n "${PID:-}" ] && kill "$PID" 2>/dev/null
+  rm -rf "$TMP"
+}
+trap cleanup EXIT
+
+echo "[ref] 起临时后端 :$PORT （库 $TMP/t.db）"
+( cd "$BACKEND" && FITCOACH_DB="$TMP/t.db" FITCOACH_COACH_AUTH=multi \
+    TLZ_GATE_SECRET=$(python3 -c "import secrets;print(secrets.token_hex(32))") \
+    uv run uvicorn api:app --port "$PORT" ) > "$TMP/srv.log" 2>&1 &
+PID=$!
+for _ in $(seq 1 40); do
+  curl -sf "http://127.0.0.1:$PORT/healthz" >/dev/null && break
+  sleep 0.5
+done
+curl -sf "http://127.0.0.1:$PORT/healthz" >/dev/null || {
+  echo "❌ 后端没起来："; tail -20 "$TMP/srv.log"; exit 1; }
+
+curl -sf -X POST "http://127.0.0.1:$PORT/register" \
+  -d "email=t@e.com&password=Passw0rd!234&display_name=T" -o /dev/null || true
+
+FC_BASE="http://127.0.0.1:$PORT" ./ref/.contract-bin

@@ -1,0 +1,24 @@
+name: fitcoach-ios
+origin: own
+lifecycle: active
+form: ios
+
+one_liner: 私教课时管理 iPhone 双端客户端 —— 教练端全量排课/学员/课包/档期/审计，学员端只读课时
+
+stack: swift-ui
+notes: |
+  **纯客户端**：后端是 ~/Dev/services/fitcoach（线上 https://fit.tianli.cyou），
+  本 app 一行后端代码都不改，消费它已有的 JSON 面：
+    · 教练端 /coach/api/*   （28 条，multi 档邮箱密码登录，fc_coach cookie）
+    · 学员端 /s/api/view    （只读 9 键窄视图，X-Student-Token 头）
+
+  Sources/Models.swift 的字段名**逐字对应** domain.py 的 dataclass ——
+  后端出 JSON 走 dataclasses.asdict()，键名即字段名（含 date_ 这种尾下划线）。
+
+  契约对账 ./ref/run：拿 app **自己的** Models/API 源码去打真后端（起临时实例、
+  临时库、跑完删），38 项断言含 409/400 错误协议分派、余额算法、token 吊销后 404。
+  反向验证做过两次：把 409 处理改成普通拒绝 → 9 项转红；改错字段名 → 编译期就红。
+  ref/run 自带端口占用 fail-closed —— 2026-08-27 实测遗留 uvicorn 占着端口时，
+  harness 会打到**另一台**服务器上全绿，那种绿比红更危险。
+
+  真机装机走 ./install-to-iphone.sh（免费 Personal Team，证书 7 天到期，重跑即续）。
