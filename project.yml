@@ -6,6 +6,8 @@ options:
 settings:
   base:
     CODE_SIGN_STYLE: Automatic
+    # 2026-08-29 起已开通付费 Developer Program(团队 B9LJH93LA4),不再留空走免费 Personal Team。
+    DEVELOPMENT_TEAM: B9LJH93LA4
     SWIFT_VERSION: "5.0"
 targets:
   FitCoach:
@@ -21,7 +23,9 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_CFBundleDisplayName: 私教课时
-        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        # 四方向全给:上 TestFlight 时 App Store Connect 对 universal(iPhone+iPad)app 强制
+        # 要求 iPad 分屏四方向不能缺,只给 Portrait 会在上传阶段被拒(2026-08-29 wrong-book 实证)。
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         GENERATE_INFOPLIST_FILE: YES
         MARKETING_VERSION: "0.1"
         CURRENT_PROJECT_VERSION: "1"
