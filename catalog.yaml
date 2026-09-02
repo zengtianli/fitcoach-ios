@@ -1,7 +1,9 @@
 name: fitcoach-ios
+bundle_id: cyou.tianli.fitcoachapp   # 派生自 project.yml（SSOT）；fleet_audit a/g 项与 app_registry gate-mac 按它对装机
 origin: own
 lifecycle: active
 form: ios
+platforms: [iphone, ipad, mac]   # 跑在哪（正交于 form=源码住哪）；multiplatform.py audit 与 project.yml 对账
 
 one_liner: 私教课时管理 iPhone 双端客户端 —— 教练端全量排课/学员/课包/档期/审计，学员端只读课时
 
