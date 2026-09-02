@@ -8,7 +8,7 @@ struct FitCoachApp: App {
         WindowGroup {
             RootView()
                 .environmentObject(session)
-                .tint(.blue)
+                .tint(.accentColor)   // 主题色 SSOT=products.yaml theme → AccentColor.colorset（theme_sync.py 派生）
                 .preferredColorScheme(.light)   // 亮色主题（与网页端/小程序一致）
         }
     }
