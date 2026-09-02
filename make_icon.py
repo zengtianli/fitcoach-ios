@@ -1,45 +1,29 @@
 #!/usr/bin/env python3
-"""生成 app 图标：一个哑铃 + 一格日历勾，画的就是这个 app 管的事
-（私教课时：练什么 + 什么时候）。亮底深字，与 app 内亮色主题一致。
-不用外部素材、不联网，重跑结果逐像素一致。"""
-from PIL import Image, ImageDraw
-import pathlib
+"""重生图标：从 Resources/icon-src.png（Seedream 定稿原图，2026-09-01 用户逐版挑选）
+按定稿裁切参数派生 icon-1024.png。改图标 = 换 icon-src.png 或调 CROP，再跑本脚本。
+旧版逐像素绘制脚本已被本派生版取代（原图标风格 2026-09-01 用户判「不达意」整批换掉）。"""
+import subprocess, sys, pathlib, shutil
 
-S = 1024
-BG   = (247, 247, 249)
-BAR  = (28, 32, 44)
-PLATE= (10, 122, 255)
-GRID = (222, 224, 230)
-OK   = (52, 199, 89)
+CROP = 0.74  # 保留中心比例（定稿参数，别顺手调）
+HERE = pathlib.Path(__file__).parent
+SRC = HERE / "Resources/icon-src.png"
+if not SRC.exists():
+    sys.exit("icon-src.png 不存在，拒绝生成（fail-closed）")
 
-img = Image.new("RGB", (S, S), BG)
-d = ImageDraw.Draw(img)
-
-# 淡网格底（日历意象）
-for i in range(1, 5):
-    v = 150 + (S - 300) * i / 5
-    d.line([(150, v), (S - 150, v)], fill=GRID, width=4)
-    d.line([(v, 150), (v, S - 150)], fill=GRID, width=4)
-
-# 哑铃：中杠 + 左右两组配重
-cy = S * 0.46
-d.rounded_rectangle([S*0.30, cy-26, S*0.70, cy+26], radius=26, fill=BAR)
-for x in (S*0.20, S*0.74):
-    d.rounded_rectangle([x, cy-110, x+60, cy+110], radius=26, fill=PLATE)
-for x in (S*0.27, S*0.67):
-    d.rounded_rectangle([x, cy-72, x+52, cy+72], radius=20, fill=BAR)
-
-# 勾：这一节记上了
-pts = [(S*0.34, S*0.72), (S*0.46, S*0.83), (S*0.70, S*0.60)]
-d.line(pts, fill=OK, width=46, joint="curve")
-
-out = pathlib.Path("Resources/Assets.xcassets/AppIcon.appiconset")
-out.mkdir(parents=True, exist_ok=True)
-img.save(out / "icon-1024.png")
-(out / "Contents.json").write_text(
-    '{"images":[{"filename":"icon-1024.png","idiom":"universal",'
-    '"platform":"ios","size":"1024x1024"}],'
-    '"info":{"author":"xcode","version":1}}\n'
-)
-(out.parent / "Contents.json").write_text('{"info":{"author":"xcode","version":1}}\n')
-print("✅ 图标已生成:", out / "icon-1024.png")
+out = HERE / "Resources/Assets.xcassets/AppIcon.appiconset/icon-1024.png"
+w = int(subprocess.check_output(["sips","-g","pixelWidth",str(SRC)]).split()[-1])
+h = int(subprocess.check_output(["sips","-g","pixelHeight",str(SRC)]).split()[-1])
+side = int(min(w, h) * CROP)
+tmp = HERE / ".icon_tmp.png"
+shutil.copy(SRC, tmp)
+# sips 的 -c 与 -z 同传时按内部固定顺序执行（先缩后裁 → 出 655px，实测踩过），必须分两步
+subprocess.check_call(["sips","-c",str(side),str(side),str(tmp)], stdout=subprocess.DEVNULL)
+subprocess.check_call(["sips","-z","1024","1024","-s","format","png",
+                       str(tmp),"--out",str(out)], stdout=subprocess.DEVNULL)
+w2 = int(subprocess.check_output(["sips","-g","pixelWidth",str(out)]).split()[-1])
+assert w2 == 1024, f"派生出 {w2}px，拒绝（fail-closed）"
+tmp.unlink()
+plain = HERE / "Resources/icon-1024.png"
+if plain.exists():
+    shutil.copy(out, plain)   # 两处副本保持一致，防漂移
+print(f"icon-1024.png 已从 icon-src.png 派生 (crop {CROP})")
