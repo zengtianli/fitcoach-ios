@@ -9,6 +9,7 @@ struct LoginView: View {
     @State private var busy = false
     @State private var err: String?
     @State private var showServer = false
+    @State private var showRegister = false
 
     var body: some View {
         NavigationStack {
@@ -65,6 +66,8 @@ struct LoginView: View {
                                 Spacer() }
                         }
                         .disabled(busy || email.isEmpty || password.isEmpty)
+                        Button("还没有账号？用邮箱注册") { showRegister = true }
+                            .font(.footnote)
                     }
                 } else {
                     Section {
@@ -95,6 +98,7 @@ struct LoginView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showServer) { ServerSheet() }
+            .sheet(isPresented: $showRegister) { RegisterView() }
         }
     }
 

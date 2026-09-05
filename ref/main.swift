@@ -55,6 +55,33 @@ func runContract() async {
     } catch APIError.gone { ok("无凭证访问 /coach/api/* → 404", true) }
     catch { ok("无凭证访问 /coach/api/*", false, "\(error)") }
 
+    print("── 注册 / 注销（App Store 5.1.1(v) 那两条）──")
+    do {
+        let tmp = Session(); tmp.baseURL = base
+        let tapi = API(tmp)
+        let stamp = Int(Date().timeIntervalSince1970)
+        tmp.coachCookie = try await tapi.register(email: "probe\(stamp)@e.com",
+                                                  password: "Passw0rd!234", displayName: "探针")
+        ok("POST /api/register 返回 cookie 值", tmp.coachCookie?.isEmpty == false)
+        ok("  注册即登录：ping 过闸", try await tapi.ping().ok)
+        do {
+            _ = try await tapi.register(email: "probe\(stamp)@e.com", password: "Passw0rd!234", displayName: "")
+            ok("  重复注册应 400", false, "竟然成功了")
+        } catch APIError.rejected { ok("  重复注册 → 400", true) }
+        do {
+            try await tapi.deleteAccount(password: "wrongwrongwrong")
+            ok("  错密码注销应 400", false, "竟然删了")
+        } catch APIError.rejected { ok("  错密码注销 → 400", true) }
+        ok("  错密码后账号仍在", try await tapi.ping().ok)
+        try await tapi.deleteAccount(password: "Passw0rd!234")
+        ok("POST /coach/api/account/delete 成功", true)
+        do { _ = try await tapi.ping(); ok("  删号后旧 cookie 应 404", false, "竟然还能过") }
+        catch APIError.gone { ok("  删号后旧 cookie → 404", true) }
+        do { _ = try await tapi.login(email: "probe\(stamp)@e.com", password: "Passw0rd!234")
+             ok("  删号后登录应 401", false, "竟然登上了") }
+        catch APIError.unauthorized { ok("  删号后登录 → 401", true) }
+    } catch { ok("注册/注销链", false, "\(error)") }
+
     print("── 建数据（走 app 真实写路径）──")
     var locId = 0, stuId = 0, pkgId = 0, sesId = 0
     do {

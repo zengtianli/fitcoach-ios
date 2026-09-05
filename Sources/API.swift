@@ -187,6 +187,27 @@ final class API {
         return r.cookie
     }
 
+    /// 注册：POST /api/register（email / password / display_name，Form 编码）→ cookie 值。
+    /// 与 login 同形态；密码强度、邮箱格式、名额上限全由后端 tenancy.register 判，这里零规则。
+    func register(email: String, password: String, displayName: String) async throws -> String {
+        var req = URLRequest(url: try makeURL("/api/register", [:]))
+        req.httpMethod = "POST"
+        req.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        req.httpBody = formBody(["email": email, "password": password, "display_name": displayName])
+        let (data, code) = try await run(req)
+        guard (200..<300).contains(code) else { throw decodeError(data, code) }
+        guard let r = try? JSONDecoder().decode(LoginResp.self, from: data), r.ok else {
+            throw APIError.decode("注册响应异常")
+        }
+        return r.cookie
+    }
+
+    /// 注销账号：POST /coach/api/account/delete（password）。后端验密码后整租户真删。
+    /// 成功后调用方必须自己清本地会话 —— cookie 值存在 UserDefaults 里，服务端清不到它。
+    func deleteAccount(password: String) async throws {
+        try await post("/coach/api/account/delete", ["password": password])
+    }
+
     struct Ping: Codable { let ok: Bool; let today: String; let now: String }
     func ping() async throws -> Ping { try await get("/coach/api/ping") }
 }

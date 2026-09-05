@@ -31,6 +31,8 @@ struct RootView: View {
             CoachTabs()
         } else if session.isStudent {
             StudentModeView()
+        } else if deepScreen == "register" {
+            RegisterView()                  // 截图/联调直达注册页（未登录态才有意义）
         } else {
             LoginView()
         }
@@ -42,6 +44,7 @@ struct RootView: View {
         switch parts.first {
         case "metrics":  MetricsView()
         case "password": PasswordView()
+        case "delete-account": AccountDeleteView()
         case "locations": LocationsView()
         case "audit":    AuditView()
         case "student":  StudentDetailView(studentId: Int(parts.count > 1 ? parts[1] : "1") ?? 1)
@@ -110,6 +113,9 @@ struct MoreView: View {
                 VStack(spacing: 0) {
                     MoreLink(icon: "key.fill", tone: .warn, title: "修改密码",
                              detail: "与网页端同一个账号") { PasswordView() }
+                    MoreDivider()
+                    MoreLink(icon: "person.crop.circle.badge.xmark", tone: .danger, title: "注销账号",
+                             detail: "删除账号与全部数据，不可恢复") { AccountDeleteView() }
                 }
             }
             .cardRow()
