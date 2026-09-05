@@ -4,9 +4,9 @@
 # 打线上/别处：FC_BASE=https://… FC_EMAIL=… FC_PASS=… ./ref/run
 set -euo pipefail
 cd "$(dirname "$0")/.."
-BACKEND=/Users/tianli/Dev/services/fitcoach
+BACKEND=$HOME/Dev/services/fitcoach
 
-source /Users/tianli/Dev/tools/dev/lib/tools/macapp/xcode_env.sh
+source $HOME/Dev/tools/dev/lib/tools/macapp/xcode_env.sh
 xcode_env_use macosx
 xcrun swiftc -O -swift-version 5 \
   Sources/Models.swift Sources/TimeKit.swift Sources/API.swift ref/main.swift \

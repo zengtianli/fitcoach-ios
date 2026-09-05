@@ -1,74 +1,58 @@
-# fitcoach-ios · 私教课时（iPhone）
+<p align="center"><img src="Resources/icon-1024.png" width="96" alt="上门体育"></p>
 
-fitcoach 的原生 iOS 双端客户端。后端不变，`https://fit.tianli.cyou` 上的数据与网页端、
-小程序端**是同一份**。
+# 上门体育 · fitcoach-ios
 
-## 装到手机
+**教练手机上排课扣课时，学员随时看还剩几节。**
 
-```bash
-bash install-to-iphone.sh
-```
+![Swift](https://img.shields.io/badge/Swift-5-F05138?logo=swift&logoColor=white) ![SwiftUI](https://img.shields.io/badge/SwiftUI-0D84FF?logo=swift&logoColor=white) ![Platform](https://img.shields.io/badge/iOS%2018.0%2B%20·%20macOS%2015.0%2B-000?logo=apple) ![TestFlight](https://img.shields.io/badge/TestFlight-内测中-0D84FF) ![License](https://img.shields.io/badge/License-MIT-green)
 
-要人做的只有两件（各一次）：Xcode（用 `/Applications/Xcode-27.0.0-Beta.5.app`）→ Settings →
-Apple Accounts 登录；装完在 iPhone → 设置 → 通用 → VPN 与设备管理 → 开发者应用 → 信任。
+给一位真实教练做的生产系统手机端，与网页端、小程序端共用同一后端、同一份数据。上线前 38 项契约断言对着临时后端真打真测——还因此发现过「端口被占时打到另一台服务器上全绿」这种比红更危险的绿。
 
-免费证书 **7 天到期**，到期 app 打不开，重跑上面这条即续。
+<table><tr>
+<td align="center" width="25%"><img src="docs/screenshots/01-01-schedule.png" alt="日程：过时未处理的课会被点名（示例数据）"><br><sub>日程：过时未处理的课会被点名（示例数据）</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/02-04-student-detail.png" alt="学员页：课时余额、到课率、体测成长（示例数据）"><br><sub>学员页：课时余额、到课率、体测成长（示例数据）</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/03-10-trend.png" alt="体测趋势：50 米跑变快=数值变小，也算进步"><br><sub>体测趋势：50 米跑变快=数值变小，也算进步</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/04-07-student-mode.png" alt="学员端：只读，剩几节课、下一节课、体测进步一屏看全（示例数据）"><br><sub>学员端：只读，剩几节课、下一节课、体测进步一屏看全（示例数据）</sub></td>
+</tr></table>
 
-## 两个入口
+<details><summary>更多截图</summary><table><tr>
+<td align="center" width="25%"><img src="docs/screenshots/05-08-availability.png" alt="档期：每周规则 + 例外 + 未来两周，排课冲突由后端硬拒"><br><sub>档期：每周规则 + 例外 + 未来两周，排课冲突由后端硬拒</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/06-09-audit.png" alt="变更记录：纠错/通融/补录这类需要解释的改动，每一笔都留痕（示例数据）"><br><sub>变更记录：纠错/通融/补录这类需要解释的改动，每一笔都留痕（示例数据）</sub></td>
+</tr></table></details>
 
-| 入口 | 凭证 | 能干什么 |
-|---|---|---|
-| 教练登录 | 邮箱 + 密码（与网页端同一账号） | 日程 / 排课改课改状态 / 学员 / 课包 / 地点 / 档期 / 变更记录 |
-| 学员查看 | 粘贴教练发的 `/s/<口令>` 链接 | 只读：剩余课时、下一节、上课记录。看不到价格、备注、变更记录 |
+## 它做什么
 
-## 功能对照（教练端）
-
-- **日程**：今天 / 本周 / 已过时未处理三视图，日期前后翻页，顶部告警条
-- **排课 / 改课**：学员 → 课包（FEFO 排序，默认选最该先消耗的）→ 时间 → 地点 → 内容；
-  当日可排时段直接显示。软警告（冲突 / 超排 / 不在档期）弹确认后可强制排入；
-  硬拒（课包已作废 / 未来的课标已上课）**不给强制**，如实报错
-- **改状态**：12 条边全开。从「已上课 / 未到 / 已取消」改出去必须填理由（后端强制）
-- **学员**：在册 / 已停用分列，搜索；详情含余额、课包分桶、全部课次
-- **学员链接**：签发 / 重新签发 / 吊销 / 系统分享 / 复制
-- **课包**：新增、改（总节数 / 单价 / 购买日 / 到期日 / 备注）、作废与撤销作废
-- **地点**：增改、停用不删
-- **档期**：每周规则、例外（停排 / 加开）、未来两周实际可排预览
-- **变更记录**：默认只列纠错 / 通融 / 补录，可切全量、可按学员筛
-- **成长数据**：学员详情里每个体测项目一行（最新值 / 相对首测的变化 / 测过几次），
-  点进去是趋势图（Swift Charts）+ 每次测量明细；「录一次成绩」表单选项目、日期、数值、备注。
-  「进步了没有」由后端判（`50 米跑` 变快 = 数值变小也算进步），客户端只负责画箭头和配色
-- **体测项目**：更多 tab 下管理测什么，可一键灌默认项目；停用不删（已录成绩全部保留）
-- **修改密码**：更多 tab 下，与网页端同一个账号
-
-## 开发
-
-```bash
-xcodegen generate --spec project.yml     # 改了 Sources 下的文件数量后必跑
-./ref/run                                # 契约对账（自己起临时后端，49 项断言）
-```
-
-`.xcodeproj` 不进仓，由 `project.yml` 生成。**新增 Swift 文件后必须重新 generate**，
-否则新文件不在 target 里，报错长得像「找不到某个类型」。
-
-### 契约对账在验什么
-
-`ref/main.swift` 复用 app **自己的** `Sources/Models.swift` + `Sources/API.swift`
-（不另写一份「我以为后端长这样」的解析器），对着真后端逐条验：
-
-- 登录拿 cookie 值、带 `Cookie:` 头能过闸、无凭证访问 `/coach/api/*` → 404
-- 12 个读端点全部真解码（字段名错 = 编译期或运行期红）
-- 写路径错误协议分派：软警告 → 409 `needsForce`，硬拒 → 400 `rejected`
-- 余额是算出来的：10 总 − 已用；`cancelled` 不扣，`bookable` 扣掉已排
-- 状态机理由规则与客户端 `Vocab.needsReason` 一致
-- 学员 token 不出现在学员详情 JSON 里；吊销后旧 token 立刻 404
-- 成长数据：`越低越好` 的项目上数值降了必须报 `improved = true`（这条判据只在后端有一份）；
-  学员端公开面**后端不下发 note**，用一个故意放宽的探针验（拿窄模型编码再 grep 是恒真的）
-
-## 已知限制
-
-| 项 | 说明 |
+| 功能 | 说明 |
 |---|---|
-| 免费证书 7 天 | 到期重跑 `install-to-iphone.sh` |
-| 无推送 | 免费 Personal Team 拿不到 push entitlement；「过时未处理」只在打开 app 时提醒 |
-| 无离线 | 每屏都实时打后端，没网就是没数据（不做本地写缓存 —— 单文件 DB 的余额不变式经不起离线合并） |
-| 学员端链接即凭证 | 与网页端同一套：怀疑外泄就在教练端重新签发 |
+| **教练单手排课、扣课时** | 日程页直接排课、标完成、标缺席；过时未处理的课会被点名。所有业务判据（余额、状态机、冲突）都在后端一份，客户端零本地判断——两边各留一份判据迟早说不同的话。 |
+| **学员端只读，一个链接就能看** | 学员拿到的是只读视图：还剩几节、下一节课什么时候、体测进步了多少。停用学员会同时吊销他的链接。 |
+| **每一笔变更都有解释** | 纠错、通融、补录——需要解释的改动默认全部留痕，多扣一节这样的敏感操作单独标红。做生产系统给真实客户用，对账能力就是信任的来源。 |
+
+## 怎么拿到
+
+TestFlight 内测中；产品落地页 fit.tianli.cyou 公开可看。
+
+后端 `fit.tianli.cyou`（注册即得自己的账本），与网页端、小程序端同一份数据。clone 下来能跑，登录后是你自己的数据。
+
+## 构建
+
+```bash
+brew install xcodegen
+xcodegen generate
+xcodebuild -scheme FitCoach -destination 'generic/platform=iOS Simulator' build
+```
+
+- 仓里的 `*.sh` 是作者本机舰队脚本的 shim（三平台构建 / 真机装机 / TestFlight），依赖 `~/Dev` 下的总部工具，不在本仓；没有那套工具时它们会明确退出。
+- `Shared/PlatformCompat.swift` 是总部共享文件的逐字节副本（iOS-only SwiftUI 修饰符在 macOS 侧的同名 no-op），别在这里改它。
+
+开发细节（回归、验证通道、约束）见 [DEVELOPING.md](DEVELOPING.md)。
+
+## 相关
+
+- 产品页：<https://apps.tianli.cyou/p/fitcoach-ios.html>
+- 舰队总览（10 个 app 怎么来的）：<https://apps.tianli.cyou/ios.html>
+- 教程：[从零到 TestFlight：一个人做 iPhone app 的完整路径](https://blog-ai.tianli.cyou/nine-ios-apps-in-two-weeks)
+
+## License
+
+MIT © 2026 曾田力 (Tianli Zeng)
