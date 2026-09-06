@@ -30,7 +30,7 @@
 
 ## 怎么拿到
 
-TestFlight 内测中；产品落地页 fit.tianli.cyou 公开可看。
+iOS 版正在准备 App Store 发布，暂未开放公开下载；源码与产品介绍可公开查看。
 
 后端 `fit.tianli.cyou`（注册即得自己的账本），与网页端、小程序端同一份数据。clone 下来能跑，登录后是你自己的数据。
 
