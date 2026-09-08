@@ -73,7 +73,7 @@ struct CoachTabs: View {
             NavigationStack { ScheduleView() }
                 .tabItem { Label("日程", systemImage: "calendar") }
                 .tag("schedule")
-            NavigationStack { StudentsView() }
+            StudentsView()
                 .tabItem { Label("学员", systemImage: "person.2") }
                 .tag("students")
             NavigationStack { AvailabilityView() }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct StudentsView: View {
     @EnvironmentObject var session: Session
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var data: StudentsResp?
     @State private var err: String?
     @State private var showNew = false
@@ -19,6 +20,34 @@ struct StudentsView: View {
     }
 
     var body: some View {
+        Group {
+            if sizeClass == .regular {
+                NavigationSplitView {
+                    studentList
+                        .navigationSplitViewColumnWidth(min: 320, ideal: 380, max: 460)
+                } detail: {
+                    NavigationStack {
+                        if let student = open {
+                            StudentDetailView(studentId: student.id)
+                                .id(student.id)
+                        } else {
+                            ContentUnavailableView("选择学员", systemImage: "person.2",
+                                                   description: Text("从左侧选择学员，查看课包、课时和成长记录。"))
+                        }
+                    }
+                    .id(open?.id)
+                }
+                .navigationSplitViewStyle(.balanced)
+            } else {
+                NavigationStack {
+                    studentList
+                        .navigationDestination(item: $open) { r in StudentDetailView(studentId: r.id) }
+                }
+            }
+        }
+    }
+
+    private var studentList: some View {
         List {
             if let e = err { ErrorBar(text: e).cardRow() }
             if data == nil { CardBox { Loading() }.cardRow() }
@@ -49,6 +78,7 @@ struct StudentsView: View {
                     StudentCell(r: r)
                         .contentShape(Rectangle())
                         .onTapGesture { open = r }
+                        .accessibilityAddTraits(.isButton)
                         .cardRow()
                 }
 
@@ -59,13 +89,13 @@ struct StudentsView: View {
                         StudentCell(r: r, dimmed: true)
                             .contentShape(Rectangle())
                             .onTapGesture { open = r }
+                            .accessibilityAddTraits(.isButton)
                             .cardRow()
                     }
                 }
             }
         }
         .listStyle(.plain)
-        .navigationDestination(item: $open) { r in StudentDetailView(studentId: r.id) }
         // `-fitcoach.openStudent <id>` —— 模拟器点不了屏幕，这条把「点某个学员」
         // 那一下**真的走一遍** navigationDestination，否则改了跳转机制只能靠
         // 「编译过了」自我安慰（上面那条注释里的坑就是这么来的）。只在启动时生效一次。
