@@ -73,7 +73,7 @@ func runContract() async {
             ok("  错密码注销应 400", false, "竟然删了")
         } catch APIError.rejected { ok("  错密码注销 → 400", true) }
         ok("  错密码后账号仍在", try await tapi.ping().ok)
-        try await tapi.deleteAccount(password: "Passw0rd!234")
+        try await tapi.deleteAccount()
         ok("POST /coach/api/account/delete 成功", true)
         do { _ = try await tapi.ping(); ok("  删号后旧 cookie 应 404", false, "竟然还能过") }
         catch APIError.gone { ok("  删号后旧 cookie → 404", true) }

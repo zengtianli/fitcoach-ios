@@ -59,7 +59,7 @@ struct LocationsView: View {
                 }
             }
         }
-        .task { if data == nil { await load() } }
+        .task { await load() }
         .sheet(isPresented: $showNew) { LocationSheet(location: nil) { Task { await load() } } }
         .sheet(item: $editing) { l in LocationSheet(location: l) { Task { await load() } } }
     }
@@ -116,6 +116,13 @@ struct LocationSheet: View {
                 Section {
                     TextField("名称", text: $name)
                     TextField("地址（可不填）", text: $address, axis: .vertical).lineLimit(1...3)
+                    if location == nil {
+                        HStack {
+                            ForEach(["健身房", "公园", "上门授课"], id: \.self) { value in
+                                Button(value) { name = value }.buttonStyle(.bordered)
+                            }
+                        }
+                    }
                 }
                 if location != nil {
                     Section {
@@ -140,6 +147,7 @@ struct LocationSheet: View {
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("取消") { dismiss() } } }
             .onAppear {
                 if let l = location { name = l.name; address = l.address; isActive = l.is_active == 1 }
+                else if name.isEmpty { name = "健身房" }
             }
         }
     }

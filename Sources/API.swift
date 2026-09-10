@@ -34,6 +34,15 @@ final class Session: ObservableObject {
     private static let kCoach = "fitcoach.coachCookie"
     private static let kStudent = "fitcoach.studentToken"
     private static let kBase = "fitcoach.baseURL"
+    private static let kRole = "fitcoach.studentMode"
+    @Published var showingLogin = false
+    @Published var loginMode = 0
+    @Published var coachEmail: String? {
+        didSet { UserDefaults.standard.set(coachEmail, forKey: "fitcoach.coachEmail") }
+    }
+    @Published var studentMode: Bool {
+        didSet { UserDefaults.standard.set(studentMode, forKey: Self.kRole) }
+    }
 
     @Published var coachCookie: String? {
         didSet { UserDefaults.standard.set(coachCookie, forKey: Self.kCoach) }
@@ -47,16 +56,21 @@ final class Session: ObservableObject {
 
     init() {
         let d = UserDefaults.standard
+        studentMode = d.bool(forKey: Self.kRole)
+        coachEmail = d.string(forKey: "fitcoach.coachEmail")
         coachCookie = d.string(forKey: Self.kCoach)
         studentToken = d.string(forKey: Self.kStudent)
         baseURL = d.string(forKey: Self.kBase) ?? "https://fit.tianli.cyou"
     }
 
-    var isCoach: Bool { coachCookie != nil }
-    var isStudent: Bool { studentToken != nil }
+    var isCoach: Bool { coachCookie != nil && !(studentMode && studentToken != nil) }
+    var isStudent: Bool { studentToken != nil && (studentMode || coachCookie == nil) }
 
-    func signOut() { coachCookie = nil }
-    func leaveStudent() { studentToken = nil }
+    func openLogin(student: Bool = false) { loginMode = student ? 1 : 0; showingLogin = true }
+    func signOut() { coachCookie = nil; coachEmail = nil; studentMode = false; openLogin() }
+    func leaveStudent() { studentToken = nil; studentMode = false; openLogin(student: true) }
+    func enterStudent(_ token: String) { studentToken = token; studentMode = true; showingLogin = false }
+    func returnToCoach() { studentMode = false; showingLogin = false }
 
     /// 学员端凭证 = 那条分享链接本身。教练发过来的是整条 URL，这里允许直接粘。
     /// 形如 https://fit.tianli.cyou/s/<token> → 取最后一段；已经是裸 token 则原样。
@@ -202,10 +216,10 @@ final class API {
         return r.cookie
     }
 
-    /// 注销账号：POST /coach/api/account/delete（password）。后端验密码后整租户真删。
+    /// 注销账号：明确确认后整租户真删；保留旧密码调用用于兼容性验证。
     /// 成功后调用方必须自己清本地会话 —— cookie 值存在 UserDefaults 里，服务端清不到它。
-    func deleteAccount(password: String) async throws {
-        try await post("/coach/api/account/delete", ["password": password])
+    func deleteAccount(password: String? = nil) async throws {
+        try await post("/coach/api/account/delete", password.map { ["password": $0] } ?? ["confirm": "delete-account"])
     }
 
     struct Ping: Codable { let ok: Bool; let today: String; let now: String }

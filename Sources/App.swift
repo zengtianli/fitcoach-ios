@@ -25,7 +25,9 @@ struct RootView: View {
     }
 
     var body: some View {
-        if session.isCoach, let s = deepScreen, !s.isEmpty {
+        if session.showingLogin {
+            LoginView(initialMode: session.loginMode)
+        } else if session.isCoach, let s = deepScreen, !s.isEmpty {
             NavigationStack { deepView(s) }
         } else if session.isCoach {
             CoachTabs()
@@ -93,32 +95,30 @@ struct MoreView: View {
 
     var body: some View {
         List {
-            GroupTitle(text: "管理", icon: "slider.horizontal.3").cardRow(top: 10, bottom: 2)
-            CardBox(padding: 0) {
-                VStack(spacing: 0) {
-                    MoreLink(icon: "ruler", tone: .accent, title: "体测项目",
-                             detail: "成长数据测什么，在这里定") { MetricsView() }
-                    MoreDivider()
-                    MoreLink(icon: "mappin.and.ellipse", tone: .ok, title: "上课地点",
-                             detail: "排课时可选的地点") { LocationsView() }
-                    MoreDivider()
-                    MoreLink(icon: "list.bullet.rectangle", tone: .violet, title: "变更记录",
-                             detail: "谁在什么时候改了什么") { AuditView() }
-                }
+            Button { session.openLogin(student: true) } label: {
+                Label("切换账号 / 登录学员端", systemImage: "person.2.circle.fill")
+                    .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 8)
             }
-            .cardRow()
+                .buttonStyle(.borderedProminent)
+                .cardRow(top: 10)
+            MoreLink(icon: "wand.and.stars", tone: .accent, title: "快速开始",
+                     detail: "一键准备地点、档期和常用体测项目") { QuickSetupView() }
+                .cardRow(top: 10)
+            GroupTitle(text: "管理", icon: "slider.horizontal.3").cardRow(top: 10, bottom: 2)
+            MoreLink(icon: "ruler", tone: .accent, title: "体测项目",
+                     detail: "成长数据测什么，在这里定") { MetricsView() }.cardRow()
+            MoreLink(icon: "mappin.and.ellipse", tone: .ok, title: "上课地点",
+                     detail: "排课时可选的地点") { LocationsView() }.cardRow()
+            MoreLink(icon: "list.bullet.rectangle", tone: .violet, title: "变更记录",
+                     detail: "谁在什么时候改了什么") { AuditView() }.cardRow()
 
             GroupTitle(text: "账号", icon: "person.crop.circle").cardRow(top: 14, bottom: 2)
-            CardBox(padding: 0) {
-                VStack(spacing: 0) {
-                    MoreLink(icon: "key.fill", tone: .warn, title: "修改密码",
-                             detail: "与网页端同一个账号") { PasswordView() }
-                    MoreDivider()
-                    MoreLink(icon: "person.crop.circle.badge.xmark", tone: .danger, title: "注销账号",
-                             detail: "删除账号与全部数据，不可恢复") { AccountDeleteView() }
-                }
-            }
-            .cardRow()
+            MoreLink(icon: "key.fill", tone: .warn, title: "修改密码",
+                     detail: "与网页端同一个账号") { PasswordView() }.cardRow()
+            MoreLink(icon: "person.crop.circle.badge.xmark", tone: .danger, title: "注销账号",
+                     detail: "删除账号与当前业务数据") { AccountDeleteView() }.cardRow()
+
+            CardBox { PrivacySupportLinks() }.cardRow()
 
             GroupTitle(text: "服务器", icon: "server.rack").cardRow(top: 14, bottom: 2)
             CardBox {
@@ -232,7 +232,12 @@ struct ServerSheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("保存") {
                         let v = text.trimmingCharacters(in: .whitespacesAndNewlines)
-                        if !v.isEmpty { session.baseURL = v.hasSuffix("/") ? String(v.dropLast()) : v }
+                        let server = v.hasSuffix("/") ? String(v.dropLast()) : v
+                        if !server.isEmpty && server != session.baseURL {
+                            session.studentToken = nil
+                            session.signOut()
+                            session.baseURL = server
+                        }
                         dismiss()
                     }
                 }

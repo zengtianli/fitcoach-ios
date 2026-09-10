@@ -70,6 +70,9 @@ struct PasswordView: View {
             try await API(session).post("/coach/api/password", [
                 "old_password": old, "new_password": new1,
             ])
+            if let saved = try? SavedLogin.load(server: session.baseURL), saved.email == session.coachEmail {
+                try? SavedLogin.save(.init(email: saved.email, password: new1), server: session.baseURL)
+            }
             old = ""; new1 = ""; new2 = ""
             done = true
         } catch {

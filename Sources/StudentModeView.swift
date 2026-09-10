@@ -164,6 +164,7 @@ struct StudentModeView: View {
                         .cardRow(top: 3, bottom: 3)
                     }
                 }
+                CardBox { PrivacySupportLinks() }.cardRow(top: 16, bottom: 20)
             }
             .listStyle(.plain)
             .pageBackground()
@@ -172,7 +173,7 @@ struct StudentModeView: View {
             .refreshable { await load() }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("退出") { session.leaveStudent() }
+                    Button("切换账号") { session.openLogin() }
                 }
             }
             .task { if data == nil { await load() } }

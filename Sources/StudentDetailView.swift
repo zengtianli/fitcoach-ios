@@ -15,7 +15,6 @@ struct StudentDetailView: View {
     @State private var statusTarget: SessionRow?
     @State private var link: LinkResp?
     @State private var linkBusy = false
-    @State private var showRevoke = false
     @State private var showLinkURL = false
     // 成长数据独立取（/coach/api/students/{id}/growth），失败单独报，
     // 不能让它把整个学员详情拖成一片空白
@@ -99,22 +98,16 @@ struct StudentDetailView: View {
                                 Text(url).font(.caption2).monospaced()
                                     .foregroundStyle(Theme.ink3).textSelection(.enabled)
                             }
-                            Divider().overlay(Theme.hairline)
-                            HStack {
-                                Button("重新签发") { Task { await token("rotate") } }
-                                    .font(.footnote)
-                                Spacer()
-                                Button("吊销链接", role: .destructive) { showRevoke = true }
-                                    .font(.footnote)
-                            }
-                            Text("链接即凭证，谁拿到谁能看这个学员的课时（看不到价格、备注与变更记录）。怀疑外泄就重新签发，旧链接立即失效。")
+                            Button("到登录页验证链接") { session.openLogin(student: true) }
+                                .buttonStyle(.borderedProminent).disabled(linkBusy)
+                            Text("先复制链接，再到登录页的「学员查看」粘贴验证。教练登录会保留，原链接不会失效。")
                                 .font(.caption2).foregroundStyle(Theme.ink3)
                         } else {
                             EmptyState(icon: "link.badge.plus",
                                        title: "还没签发学员链接",
                                        detail: "签发后把链接发给学员，他就能自己看剩余课时与下一节课。",
                                        tone: .accent,
-                                       action: ("签发学员链接", { Task { await token("rotate") } }))
+                                       action: ("签发学员链接", { Task { await createLink() } }))
                         }
                     }
                 }
@@ -236,12 +229,6 @@ struct StudentDetailView: View {
         .sheet(isPresented: $recording) {
             MeasurementFormSheet(studentId: studentId) { Task { await loadGrowth() } }
         }
-        .alert("吊销学员链接？", isPresented: $showRevoke) {
-            Button("取消", role: .cancel) {}
-            Button("吊销", role: .destructive) { Task { await token("revoke") } }
-        } message: {
-            Text("学员手里的旧链接会立即变成 404。之后可以重新签发一条新的。")
-        }
     }
 
     private func load() async {
@@ -260,14 +247,17 @@ struct StudentDetailView: View {
         catch { growthErr = errText(error) }
     }
 
-    private func token(_ action: String) async {
+    private func createLink() async {
+        guard !linkBusy else { return }
         linkBusy = true; err = nil
         defer { linkBusy = false }
         do {
-            let r = try await API(session).post("/coach/api/students/\(studentId)/token", [
-                "action": action, "reason": "",
-            ])
-            link = LinkResp(has_link: r.link_url != nil, link_url: r.link_url)
+            let current: LinkResp = try await API(session).get("/coach/api/students/\(studentId)/link")
+            link = current
+            if current.link_url == nil {
+                let result = try await API(session).post("/coach/api/students/\(studentId)/token", ["action": "rotate", "reason": ""])
+                link = LinkResp(has_link: result.link_url != nil, link_url: result.link_url)
+            }
         } catch { err = errText(error) }
     }
 }

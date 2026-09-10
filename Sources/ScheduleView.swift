@@ -97,6 +97,14 @@ struct ScheduleView: View {
                         }
                     }
                     .cardRow(top: 10)
+                    if range != "overdue" {
+                        NavigationLink {
+                            QuickSetupView { Task { await load() } }
+                        } label: {
+                            Label("第一次使用？一键准备常用设置", systemImage: "wand.and.stars")
+                        }
+                        .cardRow()
+                    }
                 }
                 ForEach(d.days) { g in
                     GroupTitle(text: "\(TZ.md(g.date_)) \(g.wd_name)",

@@ -1,14 +1,12 @@
 import SwiftUI
 
-/// 注销账号：POST /coach/api/account/delete（password）。
-/// 后端验密码后把这位教练的学员 / 课包 / 课程 / 地点 / 档期 / 体测 / 变更记录连同账号整体真删。
+/// 注销账号：登录状态下确认删除，后端将该教练的数据整体删除。
 /// App Store 5.1.1(v) 要求「能在 app 内注册就必须能在 app 内删号」—— 这一屏就是为它存在的，
 /// 别把它做成「发邮件申请」或「跳网页」。
 struct AccountDeleteView: View {
     @EnvironmentObject var session: Session
     @Environment(\.dismiss) private var dismiss
 
-    @State private var password = ""
     @State private var confirm = false
     @State private var busy = false
     @State private var err: String?
@@ -20,15 +18,13 @@ struct AccountDeleteView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Label("这个操作不可恢复", systemImage: "exclamationmark.triangle.fill")
                         .font(.subheadline.weight(.semibold)).foregroundStyle(Theme.danger)
-                    Text("将删除：账号本身、全部学员与课包、已排与已完成的课程、地点、档期、体测记录和变更记录。已发给学员的查看链接同时失效。服务器不保留副本。")
+                    Text("将删除账号及其全部学员、课包、课程、地点、档期、体测和变更记录。学员查看链接也会失效。")
                         .font(.footnote).foregroundStyle(Theme.ink2)
+                    Text("上述范围为当前业务数据库。既有离线备份的删除需联系支持核验，不会因本次操作立即清除。")
+                        .font(.footnote).foregroundStyle(Theme.ink2)
+                    PrivacySupportLinks()
                 }
                 .padding(.vertical, 4)
-            }
-            Section {
-                SecureField("输入当前密码确认", text: $password).textContentType(.password)
-            } footer: {
-                Text("只凭登录状态不允许删号 —— 手机借出去一次不该等于账号被清空。")
             }
             Section {
                 Button(role: .destructive) { confirm = true } label: {
@@ -36,7 +32,7 @@ struct AccountDeleteView: View {
                         if busy { ProgressView() } else { Text("永久删除账号").bold() }
                         Spacer() }
                 }
-                .disabled(busy || password.isEmpty)
+                .disabled(busy)
             }
         }
         .navigationTitle("注销账号")
@@ -53,11 +49,14 @@ struct AccountDeleteView: View {
         busy = true; err = nil
         defer { busy = false }
         do {
-            try await API(session).deleteAccount(password: password)
-            password = ""
+            try await API(session).deleteAccount()
+            if let saved = try? SavedLogin.load(server: session.baseURL), saved.email == session.coachEmail {
+                try? SavedLogin.remove(server: session.baseURL)
+            }
+            session.studentToken = nil
             session.signOut()                  // 本地 cookie 值在 UserDefaults，服务端清不到，必须自己清
         } catch {
-            err = errText(error)               // 密码错 → 400，后端文案原样
+            err = errText(error)
         }
     }
 }

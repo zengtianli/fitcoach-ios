@@ -2,134 +2,167 @@ import SwiftUI
 
 struct LoginView: View {
     @EnvironmentObject var session: Session
-    @State private var mode = 0            // 0 = 教练  1 = 学员
+    @State private var mode = 0
     @State private var email = ""
     @State private var password = ""
+    @State private var remember = true
     @State private var link = ""
     @State private var busy = false
     @State private var err: String?
     @State private var showServer = false
     @State private var showRegister = false
+    @FocusState private var focused: Field?
+    private enum Field { case email, password, link }
+
+    init(initialMode: Int = 0) { _mode = State(initialValue: initialMode) }
 
     var body: some View {
         NavigationStack {
-            Form {
-                // 品牌头：登录页是唯一一屏没有数据可显示的地方，
-                // 给个图标+一句话，比一张空表单像个产品
-                Section {
-                    VStack(spacing: 9) {
-                        ZStack {
-                            Circle().fill(Theme.accentSoft).frame(width: 68, height: 68)
-                            Image(systemName: "figure.strengthtraining.traditional")
-                                .font(.system(size: 30, weight: .medium))
-                                .foregroundStyle(Theme.accent)
-                        }
-                        Text("私教课时").font(.title3.weight(.semibold))
-                            .foregroundStyle(Theme.ink)
-                        Text("课包余额 · 排课 · 成长记录")
-                            .font(.caption).foregroundStyle(Theme.ink3)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .listRowBackground(Color.clear)
+            ScrollView {
+                VStack(spacing: 22) {
+                    VStack(spacing: 10) {
+                        Image(systemName: "figure.strengthtraining.traditional")
+                            .font(.system(size: 30, weight: .medium))
+                            .foregroundStyle(Theme.accent)
+                            .frame(width: 64, height: 64)
+                            .background(Theme.accentSoft, in: RoundedRectangle(cornerRadius: 20))
+                        Text(AppIdentity.displayName).font(.title2.bold()).foregroundStyle(Theme.ink)
+                        Text("轻松排课，记录每一次进步")
+                            .font(.subheadline).foregroundStyle(Theme.ink2)
+                    }.padding(.top, 12)
+                    Picker("登录身份", selection: $mode) {
+                        Text("教练登录").tag(0)
+                        Text("学员查看").tag(1)
+                    }.pickerStyle(.segmented)
+                    if let err { ErrorBar(text: err) }
+                    if mode == 0 { coachForm } else { studentForm }
+                    Button("服务器设置") { focused = nil; showServer = true }
+                        .font(.footnote).foregroundStyle(Theme.ink3)
+                    PrivacySupportLinks().padding(.bottom, 12)
                 }
+                .frame(maxWidth: 440)
+                .padding(.horizontal, 24).padding(.bottom, 24)
+                .frame(maxWidth: .infinity)
+            }
+            .background(Theme.pageBG)
+            .scrollDismissesKeyboard(.interactively)
+            .navigationTitle("").navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $showServer) { ServerSheet() }
+            .sheet(isPresented: $showRegister, onDismiss: restore) { RegisterView() }
+            .task { restore() }
+            .onChange(of: session.baseURL) { _, _ in restore() }
+            .onChange(of: mode) { _, _ in focused = nil; err = nil }
+        }
+    }
 
-                Picker("", selection: $mode) {
-                    Text("教练登录").tag(0)
-                    Text("学员查看").tag(1)
-                }
-                .pickerStyle(.segmented)
-                .listRowBackground(Color.clear)
-
-                if let e = err {
-                    Section { ErrorBar(text: e).listRowBackground(Color.clear) }
-                }
-
-                if mode == 0 {
-                    Section {
-                        TextField("邮箱", text: $email)
-                            .textContentType(.emailAddress)
-                            .keyboardType(.emailAddress)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
-                        SecureField("密码", text: $password)
-                            .textContentType(.password)
-                    } footer: {
-                        Text("与网页端 \(session.baseURL) 同一个账号。")
-                    }
-                    Section {
-                        Button {
-                            Task { await doLogin() }
-                        } label: {
-                            HStack { Spacer()
-                                if busy { ProgressView() } else { Text("登录").bold() }
-                                Spacer() }
-                        }
-                        .disabled(busy || email.isEmpty || password.isEmpty)
-                        Button("还没有账号？用邮箱注册") { showRegister = true }
-                            .font(.footnote)
-                    }
-                } else {
-                    Section {
-                        TextField("粘贴教练发来的链接或口令", text: $link, axis: .vertical)
-                            .lineLimit(1...3)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
-                    } footer: {
-                        Text("形如 \(session.baseURL)/s/xxxxx。链接即凭证，只能查看自己的课时与预约，看不到价格与备注。")
-                    }
-                    Section {
-                        Button {
-                            Task { await doStudent() }
-                        } label: {
-                            HStack { Spacer()
-                                if busy { ProgressView() } else { Text("查看我的课时").bold() }
-                                Spacer() }
-                        }
-                        .disabled(busy || link.trimmingCharacters(in: .whitespaces).isEmpty)
-                    }
-                }
-
-                Section {
-                    Button("服务器：\(session.baseURL)") { showServer = true }
-                        .font(.footnote)
+    private var coachForm: some View {
+        VStack(spacing: 18) {
+            if session.coachCookie != nil {
+                VStack(spacing: 8) {
+                    Text(session.coachEmail ?? "教练账号已登录")
+                        .font(.subheadline).foregroundStyle(Theme.ink2)
+                    Button("进入已登录的教练端") { session.returnToCoach() }
+                        .buttonStyle(.bordered)
                 }
             }
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $showServer) { ServerSheet() }
-            .sheet(isPresented: $showRegister) { RegisterView() }
+            VStack(alignment: .leading, spacing: 14) {
+                Text("账号").font(.subheadline.weight(.medium))
+                TextField("邮箱", text: $email)
+                    .textContentType(.username).keyboardType(.emailAddress)
+                    .textInputAutocapitalization(.never).autocorrectionDisabled()
+                    .focused($focused, equals: .email)
+                    .submitLabel(.next).onSubmit { focused = .password }
+                Divider()
+                Text("密码").font(.subheadline.weight(.medium))
+                SecureField("输入密码", text: $password)
+                    .textContentType(.password).focused($focused, equals: .password)
+                    .submitLabel(.go).onSubmit { if canLogin { Task { await doLogin() } } }
+            }
+            .padding(20).background(Color.white, in: RoundedRectangle(cornerRadius: 20))
+            Toggle("记住账号和密码", isOn: $remember)
+                .font(.subheadline)
+                .onChange(of: remember) { _, enabled in
+                    if !enabled {
+                        do { try SavedLogin.remove(server: session.baseURL) }
+                        catch { err = errText(error) }
+                    }
+                }
+            Button { Task { await doLogin() } } label: {
+                HStack {
+                    Spacer()
+                    if busy { ProgressView().tint(.white) } else { Text("登录").bold() }
+                    Spacer()
+                }.padding(.vertical, 8)
+            }
+            .buttonStyle(.borderedProminent).controlSize(.large).disabled(!canLogin)
+            Button("还没有账号？立即注册") { focused = nil; showRegister = true }
+                .font(.subheadline)
+        }.disabled(busy)
+    }
+
+    private var studentForm: some View {
+        VStack(spacing: 18) {
+            if session.studentToken != nil {
+                Button("进入已登录的学员端") {
+                    if let token = session.studentToken { session.enterStudent(token) }
+                }.buttonStyle(.bordered)
+            }
+            TextField("粘贴教练发来的链接或口令", text: $link, axis: .vertical)
+                .lineLimit(2...4).textInputAutocapitalization(.never).autocorrectionDisabled()
+                .focused($focused, equals: .link)
+                .padding(20).background(Color.white, in: RoundedRectangle(cornerRadius: 20))
+            Text("粘贴链接后会验证是否有效。教练账号保持登录，不受影响。")
+                .font(.footnote).foregroundStyle(Theme.ink2)
+            Button { Task { await doStudent() } } label: {
+                HStack {
+                    Spacer()
+                    if busy { ProgressView().tint(.white) } else { Text("查看我的课时").bold() }
+                    Spacer()
+                }.padding(.vertical, 8)
+            }
+            .buttonStyle(.borderedProminent).controlSize(.large)
+            .disabled(busy || link.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         }
     }
 
-    private func doLogin() async {
-        busy = true; err = nil
-        defer { busy = false }
+    private var canLogin: Bool { !busy && !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !password.isEmpty }
+    private func restore() {
+        email = ""; password = ""; err = nil
         do {
-            let cookie = try await API(session).login(
-                email: email.trimmingCharacters(in: .whitespaces), password: password)
-            password = ""
-            session.coachCookie = cookie
-        } catch {
-            err = errText(error)
-        }
+            if let saved = try SavedLogin.load(server: session.baseURL) {
+                email = saved.email; password = saved.password; remember = true
+            }
+        } catch { err = errText(error) }
     }
-
-    /// 学员端：先拿 token 真打一次 /s/api/view，**验通过才存**。
-    /// 存了再说「查不到」会让人以为是自己网络问题；这里当场验，错就当场说。
+    private func doLogin() async {
+        guard canLogin else { return }
+        busy = true; err = nil; focused = nil
+        defer { busy = false }
+        let server = session.baseURL
+        let account = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        do {
+            let cookie = try await API(session).login(email: account, password: password)
+            guard session.baseURL == server else { return }
+            if remember { try SavedLogin.save(.init(email: account, password: password), server: server) }
+            else { try SavedLogin.remove(server: server) }
+            password = ""
+            session.studentMode = false
+            session.coachEmail = account
+            session.coachCookie = cookie
+            session.showingLogin = false
+        } catch { err = errText(error) }
+    }
     private func doStudent() async {
-        busy = true; err = nil
+        busy = true; err = nil; focused = nil
         defer { busy = false }
         let token = Session.extractToken(link)
+        let server = session.baseURL
         guard !token.isEmpty else { err = "没认出链接里的口令"; return }
         do {
-            let _: StudentView = try await API(session, studentToken: token)
-                .get("/s/api/view", student: true)
-            session.studentToken = token
-        } catch APIError.gone {
-            err = "这条链接无效或已被教练吊销"
-        } catch {
-            err = errText(error)
-        }
+            let _: StudentView = try await API(session, studentToken: token).get("/s/api/view", student: true)
+            guard session.baseURL == server else { return }
+            session.enterStudent(token)
+        } catch APIError.gone { err = "这条链接已失效，请向教练确认链接是否正确。" }
+        catch { err = errText(error) }
     }
 }

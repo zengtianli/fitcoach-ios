@@ -13,6 +13,7 @@ struct RegisterView: View {
     @State private var pw2 = ""
     @State private var busy = false
     @State private var err: String?
+    @State private var remember = true
 
     private var mismatch: Bool { !pw2.isEmpty && pw1 != pw2 }
 
@@ -42,9 +43,13 @@ struct RegisterView: View {
                 } header: {
                     Text("密码")
                 } footer: {
-                    Text("强度要求由服务器判定。注册即表示同意隐私政策：账号仅存邮箱、称呼与你录入的排课数据，可随时在「更多 → 注销账号」里整体删除。")
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("密码强度由服务器判定。注册即表示同意隐私政策：服务保存账号信息及你录入的学员、课包、课程、地点、体测和变更记录，可在「更多 → 注销账号」删除当前业务数据。既有离线备份的删除需联系支持核验。")
+                        PrivacySupportLinks()
+                    }
                 }
                 Section {
+                    Toggle("记住账号和密码", isOn: $remember)
                     Button {
                         Task { await submit() }
                     } label: {
@@ -70,8 +75,15 @@ struct RegisterView: View {
             let cookie = try await API(session).register(
                 email: email.trimmingCharacters(in: .whitespaces), password: pw1,
                 displayName: name.trimmingCharacters(in: .whitespaces))
+            if remember {
+                // 账号已创建成功；本机记忆失败不应让用户重复注册。
+                try? SavedLogin.save(.init(email: email.trimmingCharacters(in: .whitespaces), password: pw1), server: session.baseURL)
+            }
             pw1 = ""; pw2 = ""
+            session.studentMode = false
+            session.coachEmail = email.trimmingCharacters(in: .whitespaces)
             session.coachCookie = cookie      // RootView 据此切到教练端，sheet 随登录页一起消失
+            session.showingLogin = false
             dismiss()
         } catch {
             err = errText(error)               // 400 的后端文案原样呈现（邮箱已注册 / 密码太短 / 名额满）

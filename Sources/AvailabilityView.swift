@@ -169,7 +169,7 @@ struct AvailabilityView: View {
                 } label: { Image(systemName: "plus.circle.fill").font(.title3) }
             }
         }
-        .task { if data == nil { await load() } }
+        .task { await load() }
         .sheet(isPresented: $newRule) {
             RuleSheet(wdNames: data?.wd_names ?? []) { Task { await load() } }
         }

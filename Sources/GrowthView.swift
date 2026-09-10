@@ -383,8 +383,18 @@ struct MeasurementFormSheet: View {
 
                 if metrics.isEmpty {
                     Section {
-                        Text("还没有可用的体测项目。先到「更多 → 体测项目」建几个。")
+                        Text("还没有可用的体测项目，可以直接添加一套常用项目。")
                             .font(.footnote).foregroundStyle(Theme.ink2)
+                        Button("使用常用项目") {
+                            Task {
+                                busy = true; err = nil
+                                defer { busy = false }
+                                do {
+                                    try await API(session).post("/coach/api/metrics/seed", [:])
+                                    await loadMetrics()
+                                } catch { err = errText(error) }
+                            }
+                        }.disabled(busy)
                     }
                 }
 

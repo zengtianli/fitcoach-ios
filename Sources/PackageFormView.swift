@@ -34,6 +34,14 @@ struct PackageFormSheet: View {
                     }
                 }
                 Section("课包") {
+                    if !isEdit {
+                        HStack {
+                            ForEach([10, 20, 30], id: \.self) { count in
+                                Button("\(count) 节") { total = String(count) }
+                                    .buttonStyle(.bordered)
+                            }
+                        }
+                    }
                     LabeledContent("总节数") {
                         TextField("10", text: $total)
                             .keyboardType(.numberPad).multilineTextAlignment(.trailing)
@@ -67,7 +75,7 @@ struct PackageFormSheet: View {
                     }
                     .disabled(busy || Int(total) == nil)
                 } footer: {
-                    Text("剩余节数是算出来的（总节数 − 已上 − 未到），不存冗余计数。把总节数改小到低于已用会得到「余额为负」的警告，但允许 —— 真实世界会退课。")
+                    Text("默认 10 节、今天购买、不过期。单价和备注可以先不填；上课或未到会扣课，取消不扣课。")
                 }
             }
             .navigationTitle(isEdit ? "改课包" : "新课包")

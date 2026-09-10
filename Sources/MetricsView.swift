@@ -24,9 +24,9 @@ struct MetricsView: View {
                         EmptyState(
                             icon: "ruler",
                             title: "还没有体测项目",
-                            detail: "先灌一套常用项目（体重、立定跳远、50 米跑…），\n再按自己的需要改。",
+                            detail: "直接添加常用项目（立定跳远、50 米跑、平板支撑等），之后随时可以改。",
                             tone: .accent,
-                            action: (seeding ? "正在灌…" : "一键灌默认项目", { Task { await seed() } })
+                            action: (seeding ? "正在添加…" : "使用常用项目", { Task { await seed() } })
                         )
                     }
                     .cardRow(top: 10)
@@ -71,7 +71,7 @@ struct MetricsView: View {
                 Button { showNew = true } label: { Image(systemName: "plus.circle.fill").font(.title3) }
             }
         }
-        .task { if data == nil { await load() } }
+        .task { await load() }
         .sheet(isPresented: $showNew) { MetricFormSheet(metric: nil) { Task { await load() } } }
         .sheet(item: $editing) { m in MetricFormSheet(metric: m) { Task { await load() } } }
     }
