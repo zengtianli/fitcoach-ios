@@ -2,7 +2,7 @@ import Foundation
 
 // 本文件的每个结构体都**逐字对应** fitcoach 后端 domain.py 的 dataclass 字段名。
 // 后端出 JSON 走 dataclasses.asdict()，键名 = 字段名（含 `date_` 这种尾下划线）。
-// 改这里之前先看 ~/Dev/services/fitcoach/domain.py —— 禁按「我以为它长这样」猜字段。
+// 改这里之前先看 ~/Apps/fitcoach/service/domain.py —— 禁按「我以为它长这样」猜字段。
 
 struct Warn: Codable, Hashable, Identifiable {
     var id: String { code + message }
