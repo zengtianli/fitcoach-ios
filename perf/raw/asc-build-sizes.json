@@ -1,0 +1,42 @@
+{
+  "source": {
+    "kind": "app_store_connect",
+    "app_id": "6806698109",
+    "bundle_id": "cyou.tianli.fitcoachapp",
+    "build_id": "4c2f341d-4c69-466e-8d4f-bb3dd9fdfa77",
+    "queried_at": "2026-09-26T19:24:30.236517+08:00",
+    "distribution": "App Store",
+    "processing_state": "VALID",
+    "device_model": "iPhone18,3",
+    "os_variant": "Universal",
+    "api_doc": "https://developer.apple.com/documentation/appstoreconnectapi/get-v1-buildbundles-_id_-buildbundlefilesizes"
+  },
+  "build": {
+    "id": "4c2f341d-4c69-466e-8d4f-bb3dd9fdfa77",
+    "attributes": {
+      "version": "5",
+      "uploadedDate": "2026-09-09T20:46:46-07:00",
+      "expired": false,
+      "processingState": "VALID"
+    }
+  },
+  "selected_device_size": {
+    "type": "buildBundleFileSizes",
+    "id": "7e91bb6a-685b-3b36-83cf-602cbdde2d41",
+    "attributes": {
+      "deviceModel": "iPhone18,3",
+      "osVersion": "Universal",
+      "downloadBytes": 2977882,
+      "installBytes": 4131840
+    },
+    "links": {
+      "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/7e91bb6a-685b-3b36-83cf-602cbdde2d41"
+    }
+  },
+  "latest_testflight_candidate": {
+    "version": "1.0",
+    "build": "5",
+    "id": "4c2f341d-4c69-466e-8d4f-bb3dd9fdfa77",
+    "is_primary_evidence": true
+  }
+}
