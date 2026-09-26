@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "app_id": "fitcoach-ios",
+  "environment": "simulator",
+  "measured_at": "2026-09-27T00:00:23.408265+08:00",
+  "version": "1.0 (1)",
+  "configuration": "Release",
+  "bundle_id": "cyou.tianli.fitcoachapp",
+  "binary_sha256": "95f808b3ac543357d1c16f39f39e817a0101e0c1547edc197f2a29aa32d26c42",
+  "source": {
+    "input_globs": [
+      "Sources/**",
+      "Shared/**",
+      "Resources/**",
+      "Widget/**",
+      "ShareExtension/**",
+      "project.yml",
+      "*.entitlements"
+    ],
+    "sha256": "760c190ee688563098d228ba5c36ec45f3c31b70c12b88bf88a69dc5145ca64e",
+    "file_count": 45,
+    "commit": "75b9328c2e1463f3324ec3fdce1ae6ba349df087",
+    "dirty_scope": "组件当前 Git 工作树；跨仓/软链输入的实际内容由 sha256 核验",
+    "dirty": false
+  },
+  "app_path": "~/Apps/fitcoach/ios/01-源程序/.dd-iphone/Build/Products/Release-iphonesimulator/FitCoach.app",
+  "simulator_udid": "C6F5D655-20E3-4CEE-89FF-3C8C20AB6D3B",
+  "simulator_device": "iPhone 17 Pro",
+  "simulator_os": "iOS 27.0",
+  "host": "Mac16,12 / Apple M4 / macOS 27.2",
+  "load_average_at_start": [
+    11.2578125,
+    22.1552734375,
+    31.25341796875
+  ],
+  "measurement_tool_sha256": "0393a632f3e0a2d2551ecb173704f195c3f9da743d0a49bad0492c1e0b669698",
+  "scope": "Simulator App process only; excludes CoreSimulator, Simulator GUI, system services and inactive extensions",
+  "data": "Fresh app container on isolated simulator; default first-run data; no production user data imported",
+  "build_receipt": {
+    "exit": 0,
+    "configuration": "Release",
+    "command": [
+      "xcrun",
+      "xcodebuild",
+      "-project",
+      "FitCoach.xcodeproj",
+      "-scheme",
+      "FitCoach",
+      "-configuration",
+      "Release",
+      "-sdk",
+      "iphonesimulator",
+      "-destination",
+      "id=C6F5D655-20E3-4CEE-89FF-3C8C20AB6D3B",
+      "-derivedDataPath",
+      "~/Apps/fitcoach/ios/01-源程序/.dd-iphone",
+      "CODE_SIGNING_ALLOWED=NO",
+      "build"
+    ],
+    "seconds": 19.9,
+    "source_before_sha256": "760c190ee688563098d228ba5c36ec45f3c31b70c12b88bf88a69dc5145ca64e",
+    "source_after_sha256": "760c190ee688563098d228ba5c36ec45f3c31b70c12b88bf88a69dc5145ca64e",
+    "source_unchanged": true,
+    "load_average_after_build": [
+      11.2578125,
+      22.1552734375,
+      31.25341796875
+    ]
+  },
+  "size": {
+    "download_bytes": 4678799,
+    "installed_bytes": 14544896,
+    "kind": "Local simulator .app ZIP; not an App Store IPA or device slice"
+  },
+  "installed_binary_sha256": "95f808b3ac543357d1c16f39f39e817a0101e0c1547edc197f2a29aa32d26c42",
+  "launch": {
+    "samples": [
+      {
+        "ms": 676.7055839991372,
+        "pid": 64804
+      },
+      {
+        "ms": 317.8485829994315,
+        "pid": 64831
+      },
+      {
+        "ms": 117.30729099872406,
+        "pid": 64867
+      }
+    ],
+    "median_ms": 317.8485829994315,
+    "runs": 3,
+    "command": [
+      "xcrun",
+      "simctl",
+      "launch",
+      "C6F5D655-20E3-4CEE-89FF-3C8C20AB6D3B",
+      "cyou.tianli.fitcoachapp"
+    ],
+    "foreground_request": "simctl default; --background not supplied",
+    "method": "simctl launch wall time through process PID acknowledgement after terminate; includes CLI overhead and warm filesystem cache; not first-frame or interactive-ready time",
+    "limitations": "Process acknowledgement only, not first-frame/interactive readiness; host load is included in raw evidence."
+  },
+  "process_before_cpu": "64867 43585 Sun Sep 27 00:00:28 2026     Ss   ~/Library/Developer/CoreSimulator/Devices/C6F5D655-20E3-4CEE-89FF-3C8C20AB6D3B/data/Containers/Bundle/Application/01CC781C-9524-4D0A-BB04-F8BE1BB0C45D/FitCoach.app/FitCoach",
+  "idle": {
+    "process": "64867",
+    "footprint_mb": 26.0,
+    "cpu_pct": 0.0,
+    "window_s": 60,
+    "settle_s": 45,
+    "method": "Shared measure.py: CPU time delta / 60s wall; 3 phys_footprint samples after CPU window, maximum reported",
+    "scope": "Simulator App process only; excludes CoreSimulator, Simulator GUI, system services and inactive extensions",
+    "limitations": "Post-launch simulator process sampling; simctl requested foreground by default; UIApplication/RunningBoard activation state was not observed and this is not a complete foreground business test."
+  },
+  "process_after_cpu": "64867 43585 Sun Sep 27 00:00:28 2026     Ss   ~/Library/Developer/CoreSimulator/Devices/C6F5D655-20E3-4CEE-89FF-3C8C20AB6D3B/data/Containers/Bundle/Application/01CC781C-9524-4D0A-BB04-F8BE1BB0C45D/FitCoach.app/FitCoach",
+  "source_unchanged_during_measurement": true,
+  "binary_unchanged_during_measurement": true,
+  "completed_at": "2026-09-27T00:02:18.488849+08:00"
+}
