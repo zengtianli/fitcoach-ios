@@ -1,0 +1,63 @@
+#!/bin/bash
+# Shared isolated acceptance runtime. Source from a fixed acceptor, never production.
+set -euo pipefail
+ACCEPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$ACCEPT_ROOT"
+ACCEPT_TMP="$(mktemp -d "${TMPDIR:-/tmp}/fitcoach-accept.XXXXXXXX")"
+mkdir -p "$ACCEPT_TMP/preferences"
+export CFFIXED_USER_HOME="$ACCEPT_TMP/preferences"
+ACCEPT_PIDS=()
+accept_cleanup() {
+  for pid in "${ACCEPT_PIDS[@]:-}"; do
+    [ -z "$pid" ] || { kill "$pid" 2>/dev/null || true; wait "$pid" 2>/dev/null || true; }
+  done
+  rm -rf "$ACCEPT_TMP"
+}
+trap accept_cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+# Acceptors must never inherit a caller's production target or credentials.
+unset FC_BASE FC_EMAIL FC_PASS FC_PORT
+export PYTHONDONTWRITEBYTECODE=1
+
+accept_compile() {
+  # Use @main in the supplied Swift file. A unique executable isolates defaults.
+  source "$HOME/Dev/tools/dev/lib/tools/macapp/xcode_env.sh"
+  xcode_env_use macosx
+  ACCEPT_BIN="$ACCEPT_TMP/accept-$(uuidgen)"
+  xcrun swiftc -O -swift-version 5 -parse-as-library \
+    Sources/Models.swift Sources/TimeKit.swift Sources/API.swift "$@" -o "$ACCEPT_BIN"
+}
+
+accept_start_backend() {
+  local backend="${FITCOACH_TEST_BACKEND:-$(cd ../../service && pwd)}"
+  [ -x "$backend/.venv/bin/python" ] || { echo 'FAIL: local test backend or venv missing' >&2; return 1; }
+  "$backend/.venv/bin/python" - "$backend" "$ACCEPT_TMP" >"$ACCEPT_TMP/server.log" 2>&1 <<'PY' &
+import os, secrets, socket, sys
+from pathlib import Path
+backend, scratch = sys.argv[1:]
+os.chdir(backend)
+sys.path.insert(0, backend)
+os.environ.update(FITCOACH_DB=f"{scratch}/test.db", FITCOACH_COACH_AUTH="multi",
+                  TLZ_GATE_SECRET=secrets.token_hex(32))
+import uvicorn
+sock = socket.socket()
+sock.bind(("127.0.0.1", 0))
+sock.listen(128)
+Path(scratch, "port").write_text(str(sock.getsockname()[1]))
+uvicorn.Server(uvicorn.Config("api:app", log_level="warning")).run(sockets=[sock])
+PY
+  local server_pid=$!
+  ACCEPT_PIDS+=("$server_pid")
+  local ready=0
+  for _ in $(seq 1 60); do
+    kill -0 "$server_pid" 2>/dev/null || break
+    if [ -s "$ACCEPT_TMP/port" ]; then
+      export FC_BASE="http://127.0.0.1:$(cat "$ACCEPT_TMP/port")"
+      if curl --noproxy '*' -fsS "$FC_BASE/healthz" >/dev/null 2>&1; then ready=1; break; fi
+    fi
+    sleep 0.2
+  done
+  [ "$ready" = 1 ] || { echo 'FAIL: isolated backend did not become ready' >&2; cat "$ACCEPT_TMP/server.log" >&2; return 1; }
+  echo 'Environment: production Swift API + local backend, disposable DB; no device/UI coverage.'
+}

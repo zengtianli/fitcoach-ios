@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "checks": {
+    "functionality": {
+      "result": "passed",
+      "scope": "business",
+      "method": "real_product",
+      "checked_at": "2026-09-28T01:43:49.650720+08:00",
+      "input_sha256": "5dc2f0df3b114f20ec8340c4626b66da9982f15c4c26ef88dc5adf1992cbd01e",
+      "evidence": "perf/acceptance/functionality.json",
+      "evidence_sha256": "994da27cc21213d9e0253448cb30d4d2a04698ba8339bf823b1fc385ba68f323",
+      "detail": "sop.accept：bash scripts/accept/functionality.sh → ✅ 57 项契约断言全过"
+    },
+    "recovery": {
+      "result": "passed",
+      "scope": "business",
+      "method": "real_product",
+      "checked_at": "2026-09-28T01:43:47.843577+08:00",
+      "input_sha256": "5dc2f0df3b114f20ec8340c4626b66da9982f15c4c26ef88dc5adf1992cbd01e",
+      "evidence": "perf/acceptance/recovery.json",
+      "evidence_sha256": "c4baece0ced4ec8ea19f2107945e95f9f12f9803191e905a2cba3210df84b079",
+      "detail": "sop.accept：bash scripts/accept/recovery.sh → PASS: recovery acceptance; production API and Session, local backend/faults; no UI or device claim"
+    },
+    "privacy": {
+      "result": "passed",
+      "scope": "business",
+      "method": "real_product",
+      "checked_at": "2026-09-28T01:43:50.250216+08:00",
+      "input_sha256": "5dc2f0df3b114f20ec8340c4626b66da9982f15c4c26ef88dc5adf1992cbd01e",
+      "evidence": "perf/acceptance/privacy.json",
+      "evidence_sha256": "f3cd52e18796dbcb679af41848fa5815724e9cbcddd437a3f630e6e52088ed4d",
+      "detail": "sop.accept：bash scripts/accept/privacy.sh → PASS: privacy 25 assertions; no UI/device coverage"
+    }
+  },
+  "updated_at": "2026-09-28T01:43:50.266214+08:00"
+}

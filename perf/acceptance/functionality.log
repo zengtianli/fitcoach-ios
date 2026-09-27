@@ -1,0 +1,70 @@
+[xcode_env] Xcode.app (Xcode 27.0, macosx SDK 27.0)
+Environment: production Swift API + local backend, disposable DB; no device/UI coverage.
+── 登录 ──
+  ✅ POST /api/login 返回 cookie 值
+  ✅ GET /coach/api/ping 带 Cookie 头能过闸
+  ✅ 无凭证访问 /coach/api/* → 404
+── 注册 / 注销（App Store 5.1.1(v) 那两条）──
+  ✅ POST /api/register 返回 cookie 值
+  ✅   注册即登录：ping 过闸
+  ✅   重复注册 → 400
+  ✅   错密码注销 → 400
+  ✅   错密码后账号仍在
+  ✅ POST /coach/api/account/delete 成功
+  ✅   删号后旧 cookie → 404
+  ✅   删号后登录 → 401
+── 建数据（走 app 真实写路径）──
+  ✅ POST /coach/api/locations
+  ✅ POST /coach/api/students
+  ✅ POST /coach/api/packages
+── 排课表单与写路径 ──
+  ✅ GET /coach/api/session-form 解码
+  ✅   课包 picker 非空
+  ✅   default_package_id 指向刚建的包
+  ✅   locations 含刚建的地点
+  ✅ 软警告 → 409 needsForce
+  ✅   409 的 warnings 全部 blocking=false
+  ✅ force=on 后建课成功
+  ✅ 硬拒 → 400 rejected
+── 读端点逐个解码 ──
+  ✅ GET schedule 解码
+  ✅   指定那天能看到刚排的课
+  ✅ GET students 解码
+  ✅ GET student detail 解码
+  ✅   剩余是算出来的：10 总 − 0 已用 = 10
+  ✅   bookable 已扣掉已排的 1 节
+  ✅ GET student link 解码
+  ✅ GET locations 解码
+  ✅ GET availability 解码
+  ✅   preview 14 天
+── 状态机与理由 ──
+  ✅ scheduled → completed 免理由
+  ✅ completed → 别的状态缺理由 → 400
+  ✅ 客户端 needsReason 与后端一致（scheduled 免、其余必填）
+  ✅ 带理由后放行
+  ✅ cancelled 不扣课时（剩余回到 10）
+  ✅ GET audit 解码且有行
+  ✅   纠错那条带 reason_code=mistake
+  ✅   默认只列纠错/通融（比 all 少）
+── 成长数据（schema v3）──
+  ✅ GET /coach/api/metrics 解码
+  ✅   默认项目里有『越低越好』的项（50 米跑）
+  ✅ GET /coach/api/students/{id}/growth 解码
+  ✅   越低越好：数值降了，delta 为负而 improved = true
+  ✅   first/latest/best 三个值都对
+  ✅   n_points = 3 且序列点数一致
+  ✅   attendance 解码（到课率 0–100）
+  ✅   measurements 带 metric_name / unit（列表直接可渲）
+── 学员端链接与只读面 ──
+  ✅ POST token rotate 返回链接
+  ✅   extractToken 从整条 URL 取出口令
+  ✅ GET /s/api/view 用 X-Student-Token 头解码
+  ✅   9 键窄视图：可用合计 = 10
+  ✅   学员端 growth 有条目且带趋势点
+  ✅   探针有效性：同结构能收到后端真发的 unit
+  ✅   学员端 growth 后端未下发 note（教练备注进不了公开面）
+  ✅   学员详情 JSON 里没有 token 字段
+  ✅ 吊销后旧 token → 404
+
+── 结果 ──
+✅ 57 项契约断言全过

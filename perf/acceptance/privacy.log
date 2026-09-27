@@ -1,0 +1,28 @@
+[xcode_env] Xcode.app (Xcode 27.0, macosx SDK 27.0)
+Environment: production Swift API + local backend, disposable DB; no device/UI coverage.
+PASS: anonymous coach read denied
+PASS: anonymous coach write denied
+PASS: anonymous student view denied
+PASS: isolated fixtures created
+PASS: tenant lists isolated in both directions
+PASS: foreign student detail denied
+PASS: foreign student link denied
+PASS: foreign student write denied
+PASS: denied write preserved owner data
+PASS: sensitive growth fixture exists on coach response
+PASS: student token binds own identity despite foreign query
+PASS: wire privacy probe has real nested content
+PASS: student wire has no private fields or sentinel values
+PASS: coach detail wire hides bearer token while probe detects note
+PASS: student header cannot read coach endpoint
+PASS: coach cookie cannot read student endpoint
+PASS: student request never carries saved coach cookie
+PASS: coach request never carries student override
+PASS: rotation immediately invalidates previous link
+PASS: rotated link reads same student
+PASS: explicit revoke immediately denies student link
+PASS: deleted account cookie denied
+PASS: deleted account student token denied
+PASS: other tenant survives account deletion
+PASS: other tenant data survives account deletion
+PASS: privacy 25 assertions; no UI/device coverage

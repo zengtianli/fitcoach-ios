@@ -1,0 +1,21 @@
+[xcode_env] Xcode.app (Xcode 27.0, macosx SDK 27.0)
+Environment: production Swift API + local backend, disposable DB; no device/UI coverage.
+PASS: fresh local account authenticates
+PASS: persistent test data created through production API
+PASS: 409 exposes nonblocking warnings for explicit confirmation
+PASS: unconfirmed 409 leaves persisted sessions and balance unchanged
+PASS: explicit force retry persists exactly one session
+PASS: 400 hard rejection stays distinct from force confirmation
+PASS: hard rejection preserves persistent data
+PASS: 401 login failure does not overwrite an existing credential
+PASS: expired credential supports real signOut recovery path
+PASS: fresh login restores requests after invalid session
+PASS: /malformed is reported as a decoding failure
+PASS: valid response succeeds after /malformed without losing credential
+PASS: /wrong-shape is reported as a decoding failure
+PASS: valid response succeeds after /wrong-shape without losing credential
+PASS: 503 is surfaced as a request failure
+PASS: connection loss is surfaced as a transport failure
+PASS: requests recover after service and connection failures
+PASS: restored real backend retains the exact pre-fault state
+PASS: recovery acceptance; production API and Session, local backend/faults; no UI or device claim
