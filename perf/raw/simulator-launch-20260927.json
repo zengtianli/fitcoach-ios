@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "app_id": "fitcoach-ios",
+  "environment": "simulator",
+  "mode": "launch",
+  "measured_at": "2026-09-27T14:19:19.938090+08:00",
+  "version": "1.0 (1)",
+  "configuration": "Release",
+  "bundle_id": "cyou.tianli.fitcoachapp",
+  "binary_sha256": "4bfe0ed5d687b51ba1bdb7956f1c44e8b15d13e469c5357dff1101bdf19c688b",
+  "build_receipt": {
+    "configuration": "Release",
+    "seconds": 17.9,
+    "source_sha256": "760c190ee688563098d228ba5c36ec45f3c31b70c12b88bf88a69dc5145ca64e",
+    "source_unchanged": true,
+    "built_from": "working tree"
+  },
+  "git_head": "a96befdf7f922fad2c5de543c267efd207cfd41f",
+  "simulator_device": "iPhone 17 Pro",
+  "simulator_os": "iOS 27.0",
+  "host": "Mac16,12 / Apple M4 / macOS 27.2",
+  "load_average_at_start": [
+    7.767578125,
+    12.5,
+    32.2568359375
+  ],
+  "measurement_tool_sha256": "0393a632f3e0a2d2551ecb173704f195c3f9da743d0a49bad0492c1e0b669698",
+  "probe_sha256": "04e8e990c1a6c393d9b49bf91ac8b4f799588f181ea10657f38517cdf281c129",
+  "scope": "Simulator App process only; excludes CoreSimulator, Simulator GUI, system services and inactive extensions",
+  "launch": {
+    "samples": [
+      {
+        "run": 0,
+        "pid": 454,
+        "host_call_epoch": 1790489963.0699031,
+        "request_to_ready_ms": 2368.5,
+        "request_to_launch_complete_ms": 2822.8
+      },
+      {
+        "run": 1,
+        "pid": 883,
+        "host_call_epoch": 1790489971.3844109,
+        "request_to_ready_ms": 1481.8,
+        "request_to_launch_complete_ms": 2376.7
+      },
+      {
+        "run": 2,
+        "pid": 1160,
+        "host_call_epoch": 1790489979.538692,
+        "request_to_ready_ms": 1465.0,
+        "request_to_launch_complete_ms": 2360.5
+      },
+      {
+        "run": 3,
+        "pid": 1612,
+        "host_call_epoch": 1790489987.671148,
+        "request_to_ready_ms": 1488.2,
+        "request_to_launch_complete_ms": 2379.9
+      },
+      {
+        "run": 4,
+        "pid": 1978,
+        "host_call_epoch": 1790489995.802353,
+        "request_to_ready_ms": 1450.6,
+        "request_to_launch_complete_ms": 2350.4
+      },
+      {
+        "run": 5,
+        "pid": 2057,
+        "host_call_epoch": 1790490003.9453492,
+        "request_to_ready_ms": 1459.3,
+        "request_to_launch_complete_ms": 2366.9
+      }
+    ],
+    "discarded_runs": 1,
+    "runs": 5,
+    "ready_median_ms": 1465.0,
+    "launch_complete_median_ms": 2366.9,
+    "method": "Simulator unified log: CoreSimulator \"Requesting launch of <bundle>\" -> SpringBoard scene content state \"ready\" (app committed its first scene content) / FrontBoard \"Dropping launch assertion\" (launch finished). App process terminated 3 s before each run; system caches warm; first run after install discarded.",
+    "marker_lines": {
+      "0": [
+        {
+          "timestamp": "2026-09-27 14:19:23.157865+0800",
+          "process": "CoreSimulatorBridge",
+          "message": "Requesting launch of cyou.tianli.fitcoachapp with options: {\n    environment =     {\n    };\n}"
+        },
+        {
+          "timestamp": "2026-09-27 14:19:23.330152+0800",
+          "process": "CoreSimulatorBridge",
+          "message": "Launch successful for 'cyou.tianli.fitcoachapp', pid: 454"
+        },
+        {
+          "timestamp": "2026-09-27 14:19:25.526328+0800",
+          "process": "SpringBoard",
+          "message": "[(FBSceneManager):sceneID:cyou.tianli.fitcoachapp-default] scene content state changed: ready"
+        },
+        {
+          "timestamp": "2026-09-27 14:19:25.980646+0800",
+          "process": "SpringBoard",
+          "message": "[app<cyou.tianli.fitcoachapp>:454] Dropping launch assertion."
+        },
+        {
+          "timestamp": "2026-09-27 14:19:26.054898+0800",
+          "process": "InputUI",
+          "message": "[app<cyou.tianli.fitcoachapp>:454] Dropping launch assertion."
+        }
+      ],
+      "1": [
+        {
+          "timestamp": "2026-09-27 14:19:31.486971+0800",
+          "process": "CoreSimulatorBridge",
+          "message": "Requesting launch of cyou.tianli.fitcoachapp with options: {\n    environment =     {\n    };\n}"
+        },
+        {
+          "timestamp": "2026-09-27 14:19:31.525363+0800",
+          "process": "CoreSimulatorBridge",
+          "message": "Launch successful for 'cyou.tianli.fitcoachapp', pid: 883"
+        },
+        {
+          "timestamp": "2026-09-27 14:19:32.968774+0800",
+          "process": "SpringBoard",
+          "message": "[(FBSceneManager):sceneID:cyou.tianli.fitcoachapp-default] scene content state changed: ready"
+        },
+        {
+          "timestamp": "2026-09-27 14:19:33.863663+0800",
+          "process": "SpringBoard",
+          "message": "[app<cyou.tianli.fitcoachapp>:883] Dropping launch assertion."
+        },
+        {
+          "timestamp": "2026-09-27 14:19:33.889340+0800",
+          "process": "InputUI",
+          "message": "[app<cyou.tianli.fitcoachapp>:883] Dropping launch assertion."
+        }
+      ],
+      "2": [
+        {
+          "timestamp": "2026-09-27 14:19:39.647464+0800",
+          "process": "CoreSimulatorBridge",
+          "message": "Requesting launch of cyou.tianli.fitcoachapp with options: {\n    environment =     {\n    };\n}"
+        },
+        {
+          "timestamp": "2026-09-27 14:19:39.683124+0800",
+          "process": "CoreSimulatorBridge",
+          "message": "Launch successful for 'cyou.tianli.fitcoachapp', pid: 1160"
+        },
+        {
+          "timestamp": "2026-09-27 14:19:41.112471+0800",
+          "process": "SpringBoard",
+          "message": "[(FBSceneManager):sceneID:cyou.tianli.fitcoachapp-default] scene content state changed: ready"
+        },
+        {
+          "timestamp": "2026-09-27 14:19:42.007946+0800",
+          "process": "SpringBoard",
+          "message": "[app<cyou.tianli.fitcoachapp>:1160] Dropping launch assertion."
+        },
+        {
+          "timestamp": "2026-09-27 14:19:42.044847+0800",
+          "process": "InputUI",
+          "message": "[app<cyou.tianli.fitcoachapp>:1160] Dropping launch assertion."
+        }
+      ],
+      "3": [
+        {
+          "timestamp": "2026-09-27 14:19:47.775454+0800",
+          "process": "CoreSimulatorBridge",
+          "message": "Requesting launch of cyou.tianli.fitcoachapp with options: {\n    environment =     {\n    };\n}"
+        },
+        {
+          "timestamp": "2026-09-27 14:19:47.815746+0800",
+          "process": "CoreSimulatorBridge",
+          "message": "Launch successful for 'cyou.tianli.fitcoachapp', pid: 1612"
+        },
+        {
+          "timestamp": "2026-09-27 14:19:49.263678+0800",
+          "process": "SpringBoard",
+          "message": "[(FBSceneManager):sceneID:cyou.tianli.fitcoachapp-default] scene content state changed: ready"
+        },
+        {
+          "timestamp": "2026-09-27 14:19:50.155394+0800",
+          "process": "SpringBoard",
+          "message": "[app<cyou.tianli.fitcoachapp>:1612] Dropping launch assertion."
+        },
+        {
+          "timestamp": "2026-09-27 14:19:50.188703+0800",
+          "process": "InputUI",
+          "message": "[app<cyou.tianli.fitcoachapp>:1612] Dropping launch assertion."
+        }
+      ],
+      "4": [
+        {
+          "timestamp": "2026-09-27 14:19:55.906497+0800",
+          "process": "CoreSimulatorBridge",
+          "message": "Requesting launch of cyou.tianli.fitcoachapp with options: {\n    environment =     {\n    };\n}"
+        },
+        {
+          "timestamp": "2026-09-27 14:19:55.942221+0800",
+          "process": "CoreSimulatorBridge",
+          "message": "Launch successful for 'cyou.tianli.fitcoachapp', pid: 1978"
+        },
+        {
+          "timestamp": "2026-09-27 14:19:57.357097+0800",
+          "process": "SpringBoard",
+          "message": "[(FBSceneManager):sceneID:cyou.tianli.fitcoachapp-default] scene content state changed: ready"
+        },
+        {
+          "timestamp": "2026-09-27 14:19:58.256883+0800",
+          "process": "SpringBoard",
+          "message": "[app<cyou.tianli.fitcoachapp>:1978] Dropping launch assertion."
+        },
+        {
+          "timestamp": "2026-09-27 14:19:58.288628+0800",
+          "process": "InputUI",
+          "message": "[app<cyou.tianli.fitcoachapp>:1978] Dropping launch assertion."
+        }
+      ],
+      "5": [
+        {
+          "timestamp": "2026-09-27 14:20:04.054164+0800",
+          "process": "CoreSimulatorBridge",
+          "message": "Requesting launch of cyou.tianli.fitcoachapp with options: {\n    environment =     {\n    };\n}"
+        },
+        {
+          "timestamp": "2026-09-27 14:20:04.088684+0800",
+          "process": "CoreSimulatorBridge",
+          "message": "Launch successful for 'cyou.tianli.fitcoachapp', pid: 2057"
+        },
+        {
+          "timestamp": "2026-09-27 14:20:05.513440+0800",
+          "process": "SpringBoard",
+          "message": "[(FBSceneManager):sceneID:cyou.tianli.fitcoachapp-default] scene content state changed: ready"
+        },
+        {
+          "timestamp": "2026-09-27 14:20:06.421084+0800",
+          "process": "SpringBoard",
+          "message": "[app<cyou.tianli.fitcoachapp>:2057] Dropping launch assertion."
+        },
+        {
+          "timestamp": "2026-09-27 14:20:06.437772+0800",
+          "process": "InputUI",
+          "message": "[app<cyou.tianli.fitcoachapp>:2057] Dropping launch assertion."
+        }
+      ]
+    }
+  },
+  "source_unchanged_during_measurement": true,
+  "completed_at": "2026-09-27T14:20:08.978927+08:00",
+  "calibration": {
+    "measured_at": "2026-09-27T14:04:00+08:00",
+    "device": "iPhone 17 Pro / iOS 27.0 Simulator (same device as app runs)",
+    "app": "com.apple.Preferences (system Settings)",
+    "settings_ready_samples_ms": [
+      3626.3,
+      2505.8,
+      2529.9,
+      2517.9,
+      2589.8,
+      2507.6
+    ],
+    "settings_launch_complete_samples_ms": [
+      3424.6,
+      2911.7,
+      2917.7,
+      2906.9,
+      2977.7,
+      2887.3
+    ],
+    "settings_ready_median_ms": 2517.9,
+    "settings_launch_complete_median_ms": 2911.7,
+    "note": "Same probe and markers as the app runs; first sample discarded. Shows the simulator's own launch overhead; not a physical-device figure."
+  },
+  "idle_evidence_kept": "perf/raw/simulator-20260927.json"
+}
