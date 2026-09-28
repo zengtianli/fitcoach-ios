@@ -9,6 +9,17 @@
   "build_id": "4c2f341d-4c69-466e-8d4f-bb3dd9fdfa77",
   "processing_state": "VALID",
   "device_install_verified": false,
-  "source_commit": null,
-  "source_note": "Apple 构建及体积已回读；尚未建立当前本机源码与该发行二进制的来源映射。"
+  "source_commit": "0e188480f55b54ad33c489f9b472563fde45e60a",
+  "source_note": "ASC 回读：该 build 由 Xcode Cloud 运行 #5 从提交 0e18848 构建；之后客户端构建输入仅有注释改动。",
+  "source_kind_detail": "xcode_cloud",
+  "source_evidence": {
+    "ci_build_run_id": "fd003235-3308-4742-a287-b271eb2b7366",
+    "ci_build_run_number": 5,
+    "ci_workflow_id": "9DC8B426-9D3E-43C3-BC6F-F8FC6A79A904",
+    "completion_status": "SUCCEEDED",
+    "finished_at": "2026-09-10T03:48:02.694Z",
+    "build_uploaded_at": "2026-09-09T20:46:46-07:00",
+    "readback": "GET /v1/ciBuildRuns/{id}/builds -> 4c2f341d-4c69-466e-8d4f-bb3dd9fdfa77 (5, VALID); GET /v1/ciBuildRuns/{id} sourceCommit.commitSha",
+    "queried_at": "2026-09-29T02:35:33+08:00"
+  }
 }
