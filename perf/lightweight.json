@@ -53,5 +53,63 @@
   "why_en": "Sizes are read back for this exact distribution build. Memory, CPU and launch time remain explicitly unmeasured.",
   "runtime_measurement": {
     "simulator": "perf/simulator.json"
+  },
+  "cli": {
+    "command": "fitcoach",
+    "version": "1.0.0",
+    "measured_at": "2026-09-30",
+    "device": "Mac16,12 / Apple M4 / macOS 27.2",
+    "environment": "macOS 命令行；仓库入口 cli/fitcoach（bash 壳，源码比二进制新时先重编）→ build/cli/fitcoach（swiftc -O，arm64）；Mac 版包内 Contents/Resources/bin/fitcoach（Xcode Release，x86_64+arm64，已剥符号，未装机，取自 .dd-mac 构建产物）",
+    "environment_en": "macOS command line; repo entry cli/fitcoach (bash shim that rebuilds when a source is newer) -> build/cli/fitcoach (swiftc -O, arm64); embedded Contents/Resources/bin/fitcoach in the Mac app (Xcode Release, x86_64+arm64, stripped, not installed, taken from the .dd-mac build)",
+    "data": "读命令打本机隔离后端（临时库：1 位教练、1 名学员、快速开始建的地点/档期/体测项目），不含线上网络往返",
+    "size": {
+      "repo_binary_bytes": 1206400,
+      "embedded_binary_bytes": 1378432,
+      "method": "ls -l 字节数（十进制 MB 约 1.21 / 1.38）"
+    },
+    "memory": {
+      "help_peak_footprint_mb": 2.0,
+      "help_max_rss_mb": 6.1,
+      "read_peak_footprint_mb": 4.2,
+      "read_max_rss_mb": 13.9,
+      "method": "/usr/bin/time -l 的 peak memory footprint 与 maximum resident set size（十进制 MB）；read = schedule --range week --json；仓库二进制与包内二进制差 < 0.2 MB"
+    },
+    "speed_cli": [
+      {
+        "key": "fitcoach --help (binary)",
+        "cmd": "build/cli/fitcoach --help",
+        "median_ms": 10.6,
+        "runs": 20
+      },
+      {
+        "key": "fitcoach --help (embedded)",
+        "cmd": "FitCoach.app/Contents/Resources/bin/fitcoach --help",
+        "median_ms": 11.9,
+        "runs": 20
+      },
+      {
+        "key": "fitcoach --help (repo shim)",
+        "cmd": "cli/fitcoach --help",
+        "median_ms": 38.7,
+        "runs": 20,
+        "note": "含 bash 壳与源码新旧检查约 28 ms"
+      },
+      {
+        "key": "fitcoach schedule --range week --json (repo shim, local backend)",
+        "cmd": "cli/fitcoach schedule --range week --json",
+        "median_ms": 75.1,
+        "runs": 20
+      },
+      {
+        "key": "fitcoach students list --json (embedded, local backend)",
+        "cmd": "FitCoach.app/Contents/Resources/bin/fitcoach students list --json",
+        "median_ms": 41.9,
+        "runs": 20
+      }
+    ],
+    "idle": "不常驻：每次命令跑完即退出，没有后台进程或定时任务",
+    "linked_frameworks": "Foundation、CFNetwork、Combine 与 Swift 运行库（otool -L）；不链接 SwiftUI/AppKit",
+    "method": "Chapter app-lightweight measure.py cli（hyperfine -N，warmup 1，20 次取中位）；输出未写入顶层 measured_at/device，iOS 真机记录保持原样",
+    "status": "measured_macos_cli"
   }
 }

@@ -50,7 +50,9 @@ bash install-to-iphone.sh
 
 ```bash
 xcodegen generate --spec project.yml     # 新增源文件或修改工程配置后执行
-./ref/run                                # 契约对账（自己起临时后端）
+./ref/run                                # 契约对账 + 命令行场景测试（各自起临时后端）
+bash cli/build.sh --link                 # 命令行 fitcoach：编到 build/cli/，链 ~/.local/bin/fitcoach 到仓库入口
+bash cli/build.sh --link-app             # 已装 Mac 版时：~/.local/bin/fitcoach 改链到包内 Contents/Resources/bin/fitcoach
 bash build-platforms.sh                   # 按项目声明检查 iPhone、iPad、Mac 构建
 ```
 
@@ -70,6 +72,19 @@ bash build-platforms.sh                   # 按项目声明检查 iPhone、iPad�
 - 学员 token 不出现在学员详情 JSON 里；吊销后旧 token 立刻 404
 - 成长数据：`越低越好` 的项目上数值降了必须报 `improved = true`（这条判据只在后端有一份）；
   学员端公开面**后端不下发 note**，用一个故意放宽的探针验（拿窄模型编码再 grep 是恒真的）
+
+### 命令行
+
+`fitcoach` 与 App 编同一份 `Models.swift` / `TimeKit.swift` / `API.swift` / `QuickSetup.swift`，给智能体驱动；
+用法、覆盖面与只在 App 里的动作见 [README 的「命令行」一节](README.md#命令行给智能体用)。`cli/test.sh`
+在隔离后端上逐条验退出码、`--json` 形状、先读后整条提交（不清掉地点 / 到期日 / 单价 / 方向 / 启用）、
+409 需 `--force`、400 硬拒、5xx 退出 1（可重试）、小数按最短写法输出、学员链接默认不外露、快速开始跨进程续补，
+以及删数据的确认门（`measurements rm` / `packages void` 要 `--yes`，`account delete` 要字面量确认，都有只读 `--dry-run`）。
+
+Mac 版把同一批源文件编进包：`project.yml` 的 `FitCoachCLI`（`type: tool`，只有 macOS）经 `FitCoach` 目标的依赖
+（`destinationFilters: [macOS]`，复制到 Resources/bin 并随 App 重签）放进 `Contents/Resources/bin/fitcoach`。
+iOS 模拟器构建与 iOS 归档都不编它（2026-09-30 本机 `archive generic/platform=iOS` 实测）。
+`FITCOACH_TEST_CLI=<包内 fitcoach> bash cli/test.sh` 对包里那份跑同一套场景测试。
 
 ## 已知限制
 
