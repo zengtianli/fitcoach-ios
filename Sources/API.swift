@@ -12,6 +12,8 @@ enum APIError: LocalizedError {
     case unauthorized(String)
     case transport(String)
     case decode(String)
+    /// 5xx：服务端或网关临时出错（重启、502/503），与 400 硬拒分开 —— 可稍后重试。
+    case server(Int, String)
 
     var errorDescription: String? {
         switch self {
@@ -21,6 +23,7 @@ enum APIError: LocalizedError {
         case .unauthorized(let m): return m
         case .transport(let m): return "网络错误：\(m)"
         case .decode(let m): return "响应解析失败：\(m)"
+        case .server(_, let m): return m
         }
     }
 }
@@ -54,13 +57,26 @@ final class Session: ObservableObject {
         didSet { UserDefaults.standard.set(baseURL, forKey: Self.kBase) }
     }
 
+    static let defaultBaseURL = "https://fit.tianli.cyou"
+
     init() {
         let d = UserDefaults.standard
         studentMode = d.bool(forKey: Self.kRole)
         coachEmail = d.string(forKey: "fitcoach.coachEmail")
         coachCookie = d.string(forKey: Self.kCoach)
         studentToken = d.string(forKey: Self.kStudent)
-        baseURL = d.string(forKey: Self.kBase) ?? "https://fit.tianli.cyou"
+        baseURL = d.string(forKey: Self.kBase) ?? Self.defaultBaseURL
+    }
+
+    /// 不落盘的会话：命令行 `fitcoach`（cli/）用它带自己保管的凭证打同一套 API。
+    /// Swift 在类自己的初始化器里赋值**不触发** didSet，所以这里一个字节都不写 UserDefaults；
+    /// 调用方之后也不得再给这些属性赋值（那会触发 didSet 落盘）。
+    init(baseURL: String, coachCookie: String? = nil, studentToken: String? = nil) {
+        studentMode = coachCookie == nil && studentToken != nil
+        coachEmail = nil
+        self.coachCookie = coachCookie
+        self.studentToken = studentToken
+        self.baseURL = baseURL
     }
 
     var isCoach: Bool { coachCookie != nil && !(studentMode && studentToken != nil) }
@@ -154,6 +170,9 @@ final class API {
         case 404: return .gone
         case 401: return .unauthorized(m?.error ?? "登录失败")
         case 409: return .needsForce(m?.warnings ?? [])
+        case 500...599:
+            if let e = m?.error, !e.isEmpty { return .server(code, e) }
+            return .server(code, "请求失败（HTTP \(code)）")
         default:
             if let e = m?.error, !e.isEmpty { return .rejected(e) }
             return .rejected("请求失败（HTTP \(code)）")
@@ -162,24 +181,36 @@ final class API {
 
     // ── 读 ────────────────────────────────────────────────────────────────
 
-    func get<T: Decodable>(_ path: String, query: [String: String] = [:], student: Bool = false) async throws -> T {
+    /// 过完错误协议的原始响应体。`get` 在它上面解码；命令行 `--json` 原样转发同一份字节。
+    func getRaw(_ path: String, query: [String: String] = [:], student: Bool = false) async throws -> Data {
         let (data, code) = try await run(authed(try makeURL(path, query), student: student))
         guard (200..<300).contains(code) else { throw decodeError(data, code) }
+        return data
+    }
+
+    func get<T: Decodable>(_ path: String, query: [String: String] = [:], student: Bool = false) async throws -> T {
+        let data = try await getRaw(path, query: query, student: student)
         do { return try JSONDecoder().decode(T.self, from: data) }
         catch { throw APIError.decode("\(path)：\(error)") }
     }
 
     // ── 写 ────────────────────────────────────────────────────────────────
 
-    /// 写路径统一出口。409 会抛 `.needsForce`，调用方决定是否带 force 重试。
-    @discardableResult
-    func post(_ path: String, _ fields: [String: String]) async throws -> MutationResp {
+    /// 写路径的原始响应体（同一条错误协议）。`post` 在它上面解码。
+    func postRaw(_ path: String, _ fields: [String: String]) async throws -> Data {
         var req = authed(try makeURL(path, [:]))
         req.httpMethod = "POST"
         req.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         req.httpBody = formBody(fields)
         let (data, code) = try await run(req)
         guard (200..<300).contains(code) else { throw decodeError(data, code) }
+        return data
+    }
+
+    /// 写路径统一出口。409 会抛 `.needsForce`，调用方决定是否带 force 重试。
+    @discardableResult
+    func post(_ path: String, _ fields: [String: String]) async throws -> MutationResp {
+        let data = try await postRaw(path, fields)
         do { return try JSONDecoder().decode(MutationResp.self, from: data) }
         catch { throw APIError.decode("\(path)：\(error)") }
     }

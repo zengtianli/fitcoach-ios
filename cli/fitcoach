@@ -1,0 +1,19 @@
+#!/bin/bash
+# fitcoach 命令行入口（~/.local/bin/fitcoach 链到这里；project.yaml sop.cli.entry 指向这里）。
+# 编好的二进制在 build/cli/fitcoach；它的任一 Swift 源比二进制新时先重编（输出到 stderr），再 exec。
+set -euo pipefail
+SELF="${BASH_SOURCE[0]}"
+while [ -L "$SELF" ]; do
+  LINK="$(readlink "$SELF")"
+  case "$LINK" in
+    /*) SELF="$LINK" ;;
+    *) SELF="$(dirname "$SELF")/$LINK" ;;
+  esac
+done
+ROOT="$(cd "$(dirname "$SELF")/.." && pwd)"
+BIN="$ROOT/build/cli/fitcoach"
+if [ ! -x "$BIN" ] || [ -n "$(find "$ROOT/cli" "$ROOT/Sources/Models.swift" "$ROOT/Sources/TimeKit.swift" \
+      "$ROOT/Sources/API.swift" "$ROOT/Sources/QuickSetup.swift" -name '*.swift' -newer "$BIN" | head -1)" ]; then
+  bash "$ROOT/cli/build.sh" >&2
+fi
+exec "$BIN" "$@"

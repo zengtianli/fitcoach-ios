@@ -349,6 +349,7 @@ struct MutationResp: Codable {
     let revoked: Bool?
     let cancelled: Int?
     let link_url: String?
+    let created: Int?           // /coach/api/metrics/seed：本次导入的项目数
 }
 
 

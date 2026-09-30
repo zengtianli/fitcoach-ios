@@ -98,8 +98,9 @@ struct RecoveryAcceptance {
         do {
             let _: API.Ping = try await api.get("/unavailable")
             throw CheckFailure(label: "503 must fail")
-        } catch APIError.rejected {
-            try require(true, "503 is surfaced as a request failure")
+        } catch APIError.server(let status, _) {
+            // 5xx 是服务端临时故障（可重试），与 400 硬拒 `.rejected` 分开（2026-09-30 起）
+            try require(status == 503, "503 is surfaced as a retryable server failure, not a hard rejection")
         }
         do {
             let _: API.Ping = try await api.get("/disconnect")

@@ -11,7 +11,7 @@ struct QuickSetupView: View {
     @State private var err: String?
 
     private var weekdays: [Int] {
-        pattern == 1 ? Array(0...6) : pattern == 2 ? [0, 6] : Array(1...5)
+        (pattern == 1 ? QuickSetup.Days.daily : pattern == 2 ? .weekend : .weekdays).weekdays
     }
 
     var body: some View {
@@ -63,35 +63,10 @@ struct QuickSetupView: View {
         busy = true; err = nil
         defer { busy = false }
         do {
-            let api = API(session)
-            let places: LocationsResp = try await api.get("/coach/api/locations")
-            if places.locations.isEmpty {
-                try await api.post("/coach/api/locations", ["name": location, "address": ""])
-            }
-            let metrics: MetricsResp = try await api.get("/coach/api/metrics")
-            if metrics.metrics.isEmpty {
-                try await api.post("/coach/api/metrics/seed", [:])
-            }
-            let availability: AvailabilityResp = try await api.get("/coach/api/availability")
-            if availability.rules_by_wd.values.allSatisfy({ $0.isEmpty }) && availability.exceptions.isEmpty {
-                // 多次请求可能部分成功；保存已完成的星期，失败时只重试剩余项。
-                pendingDays = weekdays
-            }
-            while let day = pendingDays.first {
-                if (availability.rules_by_wd[String(day)] ?? []).contains(where: {
-                    $0.start_time == "09:00" && $0.end_time == "18:00"
-                }) {
-                    pendingDays.removeFirst()
-                    continue
-                }
-                try await api.post("/coach/api/availability/rules", [
-                    "weekday": String(day), "start_time": "09:00", "end_time": "18:00",
-                ])
-                pendingDays.removeFirst()
-            }
+            // 编排在 QuickSetup.swift（与命令行 `fitcoach setup` 共用）；每步按服务端现状补空白，
+            // 部分成功后重试只补剩下的。
+            _ = try await QuickSetup.run(api: API(session), location: location, weekdays: weekdays)
             onDone(); dismiss()
         } catch { err = "部分设置可能已保存，重试会继续完成。\n" + errText(error) }
     }
-
-    @State private var pendingDays: [Int] = []
 }

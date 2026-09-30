@@ -43,6 +43,52 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
+    dependencies:
+      # Mac 版把给智能体用的命令行 fitcoach 带进包：Contents/Resources/bin/fitcoach（舰队约定，
+      # 由 cli/build.sh --link-app 链到 ~/.local/bin/fitcoach）。只对 macOS 生效：iOS 包与 Xcode Cloud
+      # 的 iOS 归档不编、不带这个工具。复制时用 App 自己的身份重签（保留加固运行时）。
+      - target: FitCoachCLI
+        destinationFilters: [macOS]
+        embed: true
+        codeSign: true
+        copy:
+          destination: resources
+          subpath: bin
     scheme:
       testTargets: []
       configVariants: []
+  # 命令行 fitcoach：与 App 同一份客户端层（Models / TimeKit / API / QuickSetup）+ cli/*.swift，
+  # 与 cli/build.sh 编的是同一批源文件。只在 Mac 上有意义，所以只有 macOS 平台。
+  FitCoachCLI:
+    type: tool
+    platform: macOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: Sources/Models.swift
+      - path: Sources/TimeKit.swift
+      - path: Sources/API.swift
+      - path: Sources/QuickSetup.swift
+      - path: cli
+        includes: ["*.swift"]
+    settings:
+      base:
+        PRODUCT_NAME: fitcoach
+        PRODUCT_MODULE_NAME: FitCoachCLI
+        PRODUCT_BUNDLE_IDENTIFIER: cyou.tianli.fitcoachapp.cli
+        GENERATE_INFOPLIST_FILE: YES
+        CREATE_INFOPLIST_SECTION_IN_BINARY: YES
+        OTHER_SWIFT_FLAGS: "-parse-as-library"
+        ENABLE_HARDENED_RUNTIME: YES
+        SKIP_INSTALL: YES
+        # 工具自己只做临时签名、不申请描述文件；嵌进 App 时随 App 的开发身份重签。
+        # 不开沙盒：它从终端被调用，凭证存在 ~/Library/Application Support/FitCoach/cli/（与仓库构建同一处）。
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
+        DEVELOPMENT_TEAM: ""
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+      configs:
+        # Release 编时就剥符号（工具不走 install，SKIP_INSTALL 下默认不剥）：通用二进制 2.7 MB → 约 1.3 MB。
+        Release:
+          DEPLOYMENT_POSTPROCESSING: YES
+          STRIP_INSTALLED_PRODUCT: YES

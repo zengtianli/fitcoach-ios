@@ -51,3 +51,9 @@ curl -sf -X POST "http://127.0.0.1:$PORT/register" \
   -d "email=t@e.com&password=Passw0rd!234&display_name=T" -o /dev/null || true
 
 FC_BASE="http://127.0.0.1:$PORT" "$TMP/contract-bin"
+
+# 命令行 fitcoach（cli/）编的是同一份 API.swift / Models.swift / QuickSetup.swift：
+# 场景测试在它自己的隔离后端上跑（凭证、偏好目录都在临时目录），见 cli/test.sh。
+echo
+echo "[ref] 命令行场景测试（cli/test.sh）"
+bash cli/test.sh
