@@ -186,7 +186,9 @@ struct MetricFormSheet: View {
         defer { busy = false }
         var f: [String: String] = [
             "name": name, "unit": unit,
-            "higher_is_better": higher ? "on" : "",
+            // 必须显式 "1"/"0"（同网页下拉框）：新建端点的默认值是 "1"，FastAPI 把空串表单字段当作
+            // 没填、套默认值 —— 发 "" 会把「越小越好」静默存成「越大越好」，进步被报成退步。
+            "higher_is_better": higher ? "1" : "0",
             "sort_order": sortOrder.isEmpty ? "0" : sortOrder,
         ]
         do {
