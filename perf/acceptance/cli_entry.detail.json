@@ -1,0 +1,24 @@
+{
+  "summary": "命令行在 App 里：fitcoach — 用法：fitcoach <命令> [参数]      每个命令都有 --help；读命令加 --json 输出 {\"ok\": true, …}",
+  "passed": true,
+  "commands": [
+    "fitcoach"
+  ],
+  "app": "cyou.tianli.fitcoachapp",
+  "host_app": "/Applications/上门体育.app",
+  "target": "/Applications/上门体育.app/Contents/Resources/bin/fitcoach",
+  "inside_app": true,
+  "help_summary": "用法：fitcoach <命令> [参数]      每个命令都有 --help；读命令加 --json 输出 {\"ok\": true, …}",
+  "entries": [
+    {
+      "command": "fitcoach",
+      "link": "~/.local/bin/fitcoach",
+      "target": "/Applications/上门体育.app/Contents/Resources/bin/fitcoach",
+      "inside_app": true,
+      "executable": true,
+      "exit_code": 0,
+      "summary": "用法：fitcoach <命令> [参数]      每个命令都有 --help；读命令加 --json 输出 {\"ok\": true, …}",
+      "error": null
+    }
+  ]
+}

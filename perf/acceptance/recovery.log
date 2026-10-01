@@ -14,7 +14,7 @@ PASS: /malformed is reported as a decoding failure
 PASS: valid response succeeds after /malformed without losing credential
 PASS: /wrong-shape is reported as a decoding failure
 PASS: valid response succeeds after /wrong-shape without losing credential
-PASS: 503 is surfaced as a request failure
+PASS: 503 is surfaced as a retryable server failure, not a hard rejection
 PASS: connection loss is surfaced as a transport failure
 PASS: requests recover after service and connection failures
 PASS: restored real backend retains the exact pre-fault state

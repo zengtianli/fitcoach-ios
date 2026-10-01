@@ -5,11 +5,11 @@
   "command": "bash scripts/accept/recovery.sh",
   "exit_code": 0,
   "status": "passed",
-  "started_at": "2026-09-28T01:43:19.464256+08:00",
-  "finished_at": "2026-09-28T01:43:47.843577+08:00",
-  "input_sha256": "5dc2f0df3b114f20ec8340c4626b66da9982f15c4c26ef88dc5adf1992cbd01e",
+  "started_at": "2026-09-30T23:06:46.291473+08:00",
+  "finished_at": "2026-09-30T23:06:52.255148+08:00",
+  "input_sha256": "a767075665ad810794f551e4b5b90f2ce0626a5119989236719f79b888550b6a",
   "log": "perf/acceptance/recovery.log",
-  "log_sha256": "92a526a10f69ecd617bb94a1cfa00eae5ae4f845b857ad84e5e8ebc1f1ca3850",
+  "log_sha256": "a4efe5613b5d8f1b1b5df9da061e7dd3fb9d230d2a19a4747f94fd148aa9dada",
   "summary": "PASS: recovery acceptance; production API and Session, local backend/faults; no UI or device claim",
   "detail": null
 }

@@ -1,3 +1,62 @@
+name: fitcoach-ios
 name_en: At-Home Sports
 name_zh: 上门体育
 display_name: At-Home Sports · 上门体育
+family: fitcoach
+form: ios
+lifecycle: active
+bundle_id: cyou.tianli.fitcoachapp
+origin: own
+sop:
+  test: bash ref/run
+  cli:
+    commands:
+    - fitcoach
+    app: cyou.tianli.fitcoachapp
+  accept:
+    functionality: bash scripts/accept/functionality.sh
+    recovery: bash scripts/accept/recovery.sh
+    privacy: bash scripts/accept/privacy.sh
+  ui:
+  - Sources/**
+  - Shared/**
+  source:
+  - Sources/**
+  - Shared/**
+  - Resources/**
+  - Widget/**
+  - ShareExtension/**
+  - project.yml
+  - '*.entitlements'
+  - cli/**
+  test_inputs:
+  - Tests/**
+  - ref/*.swift
+  - ref/run
+  - test-contract.py
+  - test_check_markdown_drift.py
+  - scripts/tests/**
+  - scripts/accept/**
+  - cli/test.sh
+  - cli/test_cli.py
+  - Package.swift
+  media:
+  - shots
+  release: perf/asc-release.json
+  runtime_note: iPhone 17 / iOS 27.2 当前离线（tunnel unavailable、ddiServicesAvailable=false）；主机 DDI 已核验可用。未启动 App，未用模拟器替代真机数据，等待连接解锁及空闲测量窗口。
+  runtime:
+    kind: ios
+    readback: builtin:asc-device
+  test_extra_files:
+  - /Users/tianli/Apps/fitcoach/service/api.py
+  - /Users/tianli/Apps/fitcoach/service/db.py
+  - /Users/tianli/Apps/fitcoach/service/domain.py
+  - /Users/tianli/Apps/fitcoach/service/ratelimit.py
+  - /Users/tianli/Apps/fitcoach/service/tenancy.py
+  - /Users/tianli/Apps/fitcoach/service/schema.sql
+  - /Users/tianli/Apps/fitcoach/service/requirements.txt
+  product:
+    distribution: public
+    source_visibility: public
+    source_url: https://github.com/zengtianli/fitcoach-ios
+    rationale: 排课、课时与学员进步，随手就能看清。 面向外部使用者提供现有公开产品与源码入口，持续维护获取、教程和版本证据。

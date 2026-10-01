@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "cli_entry",
+  "app_id": "fitcoach-ios",
+  "command": "~/Dev/.venv/bin/python ~/Apps/chapter/engine/acceptors/cli_entry.py",
+  "exit_code": 0,
+  "status": "passed",
+  "started_at": "2026-10-01T11:01:39.263834+08:00",
+  "finished_at": "2026-10-01T11:01:39.761061+08:00",
+  "input_sha256": "430912a27d266d967610b366359d9ec9fd89aa0002fb3fa45659a5ae2f13608f",
+  "log": "perf/acceptance/cli_entry.log",
+  "log_sha256": "1741cc6fac49ea44f24fb8043a2abe4d62e7839d5ea3d71ac41a7349b1bcdc96",
+  "summary": "命令行在 App 里：fitcoach — 用法：fitcoach <命令> [参数]      每个命令都有 --help；读命令加 --json 输出 {\"ok\": true, …}",
+  "detail": {
+    "summary": "命令行在 App 里：fitcoach — 用法：fitcoach <命令> [参数]      每个命令都有 --help；读命令加 --json 输出 {\"ok\": true, …}",
+    "passed": true,
+    "commands": [
+      "fitcoach"
+    ],
+    "app": "cyou.tianli.fitcoachapp",
+    "host_app": "/Applications/上门体育.app",
+    "target": "/Applications/上门体育.app/Contents/Resources/bin/fitcoach",
+    "inside_app": true,
+    "help_summary": "用法：fitcoach <命令> [参数]      每个命令都有 --help；读命令加 --json 输出 {\"ok\": true, …}",
+    "entries": [
+      {
+        "command": "fitcoach",
+        "link": "~/.local/bin/fitcoach",
+        "target": "/Applications/上门体育.app/Contents/Resources/bin/fitcoach",
+        "inside_app": true,
+        "executable": true,
+        "exit_code": 0,
+        "summary": "用法：fitcoach <命令> [参数]      每个命令都有 --help；读命令加 --json 输出 {\"ok\": true, …}",
+        "error": null
+      }
+    ]
+  }
+}

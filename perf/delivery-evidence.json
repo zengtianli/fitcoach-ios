@@ -3,34 +3,44 @@
   "checks": {
     "functionality": {
       "result": "passed",
-      "scope": "business",
+      "scope": "code",
       "method": "real_product",
-      "checked_at": "2026-09-28T01:43:49.650720+08:00",
-      "input_sha256": "5dc2f0df3b114f20ec8340c4626b66da9982f15c4c26ef88dc5adf1992cbd01e",
+      "checked_at": "2026-09-30T23:06:52.477570+08:00",
+      "input_sha256": "a767075665ad810794f551e4b5b90f2ce0626a5119989236719f79b888550b6a",
       "evidence": "perf/acceptance/functionality.json",
-      "evidence_sha256": "994da27cc21213d9e0253448cb30d4d2a04698ba8339bf823b1fc385ba68f323",
+      "evidence_sha256": "45fd3b00933ef972276b23ed0eb2f7245847eb82be50f947869906a3040293be",
       "detail": "sop.accept：bash scripts/accept/functionality.sh → ✅ 57 项契约断言全过"
     },
     "recovery": {
       "result": "passed",
-      "scope": "business",
+      "scope": "code",
       "method": "real_product",
-      "checked_at": "2026-09-28T01:43:47.843577+08:00",
-      "input_sha256": "5dc2f0df3b114f20ec8340c4626b66da9982f15c4c26ef88dc5adf1992cbd01e",
+      "checked_at": "2026-09-30T23:06:52.255148+08:00",
+      "input_sha256": "a767075665ad810794f551e4b5b90f2ce0626a5119989236719f79b888550b6a",
       "evidence": "perf/acceptance/recovery.json",
-      "evidence_sha256": "c4baece0ced4ec8ea19f2107945e95f9f12f9803191e905a2cba3210df84b079",
+      "evidence_sha256": "c7bc8039089fd9f726f3f88827d13e14f235c723867d6582e0ff7b7c56ab83eb",
       "detail": "sop.accept：bash scripts/accept/recovery.sh → PASS: recovery acceptance; production API and Session, local backend/faults; no UI or device claim"
     },
     "privacy": {
       "result": "passed",
-      "scope": "business",
+      "scope": "code",
       "method": "real_product",
-      "checked_at": "2026-09-28T01:43:50.250216+08:00",
-      "input_sha256": "5dc2f0df3b114f20ec8340c4626b66da9982f15c4c26ef88dc5adf1992cbd01e",
+      "checked_at": "2026-09-30T23:06:52.485650+08:00",
+      "input_sha256": "a767075665ad810794f551e4b5b90f2ce0626a5119989236719f79b888550b6a",
       "evidence": "perf/acceptance/privacy.json",
-      "evidence_sha256": "f3cd52e18796dbcb679af41848fa5815724e9cbcddd437a3f630e6e52088ed4d",
+      "evidence_sha256": "ebbe9ce123daa9851eab3a58cfd0d93bf163b85b272d4054b128946cbd471d1c",
       "detail": "sop.accept：bash scripts/accept/privacy.sh → PASS: privacy 25 assertions; no UI/device coverage"
+    },
+    "cli_entry": {
+      "result": "passed",
+      "scope": "cli_entry",
+      "method": "real_product",
+      "checked_at": "2026-10-01T11:01:39.761061+08:00",
+      "input_sha256": "430912a27d266d967610b366359d9ec9fd89aa0002fb3fa45659a5ae2f13608f",
+      "evidence": "perf/acceptance/cli_entry.json",
+      "evidence_sha256": "3735679a30239c53a3c702c3fc0aa4e3f833271abbd4d4898311662b8d5c6764",
+      "detail": "builtin:cli_entry：~/Dev/.venv/bin/python ~/Apps/chapter/engine/acceptors/cli_entry.py → 命令行在 App 里：fitcoach — 用法：fitcoach <命令> [参数]      每个命令都有 --help；读命令加 --json 输出 {\"ok\": true, …}"
     }
   },
-  "updated_at": "2026-09-28T01:43:50.266214+08:00"
+  "updated_at": "2026-10-01T11:01:39.796854+08:00"
 }

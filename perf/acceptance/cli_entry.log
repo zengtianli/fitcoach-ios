@@ -1,0 +1,1 @@
+命令行在 App 里：fitcoach — 用法：fitcoach <命令> [参数]      每个命令都有 --help；读命令加 --json 输出 {"ok": true, …}
