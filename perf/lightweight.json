@@ -1,115 +1,115 @@
 {
-  "product": "fitcoach-ios",
-  "platform": "ios",
-  "version": "1.0 (5)",
-  "measured_at": "2026-09-26",
-  "device": "iPhone 17（iPhone18,3）；体积为 Apple 设备切片记录，运行性能尚未真机实测",
-  "data": "App Store；体积不含用户数据与后续缓存；手机实际安装版本尚未核验",
-  "data_en": "App Store; package sizes exclude user data and caches; installed phone version not verified",
-  "size": {
-    "download_bytes": 2977882,
-    "installed_bytes": 4131840,
-    "method": "App Store Connect buildBundleFileSizes：iPhone18,3 / Universal；Apple 提供的下载/安装体积",
-    "source": "raw/asc-build-sizes.json"
-  },
-  "idle": {
-    "footprint_mb": null,
-    "cpu_pct": null,
-    "window_s": null,
-    "method": "未测：iPhone 17 / iOS 27.2 当前离线（tunnel unavailable、ddiServicesAvailable=false）；主机 DDI 已核验可用。未启动 App，未用模拟器替代真机数据，等待连接解锁及空闲测量窗口。"
-  },
-  "speed_gui": [
-    {
-      "key": "cold_launch_to_usable",
-      "label": "真机冷启动到可用",
-      "label_en": "Physical-device cold launch to usable",
-      "median_ms": null,
-      "runs": 0,
-      "status": "unmeasured",
-      "reason": "iPhone 17 / iOS 27.2 当前离线（tunnel unavailable、ddiServicesAvailable=false）；主机 DDI 已核验可用。未启动 App，未用模拟器替代真机数据，等待连接解锁及空闲测量窗口。"
-    }
-  ],
-  "background_status": "未完成真机后台/任务 CPU 核验；未以零占用代替未测",
-  "measurement_status": {
-    "size": "verified_asc",
-    "memory": "unmeasured",
-    "cpu": "unmeasured",
-    "speed": "unmeasured",
-    "device_reason": "iPhone 17 / iOS 27.2 当前离线（tunnel unavailable、ddiServicesAvailable=false）；主机 DDI 已核验可用。未启动 App，未用模拟器替代真机数据，等待连接解锁及空闲测量窗口。"
-  },
-  "source": {
-    "kind": "app_store_connect",
-    "app_id": "6806698109",
-    "bundle_id": "cyou.tianli.fitcoachapp",
-    "build_id": "4c2f341d-4c69-466e-8d4f-bb3dd9fdfa77",
-    "queried_at": "2026-09-26T19:24:30.236517+08:00",
-    "distribution": "App Store",
-    "processing_state": "VALID",
-    "device_model": "iPhone18,3",
-    "os_variant": "Universal",
-    "api_doc": "https://developer.apple.com/documentation/appstoreconnectapi/get-v1-buildbundles-_id_-buildbundlefilesizes"
-  },
-  "why": "按具体发行构建回读体积；内存、CPU 和启动时间仍明确保留未测状态。",
-  "why_en": "Sizes are read back for this exact distribution build. Memory, CPU and launch time remain explicitly unmeasured.",
-  "runtime_measurement": {
-    "simulator": "perf/simulator.json"
-  },
-  "cli": {
-    "command": "fitcoach",
-    "version": "1.0.0",
-    "measured_at": "2026-09-30",
-    "device": "Mac16,12 / Apple M4 / macOS 27.2",
-    "environment": "macOS 命令行；仓库入口 cli/fitcoach（bash 壳，源码比二进制新时先重编）→ build/cli/fitcoach（swiftc -O，arm64）；Mac 版包内 Contents/Resources/bin/fitcoach（Xcode Release，x86_64+arm64，已剥符号，未装机，取自 .dd-mac 构建产物）",
-    "environment_en": "macOS command line; repo entry cli/fitcoach (bash shim that rebuilds when a source is newer) -> build/cli/fitcoach (swiftc -O, arm64); embedded Contents/Resources/bin/fitcoach in the Mac app (Xcode Release, x86_64+arm64, stripped, not installed, taken from the .dd-mac build)",
-    "data": "读命令打本机隔离后端（临时库：1 位教练、1 名学员、快速开始建的地点/档期/体测项目），不含线上网络往返",
-    "size": {
-      "repo_binary_bytes": 1206400,
-      "embedded_binary_bytes": 1378432,
-      "method": "ls -l 字节数（十进制 MB 约 1.21 / 1.38）"
-    },
-    "memory": {
-      "help_peak_footprint_mb": 2.0,
-      "help_max_rss_mb": 6.1,
-      "read_peak_footprint_mb": 4.2,
-      "read_max_rss_mb": 13.9,
-      "method": "/usr/bin/time -l 的 peak memory footprint 与 maximum resident set size（十进制 MB）；read = schedule --range week --json；仓库二进制与包内二进制差 < 0.2 MB"
-    },
-    "speed_cli": [
-      {
-        "key": "fitcoach --help (binary)",
-        "cmd": "build/cli/fitcoach --help",
-        "median_ms": 10.6,
-        "runs": 20
-      },
-      {
-        "key": "fitcoach --help (embedded)",
-        "cmd": "FitCoach.app/Contents/Resources/bin/fitcoach --help",
-        "median_ms": 11.9,
-        "runs": 20
-      },
-      {
-        "key": "fitcoach --help (repo shim)",
-        "cmd": "cli/fitcoach --help",
-        "median_ms": 38.7,
-        "runs": 20,
-        "note": "含 bash 壳与源码新旧检查约 28 ms"
-      },
-      {
-        "key": "fitcoach schedule --range week --json (repo shim, local backend)",
-        "cmd": "cli/fitcoach schedule --range week --json",
-        "median_ms": 75.1,
-        "runs": 20
-      },
-      {
-        "key": "fitcoach students list --json (embedded, local backend)",
-        "cmd": "FitCoach.app/Contents/Resources/bin/fitcoach students list --json",
-        "median_ms": 41.9,
-        "runs": 20
-      }
-    ],
-    "idle": "不常驻：每次命令跑完即退出，没有后台进程或定时任务",
-    "linked_frameworks": "Foundation、CFNetwork、Combine 与 Swift 运行库（otool -L）；不链接 SwiftUI/AppKit",
-    "method": "Chapter app-lightweight measure.py cli（hyperfine -N，warmup 1，20 次取中位）；输出未写入顶层 measured_at/device，iOS 真机记录保持原样",
-    "status": "measured_macos_cli"
+ "product": "fitcoach-ios",
+ "platform": "ios",
+ "version": "1.0 (5)",
+ "measured_at": "2026-09-26",
+ "device": "iPhone 17（iPhone18,3）；体积为 Apple 设备切片记录，运行性能尚未真机实测",
+ "data": "App Store；体积不含用户数据与后续缓存；手机实际安装版本尚未核验",
+ "data_en": "App Store; package sizes exclude user data and caches; installed phone version not verified",
+ "size": {
+  "download_bytes": 2977882,
+  "installed_bytes": 4131840,
+  "method": "App Store Connect buildBundleFileSizes：iPhone18,3 / Universal；Apple 提供的下载/安装体积",
+  "source": "raw/asc-build-sizes.json"
+ },
+ "idle": {
+  "footprint_mb": null,
+  "cpu_pct": null,
+  "window_s": null,
+  "method": "未测：iPhone 17 / iOS 27.2 当前离线（tunnel unavailable、ddiServicesAvailable=false）；主机 DDI 已核验可用。未启动 App，未用模拟器替代真机数据，等待连接解锁及空闲测量窗口。"
+ },
+ "speed_gui": [
+  {
+   "key": "cold_launch_to_usable",
+   "label": "真机冷启动到可用",
+   "label_en": "Physical-device cold launch to usable",
+   "median_ms": null,
+   "runs": 0,
+   "status": "unmeasured",
+   "reason": "iPhone 17 / iOS 27.2 当前离线（tunnel unavailable、ddiServicesAvailable=false）；主机 DDI 已核验可用。未启动 App，未用模拟器替代真机数据，等待连接解锁及空闲测量窗口。"
   }
+ ],
+ "background_status": "未完成真机后台/任务 CPU 核验；未以零占用代替未测",
+ "measurement_status": {
+  "size": "verified_asc",
+  "memory": "unmeasured",
+  "cpu": "unmeasured",
+  "speed": "unmeasured",
+  "device_reason": "iPhone 17 / iOS 27.2 当前离线（tunnel unavailable、ddiServicesAvailable=false）；主机 DDI 已核验可用。未启动 App，未用模拟器替代真机数据，等待连接解锁及空闲测量窗口。"
+ },
+ "source": {
+  "kind": "app_store_connect",
+  "app_id": "6806698109",
+  "bundle_id": "cyou.tianli.fitcoachapp",
+  "build_id": "4c2f341d-4c69-466e-8d4f-bb3dd9fdfa77",
+  "queried_at": "2026-09-26T19:24:30.236517+08:00",
+  "distribution": "App Store",
+  "processing_state": "VALID",
+  "device_model": "iPhone18,3",
+  "os_variant": "Universal",
+  "api_doc": "https://developer.apple.com/documentation/appstoreconnectapi/get-v1-buildbundles-_id_-buildbundlefilesizes"
+ },
+ "why": "按具体发行构建回读体积；内存、CPU 和启动时间仍明确保留未测状态。",
+ "why_en": "Sizes are read back for this exact distribution build. Memory, CPU and launch time remain explicitly unmeasured.",
+ "runtime_measurement": {
+  "simulator": "perf/projections/iphone-3db5c38d60016bbc.json"
+ },
+ "cli": {
+  "command": "fitcoach",
+  "version": "1.0.0",
+  "measured_at": "2026-09-30",
+  "device": "Mac16,12 / Apple M4 / macOS 27.2",
+  "environment": "macOS 命令行；仓库入口 cli/fitcoach（bash 壳，源码比二进制新时先重编）→ build/cli/fitcoach（swiftc -O，arm64）；Mac 版包内 Contents/Resources/bin/fitcoach（Xcode Release，x86_64+arm64，已剥符号，未装机，取自 .dd-mac 构建产物）",
+  "environment_en": "macOS command line; repo entry cli/fitcoach (bash shim that rebuilds when a source is newer) -> build/cli/fitcoach (swiftc -O, arm64); embedded Contents/Resources/bin/fitcoach in the Mac app (Xcode Release, x86_64+arm64, stripped, not installed, taken from the .dd-mac build)",
+  "data": "读命令打本机隔离后端（临时库：1 位教练、1 名学员、快速开始建的地点/档期/体测项目），不含线上网络往返",
+  "size": {
+   "repo_binary_bytes": 1206400,
+   "embedded_binary_bytes": 1378432,
+   "method": "ls -l 字节数（十进制 MB 约 1.21 / 1.38）"
+  },
+  "memory": {
+   "help_peak_footprint_mb": 2.0,
+   "help_max_rss_mb": 6.1,
+   "read_peak_footprint_mb": 4.2,
+   "read_max_rss_mb": 13.9,
+   "method": "/usr/bin/time -l 的 peak memory footprint 与 maximum resident set size（十进制 MB）；read = schedule --range week --json；仓库二进制与包内二进制差 < 0.2 MB"
+  },
+  "speed_cli": [
+   {
+    "key": "fitcoach --help (binary)",
+    "cmd": "build/cli/fitcoach --help",
+    "median_ms": 10.6,
+    "runs": 20
+   },
+   {
+    "key": "fitcoach --help (embedded)",
+    "cmd": "FitCoach.app/Contents/Resources/bin/fitcoach --help",
+    "median_ms": 11.9,
+    "runs": 20
+   },
+   {
+    "key": "fitcoach --help (repo shim)",
+    "cmd": "cli/fitcoach --help",
+    "median_ms": 38.7,
+    "runs": 20,
+    "note": "含 bash 壳与源码新旧检查约 28 ms"
+   },
+   {
+    "key": "fitcoach schedule --range week --json (repo shim, local backend)",
+    "cmd": "cli/fitcoach schedule --range week --json",
+    "median_ms": 75.1,
+    "runs": 20
+   },
+   {
+    "key": "fitcoach students list --json (embedded, local backend)",
+    "cmd": "FitCoach.app/Contents/Resources/bin/fitcoach students list --json",
+    "median_ms": 41.9,
+    "runs": 20
+   }
+  ],
+  "idle": "不常驻：每次命令跑完即退出，没有后台进程或定时任务",
+  "linked_frameworks": "Foundation、CFNetwork、Combine 与 Swift 运行库（otool -L）；不链接 SwiftUI/AppKit",
+  "method": "Chapter app-lightweight measure.py cli（hyperfine -N，warmup 1，20 次取中位）；输出未写入顶层 measured_at/device，iOS 真机记录保持原样",
+  "status": "measured_macos_cli"
+ }
 }

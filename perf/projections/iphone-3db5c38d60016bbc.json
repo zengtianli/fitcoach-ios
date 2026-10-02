@@ -1,0 +1,49 @@
+{
+ "schema_version": 1,
+ "product": "fitcoach-ios",
+ "platform": "ios",
+ "version": "1.0 (1)",
+ "input_sha256": "0091b91a31cfe3d6bf678ec081dc276c130a4358ab6e7eff4c54e78b12ee2bfa",
+ "measured_at": "2026-10-02T23:51:18+08:00",
+ "device": "iPhone 17 Pro (iPhone-17-Pro) / iOS 27.0 Simulator",
+ "data": "隔离虚构演示数据；与 perf/platforms/iphone.json 共用实测原件",
+ "size": {
+  "download_bytes": 9705738,
+  "installed_bytes": 21888564,
+  "download_mb": 9.71,
+  "installed_mb": 21.89,
+  "kind": "simulator .app (Release), not a store slice"
+ },
+ "idle": {
+  "memory_mb": 32.0,
+  "cpu_pct": 0.0,
+  "window_s": 60,
+  "settle_s": 45,
+  "method": "shared measure.py idle: CPU-time delta / wall window; phys_footprint peak of 3 samples after the window",
+  "scope": "Simulator App host process only; excludes CoreSimulator, system services and inactive extensions",
+  "footprint_mb": 32.0
+ },
+ "runtime_measurement": {
+  "environment": "simulator",
+  "device": "iPhone 17 Pro (iPhone-17-Pro)",
+  "os": "iOS 27.0",
+  "xcode": "Xcode 27.0 (27A266a)",
+  "evidence": "perf/platforms/iphone/measure-20261002-235118.json",
+  "evidence_sha256": "3db5c38d60016bbce48dac24cac7215b12341e1f565fd35539339fe75696ce5b",
+  "version": "1.0 (1)"
+ },
+ "speed_gui": [
+  {
+   "key": "first_screen_ready",
+   "label": "模拟器冷启动到有数据的首屏",
+   "label_en": "Simulator cold launch to first data-bearing screen",
+   "median_ms": 3287.0,
+   "runs": 5,
+   "headline": true,
+   "method": "launch command issued -> App os_log \"lane-ready\" (first data-bearing screen), App terminated 3 s before each run, first run after install discarded, median",
+   "evidence": "perf/platforms/iphone/measure-20261002-235118.json",
+   "evidence_sha256": "3db5c38d60016bbce48dac24cac7215b12341e1f565fd35539339fe75696ce5b"
+  }
+ ],
+ "limitations": "仅模拟器 App 进程；非真机与商店包。"
+}
