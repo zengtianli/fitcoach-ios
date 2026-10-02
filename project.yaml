@@ -4,6 +4,7 @@ name_zh: 上门体育
 display_name: At-Home Sports · 上门体育
 family: fitcoach
 form: ios
+platforms: [iphone, ipad, mac, watch, vision]   # 一个 App 五个平台（用户 2026-10-02）；须与 sop.platforms 一致，multiplatform.py audit 与 project.yml 对账
 lifecycle: active
 bundle_id: cyou.tianli.fitcoachapp
 origin: own
@@ -17,14 +18,27 @@ sop:
     functionality: bash scripts/accept/functionality.sh
     recovery: bash scripts/accept/recovery.sh
     privacy: bash scripts/accept/privacy.sh
+    # 平台线启动冒烟：iPhone / iPad / Mac / Vision 先起隔离演示后端（scripts/demo/coach_day.py：真后端、127.0.0.1
+    # 随机端口、临时库、seed.py 假数据 + 今天 4 节课）；手表不联网，用 -fitcoach.watchDemo 1 的占位快照。
+    # 再交给 Chapter 内置 platform_launch（共享 sim_lane：仓外构建、无界面模拟器 / Mac 静默启动不上屏、截图）。
+    launch_iphone: bash scripts/accept/launch.sh iphone
+    launch_ipad: bash scripts/accept/launch.sh ipad
+    launch_mac: bash scripts/accept/launch.sh mac
+    launch_watch: bash scripts/accept/launch.sh watch
+    launch_vision: bash scripts/accept/launch.sh vision
   ui:
   - Sources/**
   - Shared/**
+  - Watch/**
+  - WatchWidget/**
   source:
   - Sources/**
   - Shared/**
   - Resources/**
   - Widget/**
+  # 手表 app 与表盘复杂功能随 iOS 包嵌入（FitCoach.app/Watch/），所以是每条线的源码，不只是手表线的
+  - Watch/**
+  - WatchWidget/**
   - ShareExtension/**
   - project.yml
   - '*.entitlements'
@@ -37,13 +51,51 @@ sop:
   - test_check_markdown_drift.py
   - scripts/tests/**
   - scripts/accept/**
+  - scripts/demo/**
   - cli/test.sh
   - cli/test_cli.py
   - Package.swift
   media:
   - shots
   release: perf/asc-release.json
-  runtime_note: iPhone 17 / iOS 27.2 当前离线（tunnel unavailable、ddiServicesAvailable=false）；主机 DDI 已核验可用。未启动 App，未用模拟器替代真机数据，等待连接解锁及空闲测量窗口。
+  # 一个 App 五条平台线（用户 2026-10-02：同名、同图标、同数据；「我都有，但你用模拟器好了」）。
+  # 模拟器验收、证据标 environment=simulator；Mac 线是本组件自己的 macOS 目的地（本机原生、静默）。手表 / Vision / Mac
+  # 还没上架（distribution: none）。预算：iPhone / iPad / Mac 沿用 Chapter 默认（150 MB · 0.5%）；手表与 Vision 是我们定的
+  # 目标，引擎只判 memory_mb / cpu，size_mb / cold_launch_ms 由 README 与交接对照。
+  platforms:
+    iphone:
+      simulator: {device_type: iPhone-17-Pro}
+      store_shots: shots/appstore/iphone/*.png
+      distribution: app_store
+    ipad:
+      simulator: {device_type: iPad-Pro-13-inch-M5-12GB}
+      store_shots: shots/appstore/ipad/*.png
+      distribution: app_store
+    mac:
+      # 不登记商店截图：Mac 不发行、不上推广页；静默线的进程内离屏渲染画不出侧栏选中材质（选中行成黑块），
+      # 上屏窗口截图又不许自动化做（不上屏、不进 Dock）。Mac 上架前由本人决定怎么截。
+      distribution: none
+    watch:
+      scheme: FitCoachWatch
+      bundle_id: cyou.tianli.fitcoachapp.watchkitapp
+      source: [Watch/**, WatchWidget/**]
+      simulator: {device_type: Apple-Watch-Series-12-46mm}
+      launch_args: [-fitcoach.watchDemo, '1']
+      store_shots: shots/appstore/watch/*.png
+      budget: {memory_mb: 25, cpu: 0.5, size_mb: 10, cold_launch_ms: 1500}
+      distribution: none
+    vision:
+      simulator: {device_type: Apple-Vision-Pro-4K}
+      store_shots: shots/appstore/vision/*.png
+      budget: {memory_mb: 60, cpu: 0.5}
+      distribution: none
+  measure:  # 模拟器无界面、不抢焦点；Mac 线静默（不上屏、不进 Dock），本人用电脑时也能测
+    # 起隔离演示后端 → 逐线共享测量；iPhone 同一原件投影到 simulator/lightweight，不再另测 legacy。
+    # 核当前输入与原件 SHA 后复用；锁/负载等待 0，忙或预算耗尽即返回 75，下个时段只补缺口。
+    command: ~/Dev/.venv/bin/python scripts/perf/measure_platforms.py
+    outputs: [perf/simulator.json, perf/lightweight.json, perf/raw, perf/platforms]
+    in_use: true
+  runtime_note: 平台线模式（2026-10-02）：五条线都按模拟器验收（Mac 线本机原生），实体 iPhone 不回读、真机未验证；ASC 回读只核对已上传的 iOS 构建。
   runtime:
     kind: ios
     readback: builtin:asc-device
