@@ -64,18 +64,22 @@ sop:
   # 目标，引擎只判 memory_mb / cpu，size_mb / cold_launch_ms 由 README 与交接对照。
   platforms:
     iphone:
+      input_normalization: {proof: perf/input-normalizations/finder-iphone.json, sha256: 6a8488527a6dff441a5e58c04a169ab2494a48dcc12c0fa333571bfa70a05a34}
       simulator: {device_type: iPhone-17-Pro}
       store_shots: shots/appstore/iphone/*.png
       distribution: app_store
     ipad:
+      input_normalization: {proof: perf/input-normalizations/finder-ipad.json, sha256: 4a56bbe8cf04b6430050a0f1d1632d2a91c8dceda124de71864ddfb6d0ec4193}
       simulator: {device_type: iPad-Pro-13-inch-M5-12GB}
       store_shots: shots/appstore/ipad/*.png
       distribution: app_store
     mac:
+      input_normalization: {proof: perf/input-normalizations/finder-mac.json, sha256: 932492222d1da66ecb8d462061bdffb66e21c6275d1e634a8d312e10e540437e}
       # 不登记商店截图：Mac 不发行、不上推广页；静默线的进程内离屏渲染画不出侧栏选中材质（选中行成黑块），
       # 上屏窗口截图又不许自动化做（不上屏、不进 Dock）。Mac 上架前由本人决定怎么截。
       distribution: none
     watch:
+      input_normalization: {proof: perf/input-normalizations/finder-watch.json, sha256: bb2ea22b27ca985664b813490ae7e10c80dd04afbe014c93b83d6e6bc4e81f0b}
       scheme: FitCoachWatch
       bundle_id: cyou.tianli.fitcoachapp.watchkitapp
       source: [Watch/**, WatchWidget/**]
@@ -85,6 +89,7 @@ sop:
       budget: {memory_mb: 25, cpu: 0.5, size_mb: 10, cold_launch_ms: 1500}
       distribution: none
     vision:
+      input_normalization: {proof: perf/input-normalizations/finder-vision.json, sha256: 12258be953aab1689d90c89b47605b9552a4225ec06bc39506097f8440e2af00}
       simulator: {device_type: Apple-Vision-Pro-4K}
       store_shots: shots/appstore/vision/*.png
       budget: {memory_mb: 60, cpu: 0.5}
