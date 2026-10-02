@@ -236,6 +236,7 @@ struct StudentDetailView: View {
         do {
             data = try await API(session).get("/coach/api/students/\(studentId)")
             link = try await API(session).get("/coach/api/students/\(studentId)/link")
+            LaneSignal.ready("student")
         } catch APIError.gone { session.signOut() }
         catch { err = errText(error) }
         await loadGrowth()

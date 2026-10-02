@@ -49,7 +49,7 @@ struct LoginView: View {
             .navigationTitle("").navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showServer) { ServerSheet() }
             .sheet(isPresented: $showRegister, onDismiss: restore) { RegisterView() }
-            .task { restore() }
+            .task { restore(); LaneSignal.ready("login") }
             .onChange(of: session.baseURL) { _, _ in restore() }
             .onChange(of: mode) { _, _ in focused = nil; err = nil }
         }
@@ -78,7 +78,7 @@ struct LoginView: View {
                     .textContentType(.password).focused($focused, equals: .password)
                     .submitLabel(.go).onSubmit { if canLogin { Task { await doLogin() } } }
             }
-            .padding(20).background(Color.white, in: RoundedRectangle(cornerRadius: 20))
+            .padding(20).background(Theme.cardBG, in: RoundedRectangle(cornerRadius: 20))
             Toggle("记住账号和密码", isOn: $remember)
                 .font(.subheadline)
                 .onChange(of: remember) { _, enabled in
@@ -110,7 +110,7 @@ struct LoginView: View {
             TextField("粘贴教练发来的链接或口令", text: $link, axis: .vertical)
                 .lineLimit(2...4).textInputAutocapitalization(.never).autocorrectionDisabled()
                 .focused($focused, equals: .link)
-                .padding(20).background(Color.white, in: RoundedRectangle(cornerRadius: 20))
+                .padding(20).background(Theme.cardBG, in: RoundedRectangle(cornerRadius: 20))
             Text("粘贴链接后会验证是否有效。教练账号保持登录，不受影响。")
                 .font(.footnote).foregroundStyle(Theme.ink2)
             Button { Task { await doStudent() } } label: {

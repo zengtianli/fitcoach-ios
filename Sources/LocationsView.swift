@@ -66,7 +66,10 @@ struct LocationsView: View {
 
     private func load() async {
         err = nil
-        do { data = try await API(session).get("/coach/api/locations") }
+        do {
+            data = try await API(session).get("/coach/api/locations")
+            LaneSignal.ready("locations")
+        }
         catch APIError.gone { session.signOut() }
         catch { err = errText(error) }
     }

@@ -8,6 +8,7 @@ import SwiftUI
 /// 「improved=false」写成「退步」会让家长第一反应是换机构，写成人话才有用。
 struct StudentModeView: View {
     @EnvironmentObject var session: Session
+    @Environment(\.wideLayout) private var wide
     @State private var data: StudentView?
     @State private var err: String?
     @State private var loading = false
@@ -168,6 +169,7 @@ struct StudentModeView: View {
             }
             .listStyle(.plain)
             .pageBackground()
+            .contentWidth(wide ? 680 : nil)     // 宽屏收成一列居中；窄屏原样
             .navigationTitle(data?.student_name ?? "我的课时")
             .navigationBarTitleDisplayMode(.inline)
             .refreshable { await load() }
@@ -183,7 +185,10 @@ struct StudentModeView: View {
     private func load() async {
         loading = true; err = nil
         defer { loading = false }
-        do { data = try await API(session).get("/s/api/view", student: true) }
+        do {
+            data = try await API(session).get("/s/api/view", student: true)
+            LaneSignal.ready("student-mode")
+        }
         catch APIError.gone {
             err = "这条链接已失效（可能被教练重新签发或吊销），找教练要一条新的。"
         }

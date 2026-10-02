@@ -1,21 +1,51 @@
 import SwiftUI
+#if os(iOS)
+import UIKit
+#endif
 
 @main
 struct FitCoachApp: App {
+    #if os(macOS)
+    // 平台验收车道的静默启动（-lane_quiet）；不传参数时什么都不做（Shared/LaneSignal.swift）
+    @NSApplicationDelegateAdaptor(LaneAppDelegate.self) private var laneDelegate
+    #endif
     @StateObject private var session = Session()
+
+    init() {
+        // 手表来要「今天」时 iPhone 可能是在后台被唤起的：会话代理要在第一时间挂上（其余平台空操作）
+        WatchLink.shared.activate()
+    }
 
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environmentObject(session)
                 .tint(.accentColor)   // 主题色 SSOT=products.yaml theme → AccentColor.colorset（theme_sync.py 派生）
-                .preferredColorScheme(.light)   // 亮色主题（与网页端/小程序一致）
+                #if !os(visionOS)
+                .preferredColorScheme(.light)   // 亮色主题（与网页端/小程序一致）；Vision Pro 只有玻璃，见 Theme.swift
+                #endif
         }
+        #if os(macOS)
+        // Mac 默认窗口太窄，摆不下侧栏 + 日程看板
+        .defaultSize(width: 1180, height: 780)
+        #elseif os(visionOS)
+        // Vision Pro 的默认窗口偏扁，字号也比 Mac 大一圈：给侧栏 + 日程 + 课时余额三列留够宽度
+        .defaultSize(width: 1360, height: 860)
+        #endif
     }
 }
 
 struct RootView: View {
     @EnvironmentObject var session: Session
+    @Environment(\.scenePhase) private var scenePhase
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var hSize
+    /// 只认 iPad 的 regular：iPhone Pro Max 横屏时尺寸类也是 regular，但那块屏摆不下侧栏 + 看板，
+    /// 仍走原来的底部 TabView。
+    private var wide: Bool { hSize == .regular && UIDevice.current.userInterfaceIdiom == .pad }
+    #else
+    private let wide = true      // Mac 与 Vision Pro 的窗口一律按宽屏排
+    #endif
 
     /// `-fitcoach.screen metrics|password|student:<id>|trend:<id>` —— 直接落到某个深层界面。
     /// **只为截图与联调**：模拟器没有点击能力，不给直达入口，嵌套两层以下的界面
@@ -25,19 +55,35 @@ struct RootView: View {
     }
 
     var body: some View {
-        if session.showingLogin {
-            LoginView(initialMode: session.loginMode)
-        } else if session.isCoach, let s = deepScreen, !s.isEmpty {
-            NavigationStack { deepView(s) }
-        } else if session.isCoach {
-            CoachTabs()
-        } else if session.isStudent {
-            StudentModeView()
-        } else if deepScreen == "register" {
-            RegisterView()                  // 截图/联调直达注册页（未登录态才有意义）
-        } else {
-            LoginView()
+        Group {
+            if session.showingLogin {
+                LoginView(initialMode: session.loginMode)
+            } else if session.isCoach, let s = deepScreen, !s.isEmpty {
+                NavigationStack { deepView(s) }
+            } else if session.isCoach {
+                CoachTabs()
+            } else if session.isStudent {
+                StudentModeView()
+            } else if deepScreen == "register" {
+                RegisterView()                  // 截图/联调直达注册页（未登录态才有意义）
+            } else {
+                LoginView()
+            }
         }
+        .environment(\.wideLayout, wide)
+        .task {
+            LaneSignal.applyOrientation()
+            LaneSignal.applyWindowFrame()
+            WatchLink.shared.publish()
+        }
+        // 登录 / 退出 / 换服务器：手表跟着换成新的「今天」或清空
+        .onChange(of: session.coachCookie) { _, _ in WatchLink.shared.publish(force: true) }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { WatchLink.shared.publish() }
+        }
+        #if os(macOS)
+        .frame(minWidth: 820, minHeight: 560)
+        #endif
     }
 
     @ViewBuilder
@@ -62,6 +108,7 @@ struct RootView: View {
 
 struct CoachTabs: View {
     @EnvironmentObject var session: Session
+    @Environment(\.wideLayout) private var wide
 
     /// 初始 tab 可由启动参数指定：`-fitcoach.tab schedule|students|availability|more`。
     /// 与已有的 `-fitcoach.baseURL` / `-fitcoach.coachCookie` 同一条路子（UserDefaults
@@ -71,6 +118,15 @@ struct CoachTabs: View {
         UserDefaults.standard.string(forKey: "fitcoach.tab") ?? "schedule"
 
     var body: some View {
+        if wide {
+            RegularHomeView(tab: $tab)      // iPad 全屏 / Mac / Vision Pro：侧栏 + 日程看板
+        } else {
+            compact
+        }
+    }
+
+    /// 窄屏：原来那套底部 TabView，一行没改（App Store 截图就是它）。
+    private var compact: some View {
         TabView(selection: $tab) {
             NavigationStack { ScheduleView() }
                 .tabItem { Label("日程", systemImage: "calendar") }
@@ -90,6 +146,7 @@ struct CoachTabs: View {
 
 struct MoreView: View {
     @EnvironmentObject var session: Session
+    @Environment(\.wideLayout) private var wide
     @State private var showServer = false
     @State private var showSignOut = false
 
@@ -104,13 +161,15 @@ struct MoreView: View {
             MoreLink(icon: "wand.and.stars", tone: .accent, title: "快速开始",
                      detail: "一键准备地点、档期和常用体测项目") { QuickSetupView() }
                 .cardRow(top: 10)
-            GroupTitle(text: "管理", icon: "slider.horizontal.3").cardRow(top: 10, bottom: 2)
-            MoreLink(icon: "ruler", tone: .accent, title: "体测项目",
-                     detail: "成长数据测什么，在这里定") { MetricsView() }.cardRow()
-            MoreLink(icon: "mappin.and.ellipse", tone: .ok, title: "上课地点",
-                     detail: "排课时可选的地点") { LocationsView() }.cardRow()
-            MoreLink(icon: "list.bullet.rectangle", tone: .violet, title: "变更记录",
-                     detail: "谁在什么时候改了什么") { AuditView() }.cardRow()
+            if !wide {      // 宽屏这三项在侧栏的「管理」里，这里不再重复
+                GroupTitle(text: "管理", icon: "slider.horizontal.3").cardRow(top: 10, bottom: 2)
+                MoreLink(icon: "ruler", tone: .accent, title: "体测项目",
+                         detail: "成长数据测什么，在这里定") { MetricsView() }.cardRow()
+                MoreLink(icon: "mappin.and.ellipse", tone: .ok, title: "上课地点",
+                         detail: "排课时可选的地点") { LocationsView() }.cardRow()
+                MoreLink(icon: "list.bullet.rectangle", tone: .violet, title: "变更记录",
+                         detail: "谁在什么时候改了什么") { AuditView() }.cardRow()
+            }
 
             GroupTitle(text: "账号", icon: "person.crop.circle").cardRow(top: 14, bottom: 2)
             MoreLink(icon: "key.fill", tone: .warn, title: "修改密码",
@@ -158,6 +217,7 @@ struct MoreView: View {
         .listStyle(.plain)
         .pageBackground()
         .navigationTitle("更多")
+        .onAppear { LaneSignal.ready("more") }
         .sheet(isPresented: $showServer) { ServerSheet() }
         .alert("退出登录？", isPresented: $showSignOut) {
             Button("取消", role: .cancel) {}
@@ -280,7 +340,10 @@ struct TrendProbe: View {
             }
         }
         .task {
-            do { data = try await API(session).get("/coach/api/students/\(studentId)/growth") }
+            do {
+                data = try await API(session).get("/coach/api/students/\(studentId)/growth")
+                LaneSignal.ready("trend")
+            }
             catch { err = errText(error) }
         }
     }

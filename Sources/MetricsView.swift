@@ -78,7 +78,10 @@ struct MetricsView: View {
 
     private func load() async {
         err = nil
-        do { data = try await API(session).get("/coach/api/metrics") }
+        do {
+            data = try await API(session).get("/coach/api/metrics")
+            LaneSignal.ready("metrics")
+        }
         catch APIError.gone { session.signOut() }
         catch { err = errText(error) }
     }

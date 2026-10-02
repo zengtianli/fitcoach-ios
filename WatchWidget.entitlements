@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- 手表 app 与表盘复杂功能共享「今天」快照的仓（手表本机钥匙串，不跨设备）。第一项 = 不传
+	     kSecAttrAccessGroup 时的默认落点，所以**两个手表 target 这一项必须逐字相同**（Watch/SnapshotStore.swift）。
+	     keychain access group 不用在开发者门户登记（描述文件默认带 <TeamID>.* 通配），App Group 要。 -->
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)cyou.tianli.fitcoachapp.watch</string>
+	</array>
+</dict>
+</plist>

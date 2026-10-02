@@ -7,9 +7,36 @@ import SwiftUI
 //
 // 亮色主题是**产品约束**不是默认值：App.swift 钉了 .preferredColorScheme(.light)，
 // 所以这里的颜色可以是固定值，不需要 dark 变体。别加 dark 分支。
+//
+// 唯一的例外是 Vision Pro：那里没有亮色外观，窗口是玻璃，文字一律浅色。下面 `#if os(visionOS)` 那一组
+// 不是 dark 变体，而是同一套语义在玻璃上的写法（底色透明、卡片是材质、浅色系语义色降成半透明）；
+// iPhone / iPad / Mac 只编 #else 这一组，与原来逐字相同。
 
 enum Theme {
 
+    #if os(visionOS)
+    static let pageBG    = Color.clear
+    static let cardBG    = Color.white.opacity(0.06)
+    static let cardBGAlt = Color.white.opacity(0.04)
+
+    static let accent    = Color(red: 0.42, green: 0.60, blue: 1.0)
+    static let accentSoft = accent.opacity(0.16)
+
+    static let ok      = Color(red: 0.30, green: 0.85, blue: 0.55)
+    static let okSoft  = ok.opacity(0.16)
+    static let warn    = Color(red: 1.0, green: 0.70, blue: 0.30)
+    static let warnSoft = warn.opacity(0.16)
+    static let danger  = Color(red: 1.0, green: 0.45, blue: 0.45)
+    static let dangerSoft = danger.opacity(0.16)
+    static let violet  = Color(red: 0.72, green: 0.60, blue: 1.0)
+    static let violetSoft = violet.opacity(0.16)
+
+    static let ink     = Color.white
+    static let ink2    = Color.white.opacity(0.72)
+    static let ink3    = Color.white.opacity(0.5)
+    static let hairline = Color.white.opacity(0.14)
+    static let neutralSoft = Color.white.opacity(0.10)
+    #else
     // 底色：页面比卡片略深，卡片才「浮」得起来。iOS 系统灰偏冷，这里往暖里挪一点。
     static let pageBG    = Color(red: 0.945, green: 0.949, blue: 0.961)
     static let cardBG    = Color.white
@@ -34,6 +61,8 @@ enum Theme {
     static let ink2    = Color(red: 0.376, green: 0.404, blue: 0.467)
     static let ink3    = Color(red: 0.576, green: 0.604, blue: 0.667)
     static let hairline = Color(red: 0.898, green: 0.906, blue: 0.925)
+    static let neutralSoft = Color(red: 0.925, green: 0.933, blue: 0.949)
+    #endif
 
     // 圆角：卡片 16 / 内嵌块 12 / 徽标胶囊。
     static let rCard: CGFloat = 16
@@ -48,7 +77,7 @@ enum Theme {
         case .warn:   return (warn, warnSoft)
         case .danger: return (danger, dangerSoft)
         case .violet: return (violet, violetSoft)
-        case .neutral: return (ink2, Color(red: 0.925, green: 0.933, blue: 0.949))
+        case .neutral: return (ink2, neutralSoft)
         }
     }
 
@@ -74,7 +103,7 @@ struct CardBox<Content: View>: View {
                 .padding(padding)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .background(Theme.cardBG)
+        .cardSurface()
         .clipShape(RoundedRectangle(cornerRadius: Theme.rCard, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: Theme.rCard, style: .continuous)
@@ -94,11 +123,26 @@ extension View {
             .listRowInsets(EdgeInsets(top: top, leading: 16, bottom: bottom, trailing: 16))
     }
 
-    /// 页面级：换掉 List 的系统底色，铺 Theme.pageBG。
+    /// 页面级：换掉 List 的系统底色，铺 Theme.pageBG（Vision Pro 上不铺，露出窗口的玻璃）。
+    @ViewBuilder
     func pageBackground() -> some View {
+        #if os(visionOS)
+        self.scrollContentBackground(.hidden)
+        #else
         self
             .scrollContentBackground(.hidden)
             .background(Theme.pageBG)
+        #endif
+    }
+
+    /// 卡片的面：白卡（iPhone / iPad / Mac）；Vision Pro 上是材质，玻璃上浮起来的一块。
+    @ViewBuilder
+    func cardSurface() -> some View {
+        #if os(visionOS)
+        self.background(.regularMaterial)
+        #else
+        self.background(Theme.cardBG)
+        #endif
     }
 }
 

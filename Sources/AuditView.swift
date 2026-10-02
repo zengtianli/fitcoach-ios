@@ -76,7 +76,10 @@ struct AuditView: View {
         if all { q["all"] = "1" }
         let sid = studentFilter ?? (student == 0 ? nil : student)
         if let s = sid { q["student_id"] = String(s) }
-        do { data = try await API(session).get("/coach/api/audit", query: q) }
+        do {
+            data = try await API(session).get("/coach/api/audit", query: q)
+            LaneSignal.ready("audit")
+        }
         catch APIError.gone { session.signOut() }
         catch { err = errText(error) }
     }

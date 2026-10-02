@@ -136,6 +136,7 @@ struct ScheduleView: View {
             }
         }
         .task { if data == nil { await load() } }
+        .onReceive(NotificationCenter.default.publisher(for: .fitcoachReload)) { _ in Task { await load() } }
         .sheet(isPresented: $showNew) {
             SessionFormView(sessionId: nil, studentId: nil, presetDate: data?.date)
                 { Task { await load() } }
@@ -157,6 +158,8 @@ struct ScheduleView: View {
                 .get("/coach/api/schedule", query: ["range": range, "date": date])
             data = d
             date = d.date
+            LaneSignal.ready("schedule")
+            NotificationCenter.default.post(name: .fitcoachScheduleLoaded, object: nil)
         } catch APIError.gone {
             // 未过闸与「不存在」后端刻意不区分；日程列表这条路上只可能是掉线
             session.signOut()

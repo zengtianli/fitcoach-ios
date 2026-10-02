@@ -296,6 +296,33 @@ func runContract() async {
         } catch APIError.gone { ok("吊销后旧 token → 404", true) }
     } catch { ok("学员端", false, "\(error)") }
 
+    // 手表不联网：iPhone 用这两个端点拼「今天」快照递过去（Sources/WatchLink.swift）。
+    // 这里拿真后端的响应喂同一个 WatchSnapshotBuilder，验顺序、剩余课时与编解码往返；验完把这节课取消，不影响上面的数。
+    print("── 手表快照（WatchSnapshotBuilder）──")
+    do {
+        let today = TZ.dateString(Date())
+        let made = try await api.post("/coach/api/sessions", [
+            "package_id": String(pkgId), "start_at": "\(today) 06:00", "end_at": "\(today) 06:45",
+            "location_id": String(locId), "content": "手表快照", "status": "scheduled", "force": "on",
+        ])
+        let watchSes = made.id ?? 0
+        let sch: ScheduleResp = try await api.get("/coach/api/schedule", query: ["range": "today"])
+        let stus: StudentsResp = try await api.get("/coach/api/students")
+        let snap = WatchSnapshotBuilder.make(schedule: sch, students: stus)
+        ok("快照是今天的", snap.day == sch.today && snap.isToday())
+        ok("  今天那节课进了快照", snap.lessons.contains { $0.id == watchSes })
+        ok("  课按开始时间排", snap.lessons.map(\.startAt) == snap.lessons.map(\.startAt).sorted())
+        let row = stus.rows.first { $0.id == stuId }
+        ok("  每节课带的剩余课时 = 学员列表的 available_total",
+           snap.lessons.first { $0.id == watchSes }?.remaining == row?.available_total,
+           "got \(String(describing: snap.lessons.first { $0.id == watchSes }?.remaining))")
+        ok("  余额按剩得少的在前", snap.balances.map(\.remaining) == snap.balances.map(\.remaining).sorted())
+        let back = snap.encoded().flatMap(WatchSnapshot.decode)
+        ok("  编码再解码不丢字段", back == snap)
+        _ = try await api.post("/coach/api/sessions/\(watchSes)/status",
+                               ["to": "cancelled", "reason": "", "reason_code": ""])
+    } catch { ok("手表快照", false, "\(error)") }
+
     report()
 }
 

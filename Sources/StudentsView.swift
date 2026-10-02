@@ -3,6 +3,9 @@ import SwiftUI
 struct StudentsView: View {
     @EnvironmentObject var session: Session
     @Environment(\.horizontalSizeClass) private var sizeClass
+    /// 宽屏（iPad 全屏 / Mac / Vision Pro）由 RegularHomeView 摆成三栏：这里只出中间那栏的名单，
+    /// 点谁由外层的详情栏显示（不在侧栏式分栏里再套一层分栏）。nil = 自己管导航（iPhone，原样）。
+    var columnSelection: Binding<StudentListRow?>? = nil
     @State private var data: StudentsResp?
     @State private var err: String?
     @State private var showNew = false
@@ -13,6 +16,7 @@ struct StudentsView: View {
     /// 830px，日程卡 877px）。其余卡片屏（体测项目 / 学员详情）走的就是
     /// 「onTapGesture + navigationDestination」这条路，这里对齐它们。
     @State private var open: StudentListRow?
+    private var openBinding: Binding<StudentListRow?> { columnSelection ?? $open }
 
     private func filter(_ rows: [StudentListRow]) -> [StudentListRow] {
         let k = q.trimmingCharacters(in: .whitespaces)
@@ -20,6 +24,14 @@ struct StudentsView: View {
     }
 
     var body: some View {
+        if columnSelection != nil {
+            studentList
+        } else {
+            standalone
+        }
+    }
+
+    private var standalone: some View {
         Group {
             if sizeClass == .regular {
                 NavigationSplitView {
@@ -75,9 +87,9 @@ struct StudentsView: View {
                     .cardRow()
                 }
                 ForEach(active) { r in
-                    StudentCell(r: r)
+                    marked(StudentCell(r: r), r)
                         .contentShape(Rectangle())
-                        .onTapGesture { open = r }
+                        .onTapGesture { openBinding.wrappedValue = r }
                         .accessibilityAddTraits(.isButton)
                         .cardRow()
                 }
@@ -86,9 +98,9 @@ struct StudentsView: View {
                     GroupTitle(text: "已停用", trailing: "\(d.inactive.count) 人", icon: "pause.circle")
                         .cardRow(top: 14, bottom: 2)
                     ForEach(filter(d.inactive)) { r in
-                        StudentCell(r: r, dimmed: true)
+                        marked(StudentCell(r: r, dimmed: true), r)
                             .contentShape(Rectangle())
-                            .onTapGesture { open = r }
+                            .onTapGesture { openBinding.wrappedValue = r }
                             .accessibilityAddTraits(.isButton)
                             .cardRow()
                     }
@@ -101,10 +113,10 @@ struct StudentsView: View {
         // 「编译过了」自我安慰（上面那条注释里的坑就是这么来的）。只在启动时生效一次。
         .task {
             let want = UserDefaults.standard.integer(forKey: "fitcoach.openStudent")
-            guard want > 0, open == nil else { return }
+            guard want > 0, openBinding.wrappedValue == nil else { return }
             if data == nil { await load() }
             let all = (data.map { $0.rows + $0.inactive }) ?? []
-            open = all.first { $0.id == want }
+            openBinding.wrappedValue = all.first { $0.id == want }
         }
         .pageBackground()
         .navigationTitle("学员")
@@ -118,12 +130,29 @@ struct StudentsView: View {
             }
         }
         .task { if data == nil { await load() } }
+        .onReceive(NotificationCenter.default.publisher(for: .fitcoachReload)) { _ in Task { await load() } }
         .sheet(isPresented: $showNew) { StudentFormSheet(student: nil) { Task { await load() } } }
+    }
+
+    /// 宽屏三栏里标出详情栏正在看的那位（iPhone 上没有「选中」这回事，原样返回）
+    @ViewBuilder
+    private func marked<V: View>(_ cell: V, _ r: StudentListRow) -> some View {
+        if let selected = columnSelection {
+            cell.overlay(
+                RoundedRectangle(cornerRadius: Theme.rCard, style: .continuous)
+                    .stroke(Theme.accent, lineWidth: selected.wrappedValue?.id == r.id ? 2 : 0)
+            )
+        } else {
+            cell
+        }
     }
 
     private func load() async {
         err = nil
-        do { data = try await API(session).get("/coach/api/students") }
+        do {
+            data = try await API(session).get("/coach/api/students")
+            LaneSignal.ready("students")
+        }
         catch APIError.gone { session.signOut() }
         catch { err = errText(error) }
     }
