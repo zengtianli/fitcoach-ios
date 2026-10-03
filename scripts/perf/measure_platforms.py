@@ -59,7 +59,8 @@ def current(shared, lane):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--only", help="comma-separated lanes; legacy is an alias for iphone")
+    parser.add_argument("--only", default=os.environ.get("SOP_PERF_PLATFORM"),
+                        help="comma-separated lanes; default: persisted Chapter perf platform, else all; legacy aliases iphone")
     parser.add_argument("--force", action="store_true", help="measure requested lanes even with valid current evidence")
     parser.add_argument("--budget-min", type=float, default=50.0, help="stop before starting the next step at this deadline")
     parser.add_argument("--reuse-size-build", type=Path, help="shared Release receipt; requires --only one lane")

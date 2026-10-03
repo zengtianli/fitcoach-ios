@@ -105,6 +105,23 @@ class ConsumerTests(unittest.TestCase):
             self.assertNotIn("--launch-arg=-dev_user", args)
             self.assertNotIn("--launch-arg=-dev_pw", args)
 
+    def test_persisted_queue_platform_selects_watch_only(self):
+        with patch.dict(consumer.os.environ, {"SOP_PERF_PLATFORM": "watch"}):
+            result, _, measures, shared = self.run_consumer([])
+        self.assertEqual(result, 0)
+        self.assertEqual(len(measures), 1)
+        self.assertEqual(measures[0][measures[0].index("--platform") + 1], "watch")
+        shared.lane_inputs.assert_called_once_with(consumer.APP_ID, "watch", None)
+        self.assertFalse(any(arg.startswith("--launch-arg=") for arg in measures[0]))
+
+    def test_explicit_only_overrides_queue_platform_default(self):
+        with patch.dict(consumer.os.environ, {"SOP_PERF_PLATFORM": "watch"}):
+            result, _, measures, shared = self.run_consumer(["--only", "ipad"])
+        self.assertEqual(result, 0)
+        self.assertEqual(len(measures), 1)
+        self.assertEqual(measures[0][measures[0].index("--platform") + 1], "ipad")
+        shared.lane_inputs.assert_called_once_with(consumer.APP_ID, "ipad", None)
+
 
 if __name__ == "__main__":
     unittest.main()
