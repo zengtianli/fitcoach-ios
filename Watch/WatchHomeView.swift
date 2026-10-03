@@ -18,8 +18,8 @@ struct WatchHomeView: View {
     var body: some View {
         NavigationStack(path: $path) {
             TabView(selection: $page) {
-                // 每分钟重算一次「下一节」：一节课结束，最上面那张卡就换人
-                TimelineView(.everyMinute) { ctx in
+                // 只在课程开始/结束或课表跨日时刷新；时间显示没有倒计时，不必每分钟重画整页。
+                TimelineView(.explicit(refreshDates(from: Date()))) { ctx in
                     WatchTodayPage(snapshot: snapshot, now: ctx.date)
                 }
                 .containerBackground(WatchStyle.todayBackground, for: .tabView)
@@ -38,6 +38,17 @@ struct WatchHomeView: View {
                 path = [first]
             }
         }
+    }
+
+    private func refreshDates(from now: Date) -> [Date] {
+        var boundaries = snapshot.lessons.flatMap { [$0.startDate, $0.endDate] }
+        // 未来课表在当天零点成为「今天」，当天课表在次日零点显示过期提醒。
+        let dayStart = TZ.date(fromDate: snapshot.day)
+        boundaries.append(dayStart)
+        if let dayEnd = TZ.calendar.date(byAdding: .day, value: 1, to: dayStart) {
+            boundaries.append(dayEnd)
+        }
+        return [now] + Set(boundaries.filter { $0 > now }).sorted()
     }
 }
 
