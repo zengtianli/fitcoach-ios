@@ -1,0 +1,6 @@
+＝ watch: current source and raw evidence verified; skip
+→ iphone
+[sim_lane] 清掉 1 个过期临时目录（0.47 GB），删不掉 0 个
+＝ iphone: 已保存 SDK 构建回执（/Users/tianli/Library/Caches/sim-lane/platform-measure/sim-lane-build.9cf7ee747cc92f5359d2503d3bc5b0876032472775cbc0ec3e0cc83f11339e9f/sim-lane-build.nqfxd_nq/build.json）
+开机后 1 分钟负载 40.2 180s 内没降到 15.0，未测量（下个空档重测）
+← iphone: 75

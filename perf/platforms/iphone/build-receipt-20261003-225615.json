@@ -1,0 +1,35 @@
+{
+ "ok": true,
+ "platform": "iphone",
+ "configuration": "Release",
+ "scheme": "FitCoach",
+ "compilation_conditions": [],
+ "app_path": "/Users/tianli/Library/Caches/sim-lane/platform-measure/sim-lane-build.9cf7ee747cc92f5359d2503d3bc5b0876032472775cbc0ec3e0cc83f11339e9f/sim-lane-build.nqfxd_nq/dd/Build/Products/Release-iphonesimulator/FitCoach.app",
+ "bundle_id": "cyou.tianli.fitcoachapp",
+ "version": "1.0",
+ "build": "1",
+ "executable_sha256": "5df206035c8b5274e8c127c25c0527b668537208dc73948f645c0fb6ad50c725",
+ "sdk": "iphonesimulator27.0",
+ "xcode": {
+  "name": "Xcode.app",
+  "version": "27.0",
+  "build": "27A266a",
+  "developer_dir": "/Applications/Xcode.app/Contents/Developer"
+ },
+ "destination": "generic/platform=iOS Simulator",
+ "signing": "unsigned simulator build (CODE_SIGNING_ALLOWED=NO)",
+ "log": "/Users/tianli/Library/Caches/sim-lane/platform-measure/sim-lane-build.9cf7ee747cc92f5359d2503d3bc5b0876032472775cbc0ec3e0cc83f11339e9f/sim-lane-build.nqfxd_nq/build-iphone-Release.log",
+ "work_dir": "/Users/tianli/Library/Caches/sim-lane/platform-measure/sim-lane-build.9cf7ee747cc92f5359d2503d3bc5b0876032472775cbc0ec3e0cc83f11339e9f/sim-lane-build.nqfxd_nq",
+ "seconds": 98.4,
+ "generated_info_plists": [
+  {
+   "source_path": "src/WatchWidget/Info.plist",
+   "backup_path": "cache-provenance/xcodegen-info.237fom8g/WatchWidget/Info.plist",
+   "sha256": "b959462827296bbfada6d19cfbe413759cee03d6dd3710caa758a4a36ecf44d0",
+   "targets": [
+    "FitCoachWatchWidget"
+   ],
+   "reason": "XcodeGen target info.path; absent from original sources"
+  }
+ ]
+}
