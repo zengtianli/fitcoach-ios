@@ -36,7 +36,7 @@ sop:
   - Shared/**
   - Resources/**
   - Widget/**
-  # 手表 app 与表盘复杂功能随 iOS 包嵌入（FitCoach.app/Watch/），所以是每条线的源码，不只是手表线的
+  # 手表 app 与表盘复杂功能随 iOS 包嵌入（FitCoach.app/Watch/）；Mac/Vision 按各自实际 target 用 replace 输入。
   - Watch/**
   - WatchWidget/**
   - ShareExtension/**
@@ -75,6 +75,8 @@ sop:
       distribution: app_store
     mac:
       input_normalization: {proof: perf/input-normalizations/finder-mac.json, sha256: 932492222d1da66ecb8d462061bdffb66e21c6275d1e634a8d312e10e540437e}
+      source_mode: replace
+      source: [Sources/**, Shared/PlatformCompat.swift, Shared/LaneSignal.swift, Resources/Assets.xcassets/**, project.yml, Mac.entitlements, cli/*.swift]
       # 不登记商店截图：Mac 不发行、不上推广页；静默线的进程内离屏渲染画不出侧栏选中材质（选中行成黑块），
       # 上屏窗口截图又不许自动化做（不上屏、不进 Dock）。Mac 上架前由本人决定怎么截。
       distribution: none
@@ -90,6 +92,8 @@ sop:
       distribution: none
     vision:
       input_normalization: {proof: perf/input-normalizations/finder-vision.json, sha256: 12258be953aab1689d90c89b47605b9552a4225ec06bc39506097f8440e2af00}
+      source_mode: replace
+      source: [Sources/**, Shared/PlatformCompat.swift, Shared/LaneSignal.swift, Resources/Assets.xcassets/**, project.yml]
       simulator: {device_type: Apple-Vision-Pro-4K}
       store_shots: shots/appstore/vision/*.png
       budget: {memory_mb: 60, cpu: 0.5}
