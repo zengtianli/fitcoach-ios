@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "job_id": "96078229be204bb1beefa02dc4e1640a",
+  "checked_at": "2026-10-03T18:39:11.318566+08:00",
+  "method": "official simctl device readback, process existence and nonblocking original lock probe after queue completion",
+  "raw_evidence": "perf/platforms/watch/measure-20261003-183023.json",
+  "raw_evidence_sha256": "f5a63a3fbfba973d05ec1fee480c6e603e7173382b84cece758a85b1287147ab",
+  "device": {
+    "udid": "71612A23-0E31-4E0A-9C3A-F5EE4E69FCE1",
+    "name": "Apple Watch Series 12 (46mm)",
+    "state": "Shutdown"
+  },
+  "job_child": {
+    "pid": 81197,
+    "started_at": "2026-10-03T18:30:21+08:00",
+    "alive": false
+  },
+  "idle_sample_process": {
+    "pid": 82889,
+    "alive": false
+  },
+  "sop_global_lock": "free_at_readback",
+  "sim_lane_lock_directory_present": false,
+  "scope": "this completed Watch job only; original measurement bytes remain unchanged"
+}
