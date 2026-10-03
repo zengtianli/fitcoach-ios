@@ -19,6 +19,16 @@ struct FitCoachApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .appLifecycleMobile(productID: "fitcoach-ios", channel: MobileProductLifecycle.channel, configuration: MobileProductLifecycle.configuration)
+                .onReceive(NotificationCenter.default.publisher(for: Notification.Name("FitCoachPortableConfigurationApplied"))) { note in
+                    guard let base = note.object as? String else { return }
+                    session.coachCookie = nil
+                    session.studentToken = nil
+                    session.coachEmail = nil
+                    session.studentMode = false
+                    session.baseURL = base
+                    session.showingLogin = true
+                }
                 .environmentObject(session)
                 .tint(.accentColor)   // 主题色 SSOT=products.yaml theme → AccentColor.colorset（theme_sync.py 派生）
                 #if !os(visionOS)

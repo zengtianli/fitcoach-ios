@@ -120,3 +120,16 @@ Sizes are read back for this exact distribution build. The physical device is no
 
 <sub>v1.0 (5) · iPhone 17（iPhone18,3）；体积为 Apple 设备切片记录，运行性能尚未真机实测 · App Store; package sizes exclude user data and caches; installed phone version not verified · measured 2026-09-26. Sizes come from Apple App Store Connect device slices for this build. Memory, CPU and launch time were measured on iPhone 17 Pro / iOS 27.0 Simulator / Mac16,12 / Apple M4 / macOS 27.2 with a local Release build v1.0 (1) (2026-09-27), App process only; these are not physical-device figures, which are still unmeasured. Memory uses phys_footprint; CPU is CPU time ÷ wall time over a 60-second sampling window; sizes in decimal MB. Raw data: [perf/lightweight.json](perf/lightweight.json).</sub>
 <!-- lightweight:end -->
+
+
+## Configuration and app updates
+
+New builds include a “Configuration and Updates” button below the main interface. The installed version and build come from the app bundle.
+
+Settings sync is optional and off by default. It transfers only the service address. Settings can be exported as JSON and imported from Files. Restoring an address clears this device's old server credentials and requires a new login. Roles and session tokens are excluded.
+
+The iPhone and iPad update check reads the App Store release and opens this app's system store page. Network failures remain visible. App-version checking is separate from refreshing study materials or backend data.
+
+A source version bump does not mean a new phone build has already been distributed; release and installation records identify the available build.
+
+The sandboxed Mac target uses provisioned iCloud KVS for the same settings allowlist. Mac updates come from private packages in the owner's iCloud Drive. Select the system iCloud Drive root once in “Choose iCloud Drive Update Folder”; its security bookmark stays on this Mac. After a real release is available, open its verified ZIP and move the app into Applications to upgrade. Directory permissions and update packages are excluded from synced settings.
