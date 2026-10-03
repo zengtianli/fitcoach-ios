@@ -1,0 +1,152 @@
+{
+ "schema_version": 1,
+ "app": "fitcoach-ios",
+ "checked_at": "2026-10-02T23:31:49+08:00",
+ "subject": "App Store screenshots per platform lane registered in project.yaml sop.platforms.<lane>.store_shots",
+ "lanes": {
+  "iphone": {
+   "source": "the App Store 1.0 (5) screenshots, copied unchanged from ../02-审核/当前版本/03-商店材料/截图/01–06.png",
+   "data": "seed demo data on the review demo account (placeholder students 李四 / 王五 / 赵六; 05 shows the review demo account's e-mail), already public on the App Store listing",
+   "still_valid_because": "the iPhone (compact) layout is unchanged: scripts/media/compact_unchanged.py, HEAD 692ff94 vs the five-platform working tree, same demo backend, 2026-10-02 18:57 — 5 of 7 screens byte-identical, schedule and availability differ only in the system-drawn glass bands (max 2/255 per channel, 0 px in app content); later edits were #if-gated wide / watch / vision / mac code. A re-run bound to the current sop.ui snapshot is perf/media/compact-unchanged.json when present."
+  },
+  "ipad": {
+   "source": "sim_lane run --platform ipad (iPad Pro 13-inch (M5), iPadOS 27.0 simulator; landscape through the shared LaneRotator), 2026-10-02 23:16–23:21",
+   "build": {
+    "configuration": "Debug",
+    "executable_sha256": "0c6ea2a5310f16ee3c7dc6521b09e60bf6c4f2dc01f5c7061ed901ef4bfb1a4e",
+    "sdk": "iphonesimulator27.0",
+    "version": "1.0",
+    "build": "1"
+   },
+   "ui_source_sha256_at_capture": "bd13a3eefa5318a27eca3e217eb5b19a688476d3d0ad709abcd6043a5b0c92ef",
+   "how_known": "Debug build from the code-phase final tree at 19:50; no Sources/Shared/Watch/WatchWidget/Resources/project.yml file is newer than that build, and the sop.ui snapshot then equals the current one",
+   "data": "isolated demo backend scripts/demo/coach_day.py (real service, scratch DB, fictional students, four lessons today), status bar 9:41"
+  },
+  "mac": {
+   "registered": false,
+   "why": "Mac lane does not ship and has no promo page; the quiet lane's in-process offscreen render cannot draw the sidebar selection material (the selected row renders as a black block) and on-screen captures are not allowed for automation"
+  },
+  "watch": {
+   "source": "perf/platforms/watch/launch.png",
+   "captured_at": "2026-10-03T20:49:19.234937+08:00",
+   "input_sha256": "8fec3549971fcbf1a094947d4f0bd38d44e00a5d961d8d661e37afc32b629ac1",
+   "build": {
+    "app_path": "/private/var/folders/x7/qptxw08j00v__67yzr3gcd000000gp/T/sim-lane-build.tuchfh27/dd/Build/Products/Debug-watchsimulator/FitCoachWatch.app",
+    "bundle_id": "cyou.tianli.fitcoachapp.watchkitapp",
+    "version": "1.0",
+    "build": "1",
+    "configuration": "Debug",
+    "executable_sha256": "7644ca1beb9236e6acf448046da6080e27e7c0325cee6d5708f211ae01fdf67f",
+    "sdk": "watchsimulator27.0",
+    "xcode": {
+     "name": "Xcode.app",
+     "version": "27.0",
+     "build": "27A266a",
+     "developer_dir": "/Applications/Xcode.app/Contents/Developer"
+    },
+    "log": "/private/var/folders/x7/qptxw08j00v__67yzr3gcd000000gp/T/sim-lane-build.tuchfh27/build-watch-Debug.log",
+    "reuse": null
+   },
+   "how_known": "原 launch_watch.json SHA256 e2fd9821b22f7ff918b958848465972e221ff450f5e16378006ec4352d33d899；原 launch-capture.json SHA256 a45daef163b63a4e82ca8d20ab52e42e9c652eb6865f960108d8ba0218ac1a09；当前接受器绑定和原源码、PNG链精确匹配；仅字节复制既有原片，未新运行。",
+   "data": "-fitcoach.watchDemo 1 占位快照；虚构课程与学员，仅真实 Debug 模拟器截图，不证明 WatchConnectivity、后台业务、Release 资源或真实用户数据。"
+  }
+ },
+ "files": {
+  "shots/appstore/ipad/01-schedule-landscape.png": {
+   "size": [
+    2752,
+    2064
+   ],
+   "mode": "RGB",
+   "sha256": "ce708e23853f7f4affb5ddf0e24e15f6a2ff61e16e16d22353f3657a3cccbf5f"
+  },
+  "shots/appstore/ipad/02-students-landscape.png": {
+   "size": [
+    2752,
+    2064
+   ],
+   "mode": "RGB",
+   "sha256": "aaa2e306ecde409fc739b9b80e12bc12b1c932f44ad99cea00ca5eabd3befebf"
+  },
+  "shots/appstore/ipad/03-availability-landscape.png": {
+   "size": [
+    2752,
+    2064
+   ],
+   "mode": "RGB",
+   "sha256": "e4b3a8b82c0ee778fdf9c35860d9b704dd5b923b8f6ffeaf280800bf296ebd8d"
+  },
+  "shots/appstore/ipad/04-metrics-landscape.png": {
+   "size": [
+    2752,
+    2064
+   ],
+   "mode": "RGB",
+   "sha256": "175799a89d2b41626d7fe1fa7494c572dbd7bc5c435b965a044c15f3ec0b43bc"
+  },
+  "shots/appstore/ipad/05-schedule-portrait.png": {
+   "size": [
+    2064,
+    2752
+   ],
+   "mode": "RGB",
+   "sha256": "7b5e0e0bfde8d7394a17e978802989fbafffc6006032be1c4968b25a3df5097e"
+  },
+  "shots/appstore/iphone/01.png": {
+   "size": [
+    1320,
+    2868
+   ],
+   "mode": "RGBA",
+   "sha256": "76cccadec7ca3e313061674a9e7130f5abaa96e4d8ccd54ef4e303f38cbf3a87"
+  },
+  "shots/appstore/iphone/02.png": {
+   "size": [
+    1320,
+    2868
+   ],
+   "mode": "RGBA",
+   "sha256": "b640926d0fc4421e8018c5557afefdd27217dde0bc2dbb164a640aeb19f7c3c1"
+  },
+  "shots/appstore/iphone/03.png": {
+   "size": [
+    1320,
+    2868
+   ],
+   "mode": "RGBA",
+   "sha256": "4c76b6b3829c1d675c70b12aed4b6e12f42befa1a414dcd4699169ad3350d629"
+  },
+  "shots/appstore/iphone/04.png": {
+   "size": [
+    1320,
+    2868
+   ],
+   "mode": "RGBA",
+   "sha256": "0f81a970db203fcc6370d8831ab04a4ea6e6984cbf098987d58234e2b23e62df"
+  },
+  "shots/appstore/iphone/05.png": {
+   "size": [
+    1320,
+    2868
+   ],
+   "mode": "RGBA",
+   "sha256": "8a9abc59e81c58c27a066ca91b64357ce824bb6aeb6f6a5a3a5eaecc451cd169"
+  },
+  "shots/appstore/iphone/06.png": {
+   "size": [
+    1320,
+    2868
+   ],
+   "mode": "RGBA",
+   "sha256": "267f96278a52b9c756b876d37444ae71b81291169e911fde086363fc0a48c41d"
+  },
+  "shots/appstore/watch/01-schedule.png": {
+   "size": [
+    416,
+    496
+   ],
+   "mode": "RGB",
+   "sha256": "7c07effea826924e7d1003788521e50e2faabae85f45256325820f96e2fbc990"
+  }
+ }
+}
