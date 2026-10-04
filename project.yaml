@@ -60,8 +60,8 @@ sop:
   release: perf/asc-release.json
   # 一个 App 五条平台线（用户 2026-10-02：同名、同图标、同数据；「我都有，但你用模拟器好了」）。
   # 模拟器验收、证据标 environment=simulator；Mac 线是本组件自己的 macOS 目的地（本机原生、静默）。手表 / Vision / Mac
-  # 还没上架（distribution: none）。预算：iPhone / iPad / Mac 沿用 Chapter 默认（150 MB · 0.5%）；手表与 Vision 是我们定的
-  # 目标，引擎只判 memory_mb / cpu，size_mb / cold_launch_ms 由 README 与交接对照。
+  # 还没上架（distribution: none）。资源门按原 app skill 五平台标准：缺省→产品→本线预算；
+  # memory_mb / cpu / size_mb / cold_launch_ms 均为硬门，缺测或超限不通过。
   platforms:
     iphone:
       input_normalization: {proof: perf/input-normalizations/finder-iphone.json, sha256: 6a8488527a6dff441a5e58c04a169ab2494a48dcc12c0fa333571bfa70a05a34}
@@ -76,7 +76,7 @@ sop:
     mac:
       input_normalization: {proof: perf/input-normalizations/finder-mac.json, sha256: 932492222d1da66ecb8d462061bdffb66e21c6275d1e634a8d312e10e540437e}
       source_mode: replace
-      source: [Sources/**, Shared/PlatformCompat.swift, Shared/LaneSignal.swift, Resources/Assets.xcassets/**, project.yml, Mac.entitlements, cli/*.swift]
+      source: [Sources/**, Shared/PlatformCompat.swift, Shared/LaneSignal.swift, Shared/AppLifecycle.swift, Shared/AppConfiguration.swift, Shared/AppLifecycleMobile.swift, Resources/Assets.xcassets/**, project.yml, Mac.entitlements, cli/*.swift]
       # 不登记商店截图：Mac 不发行、不上推广页；静默线的进程内离屏渲染画不出侧栏选中材质（选中行成黑块），
       # 上屏窗口截图又不许自动化做（不上屏、不进 Dock）。Mac 上架前由本人决定怎么截。
       distribution: none
@@ -93,7 +93,7 @@ sop:
     vision:
       input_normalization: {proof: perf/input-normalizations/finder-vision.json, sha256: 12258be953aab1689d90c89b47605b9552a4225ec06bc39506097f8440e2af00}
       source_mode: replace
-      source: [Sources/**, Shared/PlatformCompat.swift, Shared/LaneSignal.swift, Resources/Assets.xcassets/**, project.yml]
+      source: [Sources/**, Shared/PlatformCompat.swift, Shared/LaneSignal.swift, Shared/AppLifecycle.swift, Shared/AppConfiguration.swift, Shared/AppLifecycleMobile.swift, Resources/Assets.xcassets/**, project.yml]
       simulator: {device_type: Apple-Vision-Pro-4K}
       store_shots: shots/appstore/vision/*.png
       budget: {memory_mb: 60, cpu: 0.5}
