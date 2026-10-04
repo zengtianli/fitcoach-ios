@@ -19,7 +19,9 @@ struct FitCoachApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
-                .appLifecycleMobile(productID: "fitcoach-ios", channel: MobileProductLifecycle.channel, configuration: MobileProductLifecycle.configuration)
+                .appLifecycleMobile(productID: "fitcoach-ios", channel: MobileProductLifecycle.channel,
+                                    configuration: MobileProductLifecycle.configuration,
+                                    placement: session.isCoach && !session.showingLogin ? .settings : .footer)
                 .onReceive(NotificationCenter.default.publisher(for: Notification.Name("FitCoachPortableConfigurationApplied"))) { note in
                     guard let base = note.object as? String else { return }
                     session.coachCookie = nil
@@ -188,6 +190,9 @@ struct MoreView: View {
                      detail: "删除账号与当前业务数据") { AccountDeleteView() }.cardRow()
 
             CardBox { PrivacySupportLinks() }.cardRow()
+
+            GroupTitle(text: "应用", icon: "gearshape").cardRow(top: 14, bottom: 2)
+            CardBox { AppLifecycleMobileEntry() }.cardRow()
 
             GroupTitle(text: "服务器", icon: "server.rack").cardRow(top: 14, bottom: 2)
             CardBox {
