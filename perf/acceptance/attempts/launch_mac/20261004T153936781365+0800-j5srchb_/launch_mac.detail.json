@@ -1,0 +1,63 @@
+{
+  "summary": "Mac 本机 启动冒烟通过：os_log 1.104 s，截图 2360×1560",
+  "passed": true,
+  "platform": "mac",
+  "environment": "native",
+  "scheme": "FitCoach",
+  "sim_lane": "/Users/tianli/Dev/tools/dev/lib/tools/macapp/ios/sim_lane.py",
+  "method": "核验仓外构建回执与当前源码、产物及工具链后复用；沿共享 sim_lane 静默启动并截图，不抢焦点",
+  "build": {
+    "app_path": "/Users/tianli/Library/Caches/sim-lane/platform-measure/sim-lane-build.8259357d82f2252301ff13320505994199b1753a1fe88a2ced588500adf952e3/sim-lane-build.belsdi02/dd/Build/Products/Release/FitCoach.app",
+    "bundle_id": "cyou.tianli.fitcoachapp",
+    "version": "1.0.1",
+    "build": "6",
+    "configuration": "Release",
+    "executable_sha256": "20bae22369e10ab51e878c6488d10db96b70e61948d3e48e55f3485d0305eee3",
+    "sdk": "macosx27.0",
+    "xcode": {
+      "name": "Xcode.app",
+      "version": "27.0",
+      "build": "27A266a",
+      "developer_dir": "/Applications/Xcode.app/Contents/Developer"
+    },
+    "log": "/Users/tianli/Library/Caches/sim-lane/platform-measure/sim-lane-build.8259357d82f2252301ff13320505994199b1753a1fe88a2ced588500adf952e3/sim-lane-build.belsdi02/build-mac-Release.log",
+    "reuse": {
+      "receipt": "/Users/tianli/Library/Caches/sim-lane/platform-measure/sim-lane-build.8259357d82f2252301ff13320505994199b1753a1fe88a2ced588500adf952e3/sim-lane-build.belsdi02/build.json",
+      "receipt_sha256": "4ca83e60841fc1a00e1e8d6cfd7c0d191896330615c1b054772f5abaa48f3195",
+      "source_copy": "/Users/tianli/Library/Caches/sim-lane/platform-measure/sim-lane-build.8259357d82f2252301ff13320505994199b1753a1fe88a2ced588500adf952e3/sim-lane-build.belsdi02/src",
+      "input_sha256": "06e9f63af6fccde0e11cf8cd4dfd9cfdff8fdcd0ed4e719cfb372eb711b98665",
+      "source_file_count": 66
+    }
+  },
+  "launch_args": [
+    "-fitcoach.baseURL",
+    "http://127.0.0.1:60418",
+    "-fitcoach.coachCookie",
+    "<redacted>"
+  ],
+  "waits": {
+    "lock_seconds": 300,
+    "load_seconds": 300
+  },
+  "run": {
+    "udid": null,
+    "pid": null,
+    "ready_seconds": 1.104,
+    "ready_signal": "os_log",
+    "size": [
+      2360,
+      1560
+    ],
+    "runtime": null,
+    "device": null
+  },
+  "verdict": {
+    "non_blank": true,
+    "changed_from_baseline": null,
+    "stable": false,
+    "diff_baseline": null,
+    "diff_prev": null
+  },
+  "screenshot": "perf/platforms/mac/launch.png",
+  "screenshot_sha256": "29051cc431aaff2ef45c99624a0c1a311af7d99ac26591a124451793fa25f413"
+}

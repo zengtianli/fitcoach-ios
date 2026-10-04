@@ -1,0 +1,28 @@
+{
+  "app_id": "fitcoach-ios",
+  "check": "launch_mac",
+  "saved_at": "2026-10-04T15:39:36.781501+08:00",
+  "files": {
+    "launch.png": {
+      "sha256": "29051cc431aaff2ef45c99624a0c1a311af7d99ac26591a124451793fa25f413",
+      "bytes": 341046,
+      "mode": 420
+    },
+    "launch_mac.json": {
+      "sha256": "c0ae7dbee2effe25586ca51996f3930fa0399843b43bc9294ebe0fad5874af20",
+      "bytes": 3430,
+      "mode": 420
+    },
+    "launch_mac.detail.json": {
+      "sha256": "a527810fa8ac17464fbc574135135c59c8085530ab6bec24e5ec0dd0915bd0e8",
+      "bytes": 2514,
+      "mode": 420
+    },
+    "launch_mac.log": {
+      "sha256": "5adfcd99646a3c19843402dfc788768fae9f24d8aaf1fb6407f8936c1f13e8f8",
+      "bytes": 133,
+      "mode": 420
+    }
+  },
+  "missing": []
+}
