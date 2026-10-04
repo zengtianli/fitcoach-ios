@@ -319,6 +319,19 @@ func runContract() async {
         ok("  余额按剩得少的在前", snap.balances.map(\.remaining) == snap.balances.map(\.remaining).sorted())
         let back = snap.encoded().flatMap(WatchSnapshot.decode)
         ok("  编码再解码不丢字段", back == snap)
+        // 确定的纪元换算边界：2001 秒的 1 ULP 在 Unix 秒中不可表达。
+        // 保留完整 Equatable 比较，不以时间容差掩盖任何字段变化。
+        let precision = WatchSnapshot(day: snap.day,
+            generatedAt: Date(timeIntervalSinceReferenceDate: 800_000_000.0000001),
+            lessons: snap.lessons, balances: snap.balances)
+        ok("  时间规范到既有 Unix Double 精度",
+           precision.generatedAt.timeIntervalSinceReferenceDate == 800_000_000)
+        ok("  精度边界完整快照严格往返相等",
+           precision.encoded().flatMap(WatchSnapshot.decode) == precision)
+        let legacyData = Data(#"{"day":"2026-10-04","generatedAt":1778307200.125,"lessons":[],"balances":[]}"#.utf8)
+        let legacy = WatchSnapshot(day: "2026-10-04",
+            generatedAt: Date(timeIntervalSince1970: 1_778_307_200.125), lessons: [], balances: [])
+        ok("  旧 Unix seconds JSON 原协议可解码", WatchSnapshot.decode(legacyData) == legacy)
         _ = try await api.post("/coach/api/sessions/\(watchSes)/status",
                                ["to": "cancelled", "reason": "", "reason_code": ""])
     } catch { ok("手表快照", false, "\(error)") }

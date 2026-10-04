@@ -44,6 +44,16 @@ struct WatchSnapshot: Codable, Equatable {
     let lessons: [Lesson]          // 按开始时间
     let balances: [Balance]        // 在册且有课包的学员，剩得最少的在前
 
+    init(day: String, generatedAt: Date, lessons: [Lesson], balances: [Balance]) {
+        self.day = day
+        // Date 内部以 2001 年为纪元；既有协议用 Unix seconds Double。
+        // 两者在当前日期的浮点精度不同，构造时统一到线格式可表达的值，
+        // 使完整快照严格往返相等；不更改 JSON 字段或旧数据解码方式。
+        self.generatedAt = Date(timeIntervalSince1970: generatedAt.timeIntervalSince1970)
+        self.lessons = lessons
+        self.balances = balances
+    }
+
     /// 「下一节」：还没上（scheduled）且没结束的第一节 —— 正在上的那节也算，教练要看的就是它。
     func next(after now: Date) -> Lesson? {
         lessons.first { $0.isOpen && $0.endDate > now }
