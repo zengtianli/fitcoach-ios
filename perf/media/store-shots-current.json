@@ -49,6 +49,30 @@
    },
    "how_known": "原 launch_watch.json SHA256 e2fd9821b22f7ff918b958848465972e221ff450f5e16378006ec4352d33d899；原 launch-capture.json SHA256 a45daef163b63a4e82ca8d20ab52e42e9c652eb6865f960108d8ba0218ac1a09；当前接受器绑定和原源码、PNG链精确匹配；仅字节复制既有原片，未新运行。",
    "data": "-fitcoach.watchDemo 1 占位快照；虚构课程与学员，仅真实 Debug 模拟器截图，不证明 WatchConnectivity、后台业务、Release 资源或真实用户数据。"
+  },
+  "vision": {
+   "source": "perf/platforms/vision/launch.png",
+   "captured_at": "2026-10-05T20:19:52.442777+08:00",
+   "input_sha256": "7e6c2cb8298fd83e5edda67d8d983614534d7a4061f394719665b5e5663e200a",
+   "build": {
+    "app_path": "/private/var/folders/x7/qptxw08j00v__67yzr3gcd000000gp/T/sim-lane-build.a5oa79za/dd/Build/Products/Debug-xrsimulator/FitCoach.app",
+    "bundle_id": "cyou.tianli.fitcoachapp",
+    "version": "1.0.1",
+    "build": "6",
+    "configuration": "Debug",
+    "executable_sha256": "2a177eaa30fc4ac9edc9248638f44f9a49a83e01138f7859952e22ecfa7c8003",
+    "sdk": "xrsimulator27.0",
+    "xcode": {
+     "name": "Xcode.app",
+     "version": "27.0",
+     "build": "27A266a",
+     "developer_dir": "/Applications/Xcode.app/Contents/Developer"
+    },
+    "log": "/private/var/folders/x7/qptxw08j00v__67yzr3gcd000000gp/T/sim-lane-build.a5oa79za/build-vision-Debug.log",
+    "reuse": null
+   },
+   "how_known": "Chapter 队列 launch_vision 验收 perf/acceptance/run-zw4irpiv/launch_vision.json（SHA256 427546cc2f1a888f9975a03549772720b73f2e55c20d968ac5e0855f8b555231，2026-10-05T20:04:21.602292+08:00 起）在当前源码通过；本截图是该次无窗口模拟器启动冒烟的原片，PNG SHA256 fd2a00960e47970a0ae55a4b5f301b0ae0b0b289f5683b64973b37664ae6ab5d 与证据记录一致；仅字节复制，未另行运行或修图。",
+   "data": "隔离演示后端 scripts/demo/coach_day.py（真后端、临时库、虚构学员、今天 4 节课）；Debug 模拟器构建的首屏，不证明 Release 资源、真机或真实用户数据。"
   }
  },
  "files": {
@@ -147,6 +171,14 @@
    ],
    "mode": "RGB",
    "sha256": "7c07effea826924e7d1003788521e50e2faabae85f45256325820f96e2fbc990"
+  },
+  "shots/appstore/vision/01-schedule.png": {
+   "size": [
+    3840,
+    2160
+   ],
+   "mode": "RGB",
+   "sha256": "fd2a00960e47970a0ae55a4b5f301b0ae0b0b289f5683b64973b37664ae6ab5d"
   }
  }
 }
