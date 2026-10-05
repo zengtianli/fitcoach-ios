@@ -1,0 +1,197 @@
+{
+ "schema_version": 1,
+ "platform": "vision",
+ "app_id": "fitcoach-ios",
+ "input_sha256": "e571060ce146645a986dddd565ae4b8998b9ba9fb3c279fa8dc50249d93efd48",
+ "measured_at": "2026-10-05T22:15:03+08:00",
+ "completed_at": "2026-10-05T22:18:32+08:00",
+ "build": {
+  "configuration": "Release",
+  "scheme": "FitCoach",
+  "bundle_id": "cyou.tianli.fitcoachapp",
+  "version": "1.0.1",
+  "build": "6",
+  "sdk": "xrsimulator27.0",
+  "executable_sha256": "6bbc11fff9df72df856c2517c684bdbc388ab014c60a5ec25721a968a4c3236a",
+  "signing": "unsigned simulator build (CODE_SIGNING_ALLOWED=NO)",
+  "seconds": 13.4,
+  "xcode": {
+   "name": "Xcode.app",
+   "version": "27.0",
+   "build": "27A266a",
+   "developer_dir": "/Applications/Xcode.app/Contents/Developer"
+  },
+  "reuse": null
+ },
+ "measurement": {
+  "environment": "simulator",
+  "device": "Apple Vision Pro (Apple-Vision-Pro-4K)",
+  "os": "visionOS 27.0",
+  "udid": "0E6C8FC1-4B10-48E4-9B1E-138BF7239764",
+  "install_seconds": 5.6,
+  "samples": [
+   {
+    "run": 0,
+    "pid": 32371,
+    "ready_seconds": 2.072,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 1,
+    "pid": 32489,
+    "ready_seconds": 1.279,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 2,
+    "pid": 32575,
+    "ready_seconds": 1.261,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 3,
+    "pid": 32659,
+    "ready_seconds": 1.254,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 4,
+    "pid": 32748,
+    "ready_seconds": 1.27,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 5,
+    "pid": 32846,
+    "ready_seconds": 1.259,
+    "ready_signal": "os_log",
+    "errors": []
+   }
+  ],
+  "idle": {
+   "process": "32932",
+   "footprint_mb": 37.0,
+   "cpu_pct": 0.03,
+   "window_s": 60
+  },
+  "loads": {
+   "before_launches": [
+    23.63720703125,
+    14.380859375,
+    14.21484375
+   ],
+   "counted_launches": [
+    {
+     "run": 1,
+     "before": [
+      22.888671875,
+      14.71044921875,
+      14.33740234375
+     ],
+     "after": [
+      21.1357421875,
+      14.482421875,
+      14.2587890625
+     ]
+    },
+    {
+     "run": 2,
+     "before": [
+      21.1357421875,
+      14.482421875,
+      14.2587890625
+     ],
+     "after": [
+      18.55517578125,
+      14.15234375,
+      14.14404296875
+     ]
+    },
+    {
+     "run": 3,
+     "before": [
+      18.55517578125,
+      14.15234375,
+      14.14404296875
+     ],
+     "after": [
+      17.54931640625,
+      14.0166015625,
+      14.09619140625
+     ]
+    },
+    {
+     "run": 4,
+     "before": [
+      16.7041015625,
+      13.89990234375,
+      14.05419921875
+     ],
+     "after": [
+      15.6865234375,
+      13.7353515625,
+      13.9951171875
+     ]
+    },
+    {
+     "run": 5,
+     "before": [
+      14.75048828125,
+      13.5732421875,
+      13.9365234375
+     ],
+     "after": [
+      13.56884765625,
+      13.34765625,
+      13.8544921875
+     ]
+    }
+   ],
+   "after_launches": [
+    13.56884765625,
+    13.34765625,
+    13.8544921875
+   ],
+   "before_idle": [
+    7.02294921875,
+    11.544921875,
+    13.14892578125
+   ]
+  },
+  "orientation": null,
+  "rotation": null,
+  "device_selection": {
+   "mode": "configured/default",
+   "udid": "0E6C8FC1-4B10-48E4-9B1E-138BF7239764",
+   "name": "Apple Vision Pro",
+   "state_before": "Shutdown",
+   "shutdown_verified": false
+  },
+  "with_helpers": false,
+  "scope": "Simulator App host process only; excludes CoreSimulator, system services and inactive extensions",
+  "settle_s": 45
+ },
+ "size": {
+  "download_bytes": 5961822,
+  "installed_bytes": 16767749,
+  "download_mb": 5.96,
+  "installed_mb": 16.77
+ },
+ "speed": {
+  "cold_launch_ms": 1261.0,
+  "runs": 5,
+  "discarded_runs": 1,
+  "ready_signal": "os_log",
+  "method": "launch command issued -> App os_log \"lane-ready\" (first data-bearing screen), App terminated 3 s before each run, first run after install discarded, median"
+ },
+ "tool_sha256": {
+  "platform_measure.py": "fba4e0ec493f52895d77cbc448a18de84d9433adbf3dd53f77b0187cd3b0cdae",
+  "measure.py": "9b4f3cb22190a295fade42759bdb19f27da7c5dbd13449e78cb14743472ed94c",
+  "sim_lane.py": "b54c48849a3f8ee87c682ffb14ed3892e0c95719e54b444b70ebc8e8779e2f2e"
+ }
+}

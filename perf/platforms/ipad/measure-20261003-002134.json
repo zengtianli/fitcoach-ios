@@ -1,0 +1,119 @@
+{
+ "schema_version": 1,
+ "platform": "ipad",
+ "app_id": "fitcoach-ios",
+ "input_sha256": "0091b91a31cfe3d6bf678ec081dc276c130a4358ab6e7eff4c54e78b12ee2bfa",
+ "measured_at": "2026-10-03T00:21:34+08:00",
+ "completed_at": "2026-10-03T00:53:27+08:00",
+ "build": {
+  "configuration": "Release",
+  "scheme": "FitCoach",
+  "bundle_id": "cyou.tianli.fitcoachapp",
+  "version": "1.0",
+  "build": "1",
+  "sdk": "iphonesimulator27.0",
+  "executable_sha256": "b298af2f292c35ef0d47bd9662ad2d7242c8b0121e3972f8b7e5881887286cfb",
+  "signing": "unsigned simulator build (CODE_SIGNING_ALLOWED=NO)",
+  "seconds": 109.8,
+  "xcode": {
+   "name": "Xcode.app",
+   "version": "27.0",
+   "build": "27A266a",
+   "developer_dir": "/Applications/Xcode.app/Contents/Developer"
+  }
+ },
+ "measurement": {
+  "environment": "simulator",
+  "device": "iPad Pro 13-inch (M5) (iPad-Pro-13-inch-M5-12GB)",
+  "os": "iPadOS 27.0",
+  "udid": "A19C635F-A987-4E08-931A-A5874216E34D",
+  "install_seconds": 13.2,
+  "samples": [
+   {
+    "run": 0,
+    "pid": 78299,
+    "ready_seconds": 9.148,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 1,
+    "pid": 78515,
+    "ready_seconds": 5.117,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 2,
+    "pid": 78705,
+    "ready_seconds": 5.379,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 3,
+    "pid": 78955,
+    "ready_seconds": 5.719,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 4,
+    "pid": 79213,
+    "ready_seconds": 4.979,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 5,
+    "pid": 79372,
+    "ready_seconds": 5.133,
+    "ready_signal": "os_log",
+    "errors": []
+   }
+  ],
+  "idle": {
+   "process": "79510",
+   "footprint_mb": 42.0,
+   "cpu_pct": 0.0,
+   "window_s": 60
+  },
+  "loads": {
+   "before_launches": [
+    15.56689453125,
+    68.5830078125,
+    103.21728515625
+   ],
+   "after_launches": [
+    12.65478515625,
+    55.904296875,
+    95.4765625
+   ],
+   "before_idle": [
+    9.6025390625,
+    47.3291015625,
+    89.58447265625
+   ]
+  },
+  "scope": "Simulator App host process only; excludes CoreSimulator, system services and inactive extensions",
+  "settle_s": 45
+ },
+ "size": {
+  "download_bytes": 9705739,
+  "installed_bytes": 21888388,
+  "download_mb": 9.71,
+  "installed_mb": 21.89
+ },
+ "speed": {
+  "cold_launch_ms": 5133.0,
+  "runs": 5,
+  "discarded_runs": 1,
+  "ready_signal": "os_log",
+  "method": "launch command issued -> App os_log \"lane-ready\" (first data-bearing screen), App terminated 3 s before each run, first run after install discarded, median"
+ },
+ "tool_sha256": {
+  "platform_measure.py": "72d5b8df78e79426673d5b8e39fd40ebbc2db7ce93014750d7c5358fee1a6b06",
+  "measure.py": "0393a632f3e0a2d2551ecb173704f195c3f9da743d0a49bad0492c1e0b669698",
+  "sim_lane.py": "c676720c1b8981fd6988dca5f5c23c46790f92e836af6123cc9133c69ed7b227"
+ }
+}

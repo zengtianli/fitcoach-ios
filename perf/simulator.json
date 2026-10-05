@@ -1,74 +1,49 @@
 {
-  "schema_version": 1,
-  "product": "fitcoach-ios",
-  "platform": "ios",
-  "version": "1.0 (1)",
-  "configuration": "Release",
-  "measured_at": "2026-09-27T00:00:23.408265+08:00",
-  "device": "iPhone 17 Pro / iOS 27.0 Simulator / Mac16,12 / Apple M4 / macOS 27.2",
-  "input_sha256": "760c190ee688563098d228ba5c36ec45f3c31b70c12b88bf88a69dc5145ca64e",
-  "data": "Fresh app container on isolated simulator; default first-run data; no production user data imported",
-  "size": {
-    "download_bytes": 4678799,
-    "installed_bytes": 14544896,
-    "kind": "Local simulator .app ZIP; not an App Store IPA or device slice"
-  },
-  "idle": {
-    "process": "64867",
-    "footprint_mb": 26.0,
-    "cpu_pct": 0.0,
-    "window_s": 60,
-    "settle_s": 45,
-    "method": "Shared measure.py: CPU time delta / 60s wall; 3 phys_footprint samples after CPU window, maximum reported",
-    "scope": "Simulator App process only; excludes CoreSimulator, Simulator GUI, system services and inactive extensions",
-    "limitations": "Post-launch simulator process sampling; simctl requested foreground by default; UIApplication/RunningBoard activation state was not observed and this is not a complete foreground business test."
-  },
-  "speed_gui": [
-    {
-      "key": "first_screen_ready",
-      "label": "模拟器冷启动到首屏就绪",
-      "label_en": "Simulator cold launch to first screen ready",
-      "median_ms": 1465.0,
-      "runs": 5,
-      "headline": true,
-      "method": "Simulator unified log: CoreSimulator \"Requesting launch of <bundle>\" -> SpringBoard scene content state \"ready\" (app committed its first scene content) / FrontBoard \"Dropping launch assertion\" (launch finished). App process terminated 3 s before each run; system caches warm; first run after install discarded. Median of 5 runs. Reference on the same simulator: system Settings app 2517.9 ms to ready.",
-      "evidence": "perf/raw/simulator-launch-20260927.json",
-      "evidence_sha256": "8582bf1a17b7358877d5ebd6baa32d4e5b2d483f4c5b40f3965cf5f1a431dc6f"
-    },
-    {
-      "key": "launch_complete",
-      "label": "模拟器冷启动到系统判定启动完成",
-      "label_en": "Simulator cold launch to launch completed",
-      "median_ms": 2366.9,
-      "runs": 5,
-      "headline": false,
-      "method": "Simulator unified log: CoreSimulator \"Requesting launch of <bundle>\" -> SpringBoard scene content state \"ready\" (app committed its first scene content) / FrontBoard \"Dropping launch assertion\" (launch finished). App process terminated 3 s before each run; system caches warm; first run after install discarded. Median of 5 runs. Reference on the same simulator: system Settings app 2517.9 ms to ready.",
-      "evidence": "perf/raw/simulator-launch-20260927.json",
-      "evidence_sha256": "8582bf1a17b7358877d5ebd6baa32d4e5b2d483f4c5b40f3965cf5f1a431dc6f"
-    }
-  ],
-  "runtime_measurement": {
-    "environment": "simulator",
-    "device": "iPhone 17 Pro",
-    "os": "iOS 27.0",
-    "version": "1.0 (1)",
-    "evidence": "perf/raw/simulator-20260927.json",
-    "evidence_sha256": "e05702a6c389d5632fbdc4f4c37d80500499094fe248b8f985877424dd35d609"
-  },
-  "build": {
-    "configuration": "Release",
-    "binary_sha256": "95f808b3ac543357d1c16f39f39e817a0101e0c1547edc197f2a29aa32d26c42",
-    "input_sha256": "760c190ee688563098d228ba5c36ec45f3c31b70c12b88bf88a69dc5145ca64e",
-    "actual_build": true
-  },
-  "scope": "Simulator App process only; excludes CoreSimulator, Simulator GUI, system services and inactive extensions",
-  "limitations": "模拟器应用进程占用，排除 Simulator/CoreSimulator 系统开销；此 ZIP 不是 App Store 下载包。后台与业务任务峰值未在本次测量。",
-  "speed_measured_at": "2026-09-27T14:19:19.938090+08:00",
-  "speed_build": {
-    "version": "1.0 (1)",
-    "configuration": "Release",
-    "binary_sha256": "4bfe0ed5d687b51ba1bdb7956f1c44e8b15d13e469c5357dff1101bdf19c688b",
-    "input_sha256": "760c190ee688563098d228ba5c36ec45f3c31b70c12b88bf88a69dc5145ca64e",
-    "source_same_as_idle_measurement": true
+ "schema_version": 1,
+ "product": "fitcoach-ios",
+ "platform": "ios",
+ "version": "1.0.1 (6)",
+ "input_sha256": "54423e926562e35f9298419e971e7610ecb1be57f5cf0e75ffd22728ae3ed085",
+ "measured_at": "2026-10-05T22:08:30+08:00",
+ "device": "iPhone 17 Pro (iPhone-17-Pro) / iOS 27.0 Simulator",
+ "data": "隔离虚构演示数据；与 perf/platforms/iphone.json 共用实测原件",
+ "size": {
+  "download_bytes": 9999307,
+  "installed_bytes": 22837412,
+  "download_mb": 10.0,
+  "installed_mb": 22.84,
+  "kind": "simulator .app (Release), not a store slice"
+ },
+ "idle": {
+  "memory_mb": 23.0,
+  "cpu_pct": 0.0,
+  "window_s": 60,
+  "settle_s": 45,
+  "method": "shared measure.py idle: CPU-time delta / wall window; phys_footprint peak of 3 samples after the window",
+  "scope": "Simulator App host process only; excludes CoreSimulator, system services and inactive extensions",
+  "footprint_mb": 23.0
+ },
+ "runtime_measurement": {
+  "environment": "simulator",
+  "device": "iPhone 17 Pro (iPhone-17-Pro)",
+  "os": "iOS 27.0",
+  "xcode": "Xcode 27.0 (27A266a)",
+  "evidence": "perf/platforms/iphone/measure-20261005-220830.json",
+  "evidence_sha256": "e83d198e762b8a3a78a6c8254a0a0c209f10b1afed9ec3ec2713b5f6881042a4",
+  "version": "1.0.1 (6)"
+ },
+ "speed_gui": [
+  {
+   "key": "first_screen_ready",
+   "label": "模拟器冷启动到有数据的首屏",
+   "label_en": "Simulator cold launch to first data-bearing screen",
+   "median_ms": 1129.0,
+   "runs": 5,
+   "headline": true,
+   "method": "launch command issued -> App os_log \"lane-ready\" (first data-bearing screen), App terminated 3 s before each run, first run after install discarded, median",
+   "evidence": "perf/platforms/iphone/measure-20261005-220830.json",
+   "evidence_sha256": "e83d198e762b8a3a78a6c8254a0a0c209f10b1afed9ec3ec2713b5f6881042a4"
   }
+ ],
+ "limitations": "仅模拟器 App 进程；非真机与商店包。"
 }

@@ -1,39 +1,39 @@
 {
  "schema_version": 1,
- "platform": "watch",
+ "platform": "iphone",
  "app_id": "fitcoach-ios",
  "version": "1.0.1",
  "build": "6",
  "input_sha256": "54423e926562e35f9298419e971e7610ecb1be57f5cf0e75ffd22728ae3ed085",
  "runtime_measurement": {
   "environment": "simulator",
-  "device": "Apple Watch Series 12 (46mm) (Apple-Watch-Series-12-46mm)",
-  "os": "watchOS 27.0",
+  "device": "iPhone 17 Pro (iPhone-17-Pro)",
+  "os": "iOS 27.0",
   "xcode": "Xcode 27.0 (27A266a)",
-  "evidence": "perf/platforms/watch/measure-20261006-074422.json",
-  "evidence_sha256": "d0769feeca4dd783cdaecccf0c920cdcddb32d3876ede0233484ba100e5b1f41"
+  "evidence": "perf/platforms/iphone/measure-20261005-220830.json",
+  "evidence_sha256": "e83d198e762b8a3a78a6c8254a0a0c209f10b1afed9ec3ec2713b5f6881042a4"
  },
  "size": {
-  "download_bytes": 2636111,
-  "installed_bytes": 4053133,
-  "download_mb": 2.64,
-  "installed_mb": 4.05,
+  "download_bytes": 9999307,
+  "installed_bytes": 22837412,
+  "download_mb": 10.0,
+  "installed_mb": 22.84,
   "kind": "simulator .app (Release), not a store slice"
  },
  "speed": {
-  "cold_launch_ms": 413.0,
+  "cold_launch_ms": 1129.0,
   "runs": 5,
   "discarded_runs": 1,
   "ready_signal": "os_log",
   "method": "launch command issued -> App os_log \"lane-ready\" (first data-bearing screen), App terminated 3 s before each run, first run after install discarded, median"
  },
  "idle": {
-  "memory_mb": 18.0,
+  "memory_mb": 23.0,
   "cpu_pct": 0.0,
   "window_s": 60,
   "settle_s": 45,
   "method": "shared measure.py idle: CPU-time delta / wall window; phys_footprint peak of 3 samples after the window",
   "scope": "Simulator App host process only; excludes CoreSimulator, system services and inactive extensions"
  },
- "measured_at": "2026-10-06T07:44:22+08:00"
+ "measured_at": "2026-10-05T22:08:30+08:00"
 }

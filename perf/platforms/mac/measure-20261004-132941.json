@@ -1,0 +1,120 @@
+{
+ "schema_version": 1,
+ "platform": "mac",
+ "app_id": "fitcoach-ios",
+ "input_sha256": "06e9f63af6fccde0e11cf8cd4dfd9cfdff8fdcd0ed4e719cfb372eb711b98665",
+ "measured_at": "2026-10-04T13:29:41+08:00",
+ "completed_at": "2026-10-04T13:34:58+08:00",
+ "build": {
+  "configuration": "Release",
+  "scheme": "FitCoach",
+  "bundle_id": "cyou.tianli.fitcoachapp",
+  "version": "1.0.1",
+  "build": "6",
+  "sdk": "macosx27.0",
+  "executable_sha256": "20bae22369e10ab51e878c6488d10db96b70e61948d3e48e55f3485d0305eee3",
+  "signing": "ad-hoc, entitlements stripped, no sandbox, no hardened runtime (local lane build)",
+  "seconds": 165.7,
+  "xcode": {
+   "name": "Xcode.app",
+   "version": "27.0",
+   "build": "27A266a",
+   "developer_dir": "/Applications/Xcode.app/Contents/Developer"
+  },
+  "reuse": null
+ },
+ "measurement": {
+  "environment": "native",
+  "device": "Mac16,12 / Apple M4",
+  "os": "macOS 27.2",
+  "samples": [
+   {
+    "run": 0,
+    "pid": null,
+    "ready_seconds": 1.16,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 1,
+    "pid": null,
+    "ready_seconds": 0.631,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 2,
+    "pid": null,
+    "ready_seconds": 0.649,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 3,
+    "pid": null,
+    "ready_seconds": 0.6,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 4,
+    "pid": null,
+    "ready_seconds": 0.685,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 5,
+    "pid": null,
+    "ready_seconds": 0.61,
+    "ready_signal": "os_log",
+    "errors": []
+   }
+  ],
+  "idle": {
+   "process": "88055",
+   "footprint_mb": 50.0,
+   "cpu_pct": 0.0,
+   "window_s": 60
+  },
+  "loads": {
+   "before_launches": [
+    9.80419921875,
+    25.38037109375,
+    32.27978515625
+   ],
+   "after_launches": [
+    9.08837890625,
+    23.75537109375,
+    31.453125
+   ],
+   "before_idle": [
+    5.60205078125,
+    20.7861328125,
+    29.9619140625
+   ]
+  },
+  "orientation": null,
+  "with_helpers": false,
+  "scope": "Local ad-hoc Release build, main process only, quiet launch (hidden, no Dock icon, window never on screen)",
+  "settle_s": 45
+ },
+ "size": {
+  "download_bytes": 6270115,
+  "installed_bytes": 18288062,
+  "download_mb": 6.27,
+  "installed_mb": 18.29
+ },
+ "speed": {
+  "cold_launch_ms": 631.0,
+  "runs": 5,
+  "discarded_runs": 1,
+  "ready_signal": "os_log",
+  "method": "launch command issued -> App os_log \"lane-ready\" (first data-bearing screen), App terminated 3 s before each run, first run after install discarded, median"
+ },
+ "tool_sha256": {
+  "platform_measure.py": "da85b47da11905bd81ef01df3ef26a0b9821894aea2f92deb78976a45d70e3d2",
+  "measure.py": "9b4f3cb22190a295fade42759bdb19f27da7c5dbd13449e78cb14743472ed94c",
+  "sim_lane.py": "ba7cbd20ded10311bdc948675314205e5be797537da2eb9ae33ac2844e1d3d34"
+ }
+}

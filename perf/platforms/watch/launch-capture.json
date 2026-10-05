@@ -1,0 +1,42 @@
+{
+  "ok": true,
+  "platform": "watch",
+  "udid": "71612A23-0E31-4E0A-9C3A-F5EE4E69FCE1",
+  "device": "Apple Watch Series 12 (46mm)",
+  "device_type": "Apple-Watch-Series-12-46mm",
+  "runtime": "watchOS-27-0",
+  "bundle_id": "cyou.tianli.fitcoachapp.watchkitapp",
+  "version": "1.0.1",
+  "build": "6",
+  "launch_args": [
+    "-fitcoach.watchDemo",
+    "1",
+    "-fitcoach.watchDemo",
+    "1"
+  ],
+  "environment": "simulator",
+  "errors": [],
+  "boot_seconds": 31.8,
+  "install_seconds": 3.6,
+  "baseline_stable": true,
+  "size": [
+    416,
+    496
+  ],
+  "pid": 5170,
+  "ready_seconds": 1.116,
+  "ready_signal": "os_log",
+  "screenshot": "perf/platforms/watch/launch.png",
+  "verdict": {
+    "non_blank": true,
+    "changed_from_baseline": true,
+    "stable": true,
+    "diff_baseline": 0.9003,
+    "diff_prev": 0.0
+  },
+  "notes": [],
+  "shutdown": true,
+  "input_sha256": "54423e926562e35f9298419e971e7610ecb1be57f5cf0e75ffd22728ae3ed085",
+  "executable_sha256": "7644ca1beb9236e6acf448046da6080e27e7c0325cee6d5708f211ae01fdf67f",
+  "screenshot_sha256": "f159bd5cc08e7d3554cb38f445e9d68a008a584df1c7404e27df82fdc340b82f"
+}

@@ -1,0 +1,197 @@
+{
+ "schema_version": 1,
+ "platform": "watch",
+ "app_id": "fitcoach-ios",
+ "input_sha256": "f69b25a09ac8bdebb3250a003a9b9979a611281f396f456e3ab268de4d1255bf",
+ "measured_at": "2026-10-04T13:49:33+08:00",
+ "completed_at": "2026-10-04T13:54:21+08:00",
+ "build": {
+  "configuration": "Release",
+  "scheme": "FitCoachWatch",
+  "bundle_id": "cyou.tianli.fitcoachapp.watchkitapp",
+  "version": "1.0.1",
+  "build": "6",
+  "sdk": "watchsimulator27.0",
+  "executable_sha256": "e46a9e38a79b60b28afcd5b953babfb9380fd08d57ecb62fdeb5dcd50547d190",
+  "signing": "unsigned simulator build (CODE_SIGNING_ALLOWED=NO)",
+  "seconds": 63.5,
+  "xcode": {
+   "name": "Xcode.app",
+   "version": "27.0",
+   "build": "27A266a",
+   "developer_dir": "/Applications/Xcode.app/Contents/Developer"
+  },
+  "reuse": null
+ },
+ "measurement": {
+  "environment": "simulator",
+  "device": "Apple Watch Series 12 (46mm) (Apple-Watch-Series-12-46mm)",
+  "os": "watchOS 27.0",
+  "udid": "71612A23-0E31-4E0A-9C3A-F5EE4E69FCE1",
+  "install_seconds": 6.7,
+  "samples": [
+   {
+    "run": 0,
+    "pid": 98697,
+    "ready_seconds": 0.894,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 1,
+    "pid": 98818,
+    "ready_seconds": 0.764,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 2,
+    "pid": 98929,
+    "ready_seconds": 0.752,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 3,
+    "pid": 99047,
+    "ready_seconds": 0.753,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 4,
+    "pid": 99181,
+    "ready_seconds": 0.769,
+    "ready_signal": "os_log",
+    "errors": []
+   },
+   {
+    "run": 5,
+    "pid": 99311,
+    "ready_seconds": 0.765,
+    "ready_signal": "os_log",
+    "errors": []
+   }
+  ],
+  "idle": {
+   "process": "99397",
+   "footprint_mb": 21.0,
+   "cpu_pct": 0.0,
+   "window_s": 60
+  },
+  "loads": {
+   "before_launches": [
+    8.17822265625,
+    38.55908203125,
+    47.2197265625
+   ],
+   "counted_launches": [
+    {
+     "run": 1,
+     "before": [
+      7.5478515625,
+      37.4208984375,
+      46.71435546875
+     ],
+     "after": [
+      6.61474609375,
+      36.2373046875,
+      46.185546875
+     ]
+    },
+    {
+     "run": 2,
+     "before": [
+      6.61474609375,
+      36.2373046875,
+      46.185546875
+     ],
+     "after": [
+      6.2060546875,
+      35.1748046875,
+      45.69189453125
+     ]
+    },
+    {
+     "run": 3,
+     "before": [
+      6.2060546875,
+      35.1748046875,
+      45.69189453125
+     ],
+     "after": [
+      6.02685546875,
+      34.18115234375,
+      45.2158203125
+     ]
+    },
+    {
+     "run": 4,
+     "before": [
+      6.02685546875,
+      34.18115234375,
+      45.2158203125
+     ],
+     "after": [
+      5.5546875,
+      33.1533203125,
+      44.72216796875
+     ]
+    },
+    {
+     "run": 5,
+     "before": [
+      5.5546875,
+      33.1533203125,
+      44.72216796875
+     ],
+     "after": [
+      5.35009765625,
+      32.65234375,
+      44.4775390625
+     ]
+    }
+   ],
+   "after_launches": [
+    5.35009765625,
+    32.65234375,
+    44.4775390625
+   ],
+   "before_idle": [
+    3.95068359375,
+    27.6630859375,
+    41.87890625
+   ]
+  },
+  "orientation": null,
+  "rotation": null,
+  "device_selection": {
+   "mode": "configured/default",
+   "udid": "71612A23-0E31-4E0A-9C3A-F5EE4E69FCE1",
+   "name": "Apple Watch Series 12 (46mm)",
+   "state_before": "Shutdown",
+   "shutdown_verified": false
+  },
+  "with_helpers": false,
+  "scope": "Simulator App host process only; excludes CoreSimulator, system services and inactive extensions",
+  "settle_s": 45
+ },
+ "size": {
+  "download_bytes": 2636111,
+  "installed_bytes": 4053133,
+  "download_mb": 2.64,
+  "installed_mb": 4.05
+ },
+ "speed": {
+  "cold_launch_ms": 764.0,
+  "runs": 5,
+  "discarded_runs": 1,
+  "ready_signal": "os_log",
+  "method": "launch command issued -> App os_log \"lane-ready\" (first data-bearing screen), App terminated 3 s before each run, first run after install discarded, median"
+ },
+ "tool_sha256": {
+  "platform_measure.py": "da85b47da11905bd81ef01df3ef26a0b9821894aea2f92deb78976a45d70e3d2",
+  "measure.py": "9b4f3cb22190a295fade42759bdb19f27da7c5dbd13449e78cb14743472ed94c",
+  "sim_lane.py": "ba7cbd20ded10311bdc948675314205e5be797537da2eb9ae33ac2844e1d3d34"
+ }
+}
