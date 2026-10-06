@@ -11,3 +11,4 @@ esac
 export FITCOACH_BASE="$FC_BASE" FITCOACH_CLI_HOME="$ACCEPT_TMP/cli-home"
 bash cli/build.sh
 python3 cli/test_cli.py "$ACCEPT_TMP"
+python3 cli/test_phone_cli.py

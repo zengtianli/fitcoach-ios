@@ -155,7 +155,7 @@ enum Commands {
         try a.noPositional()
         let removed = try c.store.remove(c.base)
         Out.success(["base": c.base, "removed": removed]) {
-            Out.line(removed ? "已删掉本机凭证（\(c.base)）。服务端会话无法吊销，到期前仍有效。"
+            Out.line(removed ? "已删掉本机凭证（\(c.base)）。服务端业务数据保留。"
                              : "本机没有这台服务器的凭证（\(c.base)）")
         }
     }
@@ -207,8 +207,11 @@ enum Commands {
             guard n1 == n2 else { throw Failure.usage("两次输入的新密码不一致") }
             old = o; new = n1
         }
-        _ = try await send(api, "/coach/api/password", ["old_password": old, "new_password": new])
-        Out.success(["base": c.base]) { Out.line("密码已修改。已有登录（含本机命令行）不会因此失效。") }
+        let (_, result) = try await send(api, "/coach/api/password", ["old_password": old, "new_password": new])
+        if let cookie = result["cookie"] as? String {
+            try c.store.save(c.base, Credential(cookie: cookie, email: c.store.load(c.base)?.email, saved_at: TZ.stampString(Date())))
+        }
+        Out.success(["base": c.base]) { Out.line("密码已修改，当前设备会话已更新；其他设备需要重新登录。") }
     }
 
     /// App AccountDeleteView → API.deleteAccount()。整租户真删，不可恢复：字面量确认门。

@@ -33,6 +33,7 @@ enum APIError: LocalizedError {
 /// URLSession 的自动 cookie jar 在这里帮不上忙 —— 后端根本没发 Set-Cookie。
 @MainActor
 final class Session: ObservableObject {
+    private var persists = true
     static let coachCookieName = "fc_coach"
     private static let kCoach = "fitcoach.coachCookie"
     private static let kStudent = "fitcoach.studentToken"
@@ -41,20 +42,20 @@ final class Session: ObservableObject {
     @Published var showingLogin = false
     @Published var loginMode = 0
     @Published var coachEmail: String? {
-        didSet { UserDefaults.standard.set(coachEmail, forKey: "fitcoach.coachEmail") }
+        didSet { if persists { UserDefaults.standard.set(coachEmail, forKey: "fitcoach.coachEmail") } }
     }
     @Published var studentMode: Bool {
-        didSet { UserDefaults.standard.set(studentMode, forKey: Self.kRole) }
+        didSet { if persists { UserDefaults.standard.set(studentMode, forKey: Self.kRole) } }
     }
 
     @Published var coachCookie: String? {
-        didSet { UserDefaults.standard.set(coachCookie, forKey: Self.kCoach) }
+        didSet { if persists { UserDefaults.standard.set(coachCookie, forKey: Self.kCoach) } }
     }
     @Published var studentToken: String? {
-        didSet { UserDefaults.standard.set(studentToken, forKey: Self.kStudent) }
+        didSet { if persists { UserDefaults.standard.set(studentToken, forKey: Self.kStudent) } }
     }
     @Published var baseURL: String {
-        didSet { UserDefaults.standard.set(baseURL, forKey: Self.kBase) }
+        didSet { if persists { UserDefaults.standard.set(baseURL, forKey: Self.kBase) } }
     }
 
     static let defaultBaseURL = "https://fit.tianli.cyou"
@@ -70,8 +71,9 @@ final class Session: ObservableObject {
 
     /// 不落盘的会话：命令行 `fitcoach`（cli/）用它带自己保管的凭证打同一套 API。
     /// Swift 在类自己的初始化器里赋值**不触发** didSet，所以这里一个字节都不写 UserDefaults；
-    /// 调用方之后也不得再给这些属性赋值（那会触发 didSet 落盘）。
+    /// 401 清理也只改此实例，不触碰原生 App 的偏好或凭证。
     init(baseURL: String, coachCookie: String? = nil, studentToken: String? = nil) {
+        persists = false
         studentMode = coachCookie == nil && studentToken != nil
         coachEmail = nil
         self.coachCookie = coachCookie
@@ -169,7 +171,9 @@ final class API {
         switch code {
         case 404: return .gone
         case 401: return .unauthorized(m?.error ?? T("error.login", "登录失败"))
-        case 409: return .needsForce(m?.warnings ?? [])
+        case 409:
+            if let warnings = m?.warnings, !warnings.isEmpty { return .needsForce(warnings) }
+            return .rejected(m?.error ?? T("error.http", "请求失败（HTTP {code}）", ["code": "\(code)"]))
         case 500...599:
             if let e = m?.error, !e.isEmpty { return .server(code, e) }
             return .server(code, T("error.http", "请求失败（HTTP {code}）", ["code": "\(code)"]))
@@ -184,6 +188,7 @@ final class API {
     /// 过完错误协议的原始响应体。`get` 在它上面解码；命令行 `--json` 原样转发同一份字节。
     func getRaw(_ path: String, query: [String: String] = [:], student: Bool = false) async throws -> Data {
         let (data, code) = try await run(authed(try makeURL(path, query), student: student))
+        if !student && code == 401 { session.signOut() }
         guard (200..<300).contains(code) else { throw decodeError(data, code) }
         return data
     }
@@ -207,6 +212,7 @@ final class API {
         req.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         req.httpBody = formBody(fields)
         let (data, code) = try await run(req)
+        if code == 401 { session.signOut() }
         guard (200..<300).contains(code) else { throw decodeError(data, code) }
         return data
     }
@@ -217,6 +223,115 @@ final class API {
         let data = try await postRaw(path, fields)
         do { return try JSONDecoder().decode(MutationResp.self, from: data) }
         catch { throw APIError.decode("\(path)：\(error)") }
+    }
+
+    /// 手机账号接口显式收 JSON；旧业务和邮箱账号仍走 Form。公共操作不附带教练凭证。
+    func accountJSONRaw(_ path: String, _ fields: [String: Any], authenticated: Bool = false) async throws -> Data {
+        var req = authenticated ? authed(try makeURL(path, [:])) : URLRequest(url: try makeURL(path, [:]))
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = try JSONSerialization.data(withJSONObject: fields)
+        let (data, code) = try await run(req)
+        if authenticated && [401, 404].contains(code) {
+            // 错码、过期授权也会 401；用真实会话探针区分，不能因校验失败退出原账号。
+            let probe = try await coachSessionProbe()
+            if [401, 404].contains(probe) {
+                session.signOut()
+                throw APIError.unauthorized(T("error.gone", "登录已失效，请重新登录"))
+            }
+            if probe != 200 { throw APIError.server(probe, T("account.session_unconfirmed", "登录状态暂时无法确认，请重试")) }
+            let body = try? JSONDecoder().decode(MutationResp.self, from: data)
+            throw APIError.rejected(body?.error ?? T("account.phone.authorization_failed", "验证码或授权无效，请重新获取验证码"))
+        }
+        guard (200..<300).contains(code) else { throw decodeError(data, code) }
+        if let box = try? JSONDecoder().decode(PhoneResult.self, from: data), let ui = box.ui {
+            RemoteUISink.adopt(ui.value)
+        }
+        return data
+    }
+
+    func accountJSON(_ path: String, _ fields: [String: Any], authenticated: Bool = false) async throws -> PhoneResult {
+        let data = try await accountJSONRaw(path, fields, authenticated: authenticated)
+        do { return try JSONDecoder().decode(PhoneResult.self, from: data) }
+        catch { throw APIError.decode("\(path)：\(error)") }
+    }
+
+    struct SMSHints: Codable {
+        var enabled: Bool? = nil
+        var resend_seconds: Int? = nil
+        var code_ttl_seconds: Int? = nil
+        var sign_name: String? = nil
+        var resend: Int { min(600, max(10, resend_seconds ?? 60)) }
+        var ttl: Int { min(3600, max(60, code_ttl_seconds ?? 300)) }
+    }
+
+    struct PhoneResult: Codable, UICarrier {
+        let ok: Bool
+        var cookie: String? = nil
+        var email: String? = nil
+        var coach_id: Int? = nil
+        var phone_hint: String? = nil
+        var phone_verified: Bool? = nil
+        var has_password: Bool? = nil
+        var display_name: String? = nil
+        var message: String? = nil
+        var challenge_id: String? = nil
+        var verification_token: String? = nil
+        var recovery_key: String? = nil
+        var resend_seconds: Int? = nil
+        var code_ttl_seconds: Int? = nil
+        var sign_name: String? = nil
+        var sms: SMSHints? = nil
+        var ui: Lenient<FeedUI>? = nil
+        var hints: SMSHints { sms ?? .init(resend_seconds: resend_seconds, code_ttl_seconds: code_ttl_seconds, sign_name: sign_name) }
+    }
+
+    func phoneSend(purpose: String, phone: String, requestID: String,
+                   password: String = "", identityGrant: String = "") async throws -> PhoneResult {
+        try await accountJSON("/api/phone_send", ["purpose": purpose, "phone": phone,
+            "request_id": requestID, "password": password, "identity_grant": identityGrant],
+            authenticated: ["bind", "change_old", "change_new", "identity"].contains(purpose))
+    }
+
+    func phoneVerify(challenge: String, code: String, authenticated: Bool = false) async throws -> String {
+        let r = try await accountJSON("/api/phone_verify", ["challenge_id": challenge, "code": code], authenticated: authenticated)
+        guard let token = r.verification_token, !token.isEmpty else { throw APIError.decode("验证码核验响应异常") }
+        return token
+    }
+
+    func accountInfo() async throws -> PhoneResult {
+        let (data, code) = try await run(authed(try makeURL("/coach/api/account", [:])))
+        if [401, 404].contains(code) {
+            let probe = try await coachSessionProbe()
+            if [401, 404].contains(probe) {
+                session.signOut()
+                throw APIError.unauthorized(T("error.gone", "登录已失效，请重新登录"))
+            }
+            if probe != 200 { throw APIError.server(probe, T("account.session_unconfirmed", "登录状态暂时无法确认，请重试")) }
+            let body = try? JSONDecoder().decode(MutationResp.self, from: data)
+            throw APIError.rejected(body?.error ?? T("account.security_unavailable", "账号安全信息暂时无法读取，请重试"))
+        }
+        guard (200..<300).contains(code) else { throw decodeError(data, code) }
+        let result: PhoneResult
+        do { result = try JSONDecoder().decode(PhoneResult.self, from: data) }
+        catch { throw APIError.decode("账号安全响应异常") }
+        if let ui = result.ui { RemoteUISink.adopt(ui.value) }
+        return result
+    }
+
+    private func coachSessionProbe() async throws -> Int {
+        let (_, code) = try await run(authed(try makeURL("/coach/api/ping", [:])))
+        return code
+    }
+
+    func accountHints() async throws -> PhoneResult {
+        let (data, code) = try await run(URLRequest(url: makeURL("/api/account_hints", [:])))
+        guard (200..<300).contains(code) else { throw decodeError(data, code) }
+        let result: PhoneResult
+        do { result = try JSONDecoder().decode(PhoneResult.self, from: data) }
+        catch { throw APIError.decode("短信提示响应异常") }
+        if let ui = result.ui { RemoteUISink.adopt(ui.value) }
+        return result
     }
 
     // ── 登录 ──────────────────────────────────────────────────────────────

@@ -9,6 +9,12 @@ lifecycle: active
 bundle_id: cyou.tianli.fitcoachapp
 origin: own
 sop:
+  account:
+    mode: password
+    rationale: 保留教练邮箱密码账号；已验证手机号用于注册、验证码登录、绑定换绑与找回，业务归属保持原 coach_id。邮箱密码登录本身不宣称邮箱验证或真实邮件闭环。
+    verification_channels: [phone]
+    phone_login: true
+    inputs: [../../service/account_phone.py, ../../service/tenancy.py, ../../service/api.py, ../../service/schema.sql]
   test: bash ref/run
   cli:
     commands:

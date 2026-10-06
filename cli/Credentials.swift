@@ -6,8 +6,8 @@ import Foundation
 /// 按服务器地址分条；`FITCOACH_CLI_HOME` 可改目录（测试、沙盒）。
 /// 不用钥匙串：本机编译的命令行每次重编签名都会变，钥匙串会弹「允许访问」对话框 ——
 /// 给智能体驱动的命令行弹窗等于卡死并抢用户焦点。
-/// 这枚 cookie 是后端无状态签名会话（30 天），服务端没有吊销表：logout 只删本机这份，
-/// 改密码也不会让它失效。
+/// cookie 是后端签名会话；账号版本变化（改密、手机号换绑/找回）使旧会话失效。
+/// 成功回执的新 cookie 更新本文件，logout 只删本机这份。
 struct Credential: Codable {
     let cookie: String
     let email: String?

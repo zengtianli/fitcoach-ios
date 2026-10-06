@@ -30,6 +30,17 @@ struct Spec {
 @MainActor
 enum Registry {
     static let groups: [String: [String: Spec]] = [
+        "phone": [
+            "hints": Spec(run: PhoneCommands.hints),
+            "account": Spec(run: PhoneCommands.account),
+            "send": Spec(values: ["purpose", "phone", "request-id", "identity-grant-file"], flags: ["confirm-send", "password-stdin"], run: PhoneCommands.send),
+            "verify": Spec(values: ["challenge"], flags: ["code-stdin", "authenticated"], run: PhoneCommands.verify),
+            "register": Spec(values: ["grant-file", "display-name"], flags: ["agreed", "password-stdin"], run: PhoneCommands.register),
+            "login": Spec(values: ["grant-file"], flags: ["ownership-stdin"], run: PhoneCommands.login),
+            "recover": Spec(values: ["grant-file"], flags: ["secrets-stdin"], run: PhoneCommands.recover),
+            "bind": Spec(values: ["phone", "grant-file", "old-grant-file", "identity-grant-file"], flags: ["password-stdin"], run: PhoneCommands.bind),
+            "set-password": Spec(values: ["identity-grant-file"], flags: ["password-stdin"], run: PhoneCommands.setPassword),
+        ],
         "students": [
             "list": Spec(run: Commands.studentsList),
             "show": Spec(run: Commands.studentsShow),
@@ -136,6 +147,7 @@ struct FitCoachCLI {
         }
 
         var rest = Array(argv[(index + 1)...])
+        let phoneSubcommand = head == "phone" ? rest.first : nil
         let spec: Spec
         if let table = Registry.groups[head] {
             guard let sub = rest.first, !sub.hasPrefix("-") else {
@@ -164,6 +176,12 @@ struct FitCoachCLI {
             try await spec.run(args, context)
             exit(ExitCode.ok.rawValue)
         } catch {
+            // 公共短信核验/登录失败不能清掉另一枚仍有效的本地教练会话。
+            let authenticated = head != "phone"
+                || ["account", "bind", "set-password"].contains(phoneSubcommand ?? "")
+                || (phoneSubcommand == "verify" && args.has("authenticated"))
+                || (phoneSubcommand == "send" && ["bind", "change_old", "change_new", "identity"].contains(args.value("purpose") ?? ""))
+            if authenticated, case APIError.unauthorized = error { _ = try? context.store.remove(context.base) }
             Out.fail(await classify(error, api: try? context.coach()))
         }
     }
@@ -185,7 +203,7 @@ enum Help {
     与「上门体育」App、网页 fit.tianli.cyou、小程序同一套 /coach/api/*、同一份数据；业务判据全在后端。
     教练端：
       login          登录并在本机保存凭证：--email E --password-stdin（密码只从 stdin 或终端读）
-      logout         删掉本机凭证（服务端会话无法吊销，到期前仍有效）
+      logout         删掉本机凭证；服务端数据保留
       status         登录态、账号与服务端今天/现在
       schedule       日程与预警：[--range today|week|overdue] [--date YYYY-MM-DD]
       students       学员：list · show ID · link ID [--reveal] · add · update ID · issue-link ID · revoke-link ID
@@ -201,6 +219,7 @@ enum Help {
       password       改密码：--stdin（第 1 行旧密码，第 2 行新密码）
       register       注册新教练：--email E --display-name N --password-stdin
       account        注销账号（整个租户真删、不可恢复）：account delete --confirm delete-account [--dry-run]
+      phone          手机账号：hints · account · send · verify · register · login · recover · bind · set-password
     学员端：
       student-view   用学员链接读只读视图：--token-stdin（链接或口令只从 stdin 读，不进命令行参数）
 
@@ -218,6 +237,24 @@ enum Help {
     """
 
     static let groups: [String: String] = [
+        "phone": """
+        用法：fitcoach phone <子命令> [参数] [--json]
+          hints / account              公共短信提示 / 当前账号安全状态
+          send --purpose P [--phone N] --request-id ID --confirm-send [--password-stdin] [--identity-grant-file FILE]
+                                       P: register|login|recover|bind|change_old|change_new|identity；发送会计费；未知结果重用同一个 ID，禁自动重发
+          verify --challenge ID --code-stdin [--authenticated]
+                                       验证码只从 stdin 第一行读取；返回 0600 授权文件路径，绑定用途需 --authenticated
+          register --grant-file FILE --agreed [--display-name N] [--password-stdin]
+          login --grant-file FILE [--ownership-stdin]
+                                       风险验证从 stdin JSON 读 password / recovery_key；失败保留授权文件
+          recover --grant-file FILE --secrets-stdin
+                                       stdin JSON: new_password + recovery_key 或原 password；找回始终要求独立归属证明。成功清本机会话，重新登录
+          bind --phone N --grant-file FILE [--old-grant-file FILE] [--identity-grant-file FILE] [--password-stdin]
+                                       换绑先验证旧、新号码；密码账号要原密码。保持 coach_id 和业务数据
+          set-password --identity-grant-file FILE --password-stdin
+                                       手机新户验证 identity 后设密码；成功更新当前设备 cookie
+          授权、恢复密钥只存命令行私有目录 0600 文件，不输出明文；恢复密钥文件路径只在首次注册/绑定返回，请备份到密码管理器。
+        """,
         "login": """
         用法：fitcoach login --email E [--password-stdin] [--base URL] [--json]
           POST /api/login（与 App 同一端点），凭证存本机 0600 文件，不写 App 的登录。
@@ -226,7 +263,7 @@ enum Help {
         """,
         "logout": """
         用法：fitcoach logout [--base URL] [--json]
-          删掉本机这台服务器的凭证。后端会话是无状态签名（30 天），服务端无法吊销，改密码也不失效。
+          删掉本机这台服务器的凭证。账号版本变化（改密、换绑或找回）使旧会话失效；普通退出不删除业务数据。
         """,
         "status": """
         用法：fitcoach status [--base URL] [--json]
@@ -239,7 +276,7 @@ enum Help {
         "password": """
         用法：fitcoach password --stdin [--json]
           POST /coach/api/password。stdin 第 1 行旧密码、第 2 行新密码；终端里不带 --stdin 时逐项不回显输入。
-          已有登录（含本机命令行）不会因此失效。
+          成功更新当前命令行的会话；其他设备的旧会话失效，需要重新登录。
         """,
         "account": """
         用法：fitcoach account delete --confirm delete-account [--dry-run] [--json]

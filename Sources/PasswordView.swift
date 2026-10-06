@@ -67,9 +67,12 @@ struct PasswordView: View {
         busy = true; err = nil; done = false
         defer { busy = false }
         do {
-            try await API(session).post("/coach/api/password", [
+            let data = try await API(session).postRaw("/coach/api/password", [
                 "old_password": old, "new_password": new1,
             ])
+            if let r = try? JSONDecoder().decode(API.PhoneResult.self, from: data), let cookie = r.cookie {
+                session.coachCookie = cookie
+            }
             if let saved = try? SavedLogin.load(server: session.baseURL), saved.email == session.coachEmail {
                 try? SavedLogin.save(.init(email: saved.email, password: new1), server: session.baseURL)
             }

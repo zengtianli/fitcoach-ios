@@ -122,6 +122,7 @@ struct RootView: View {
         switch parts.first {
         case "metrics":  MetricsView()
         case "password": PasswordView()
+        case "phone-account": PhoneSecurityView()
         case "delete-account": AccountDeleteView()
         case "locations": LocationsView()
         case "audit":    AuditView()
@@ -202,6 +203,8 @@ struct MoreView: View {
             }
 
             GroupTitle(text: "账号", icon: "person.crop.circle").cardRow(top: 14, bottom: 2)
+            MoreLink(icon: "phone.fill", tone: .accent, title: "手机号与账号安全",
+                     detail: "绑定、换绑与手机账号设置密码") { PhoneSecurityView() }.cardRow()
             MoreLink(icon: "key.fill", tone: .warn, title: "修改密码",
                      detail: "与网页端同一个账号") { PasswordView() }.cardRow()
             MoreLink(icon: "person.crop.circle.badge.xmark", tone: .danger, title: "注销账号",

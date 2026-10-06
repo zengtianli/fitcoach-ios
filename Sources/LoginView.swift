@@ -11,6 +11,7 @@ struct LoginView: View {
     @State private var err: String?
     @State private var showServer = false
     @State private var showRegister = false
+    @State private var phoneMode: PhoneAccountView.Mode?
     @FocusState private var focused: Field?
     private enum Field { case email, password, link }
 
@@ -49,6 +50,7 @@ struct LoginView: View {
             .navigationTitle("").navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showServer) { ServerSheet() }
             .sheet(isPresented: $showRegister, onDismiss: restore) { RegisterView() }
+            .sheet(item: $phoneMode) { mode in PhoneAccountView(mode: mode) }
             .task { restore(); LaneSignal.ready("login") }
             .onChange(of: session.baseURL) { _, _ in restore() }
             .onChange(of: mode) { _, _ in focused = nil; err = nil }
@@ -97,6 +99,11 @@ struct LoginView: View {
             .buttonStyle(.borderedProminent).controlSize(.large).disabled(!canLogin)
             Button("还没有账号？立即注册") { focused = nil; showRegister = true }
                 .font(.subheadline)
+            HStack {
+                Button("短信登录") { focused = nil; phoneMode = .login }
+                Button("手机注册") { focused = nil; phoneMode = .register }
+                Button("忘记密码") { focused = nil; phoneMode = .recover }
+            }.font(.subheadline)
         }.disabled(busy)
     }
 
