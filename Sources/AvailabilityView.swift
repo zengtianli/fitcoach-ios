@@ -30,8 +30,8 @@ struct AvailabilityView: View {
                     if empty {
                         CardBox {
                             EmptyState(icon: "calendar.badge.clock",
-                                       title: "还没有设置可排时段",
-                                       detail: "定好每周几点到几点能排课，排课时超出这个范围会提醒你。",
+                                       title: T("availability.rules.empty.title", "还没有设置可排时段"),
+                                       detail: T("availability.rules.empty.detail", "定好每周几点到几点能排课，排课时超出这个范围会提醒你。"),
                                        tone: .accent,
                                        action: ("加每周规则", { newRule = true }))
                         }
@@ -76,8 +76,8 @@ struct AvailabilityView: View {
                     if d.exceptions.isEmpty {
                         CardBox {
                             EmptyState(icon: "calendar.badge.exclamationmark",
-                                       title: "没有例外",
-                                       detail: "临时停排（出差、放假）或临时加开，都在这里加。",
+                                       title: T("availability.exceptions.empty.title", "没有例外"),
+                                       detail: T("availability.exceptions.empty.detail", "临时停排（出差、放假）或临时加开，都在这里加。"),
                                        tone: .accent,
                                        action: ("加一条例外", { newExc = true }))
                         }

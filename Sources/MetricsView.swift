@@ -23,8 +23,8 @@ struct MetricsView: View {
                     CardBox {
                         EmptyState(
                             icon: "ruler",
-                            title: "还没有体测项目",
-                            detail: "直接添加常用项目（立定跳远、50 米跑、平板支撑等），之后随时可以改。",
+                            title: T("metrics.empty.title", "还没有体测项目"),
+                            detail: T("metrics.empty.detail", "直接添加常用项目（立定跳远、50 米跑、平板支撑等），之后随时可以改。"),
                             tone: .accent,
                             action: (seeding ? "正在添加…" : "使用常用项目", { Task { await seed() } })
                         )

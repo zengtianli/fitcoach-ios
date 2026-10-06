@@ -85,13 +85,13 @@ struct ScheduleView: View {
                     CardBox {
                         if range == "overdue" {
                             EmptyState(icon: "checkmark.seal.fill",
-                                       title: "没有过时未处理的课",
-                                       detail: "上过的课都已经标好状态了，不用补。",
+                                       title: T("schedule.overdue.empty.title", "没有过时未处理的课"),
+                                       detail: T("schedule.overdue.empty.detail", "上过的课都已经标好状态了，不用补。"),
                                        tone: .ok)
                         } else {
                             EmptyState(icon: "calendar.badge.plus",
-                                       title: "这段时间还没有安排",
-                                       detail: "点右上角的 + 排第一节课。",
+                                       title: T("schedule.empty.title", "这段时间还没有安排"),
+                                       detail: T("schedule.empty.detail", "点右上角的 + 排第一节课。"),
                                        tone: .accent,
                                        action: ("排一节课", { showNew = true }))
                         }

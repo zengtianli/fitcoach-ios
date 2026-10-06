@@ -104,8 +104,8 @@ struct StudentDetailView: View {
                                 .font(.caption2).foregroundStyle(Theme.ink3)
                         } else {
                             EmptyState(icon: "link.badge.plus",
-                                       title: "还没签发学员链接",
-                                       detail: "签发后把链接发给学员，他就能自己看剩余课时与下一节课。",
+                                       title: T("student.link.empty.title", "还没签发学员链接"),
+                                       detail: T("student.link.empty.detail", "签发后把链接发给学员，他就能自己看剩余课时与下一节课。"),
                                        tone: .accent,
                                        action: ("签发学员链接", { Task { await createLink() } }))
                         }
@@ -140,8 +140,8 @@ struct StudentDetailView: View {
                 if d.sessions.isEmpty {
                     CardBox {
                         EmptyState(icon: "calendar.badge.plus",
-                                   title: "还没有课次",
-                                   detail: "排第一节课，或补录已经上过的课。",
+                                   title: T("student.sessions.empty.title", "还没有课次"),
+                                   detail: T("student.sessions.empty.detail", "排第一节课，或补录已经上过的课。"),
                                    tone: .accent,
                                    action: ("排一节课", { newSession = true }))
                     }

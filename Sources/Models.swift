@@ -42,7 +42,7 @@ struct DayGroup: Codable, Hashable, Identifiable {
     let sessions: [SessionRow]
 }
 
-struct ScheduleResp: Codable {
+struct ScheduleResp: Codable, UICarrier {
     let range: String
     let date: String
     let title: String
@@ -52,6 +52,8 @@ struct ScheduleResp: Codable {
     let now: String
     let days: [DayGroup]
     let warnings: [CoachWarning]
+    /// 后台覆盖项（词表、说明文字、阈值）；旧后端不带。解不开只丢这一段，课表照常。
+    var ui: Lenient<FeedUI>? = nil
 }
 
 struct StudentListRow: Codable, Hashable, Identifiable {
@@ -130,7 +132,7 @@ struct PackagePick: Codable, Hashable, Identifiable {
     let selectable: Bool
 }
 
-struct SessionFormResp: Codable {
+struct SessionFormResp: Codable, UICarrier {
     let today: String
     let session: SessionRow?
     let students: [NamedRef]
@@ -139,6 +141,7 @@ struct SessionFormResp: Codable {
     let locations: [NamedRef]
     let windows: [[String]]          // [["09:00","12:00"], …]
     let windows_reason: String?
+    var ui: Lenient<FeedUI>? = nil
 }
 
 struct Location: Codable, Hashable, Identifiable {
@@ -353,24 +356,33 @@ struct MutationResp: Codable {
 }
 
 
-// ── 词表：与 domain.REASON_CODES / _STATUS_LABELS 逐字一致 ──────────────────
+// ── 词表：后端说了算，这里只留兜底 ──────────────────────────────────────────
+//
+// 课次状态与理由分类的名称、先后由后端在 `ui` 段里给（ping / schedule / session-form 三个读端点，
+// 后端取自 domain.STATUSES / status_label / REASON_CODES 与网页端模板的 REASON_CODE_LABELS）。
+// 下面 `bundled…` 是没拿到时的兜底：旧后端、还没联上网的首次启动、覆盖项写坏。
+// 改名字改后端，不改这里、不发版。键：`status.<码>` `status_short.<码>` `reason.<码>` `bucket.<码>`。
+
+/// 带着后台覆盖项（`ui`）的响应。`API.get` 解到这类响应就把它交给 `Remote.ui`。
+protocol UICarrier {
+    var ui: Lenient<FeedUI>? { get }
+}
 
 enum Vocab {
-    static let statuses = ["scheduled", "completed", "no_show", "cancelled"]
+    private static let bundledStatuses = ["scheduled", "completed", "no_show", "cancelled"]
 
-    static let statusLabels: [String: String] = [
+    private static let bundledStatusLabels: [String: String] = [
         "scheduled": "已排课",
         "completed": "已上课",
         "no_show": "未到（已扣课时）",
         "cancelled": "已取消（未扣课时）",
     ]
 
-    static let statusShort: [String: String] = [
+    private static let bundledStatusShort: [String: String] = [
         "scheduled": "已排课", "completed": "已上课", "no_show": "未到", "cancelled": "已取消",
     ]
 
-    /// 顺序与 templates/_macros.html 的 REASON_CODE_LABELS 一致
-    static let reasonCodes: [(String, String)] = [
+    private static let bundledReasons: [(String, String)] = [
         ("mistake", "记错了"),
         ("student_leave", "学员请假"),
         ("student_injury", "学员伤病"),
@@ -380,14 +392,55 @@ enum Vocab {
         ("other", "其它"),
     ]
 
+    private static let bundledBuckets: [String: String] = [
+        "active": "可用", "lapsed": "已过期", "exhausted": "已用完", "voided": "已作废",
+    ]
+
+    /// 后台 `ui.order` 里某一类词（按前缀）的先后，去掉前缀；没下发为空。
+    private static func remoteOrder(_ prefix: String) -> [String] {
+        Remote.order([]).filter { $0.hasPrefix(prefix) }.map { String($0.dropFirst(prefix.count)) }
+    }
+
+    /// 自带词表盖上后台给的名称；后台多给的码（自带表里没有）也认。
+    private static func labels(_ prefix: String, _ bundled: [String: String]) -> [String: String] {
+        guard let vocab = Remote.ui?.vocab else { return bundled }
+        var out = bundled
+        for (key, word) in vocab where key.hasPrefix(prefix) {
+            if let label = word.label, !label.isEmpty { out[String(key.dropFirst(prefix.count))] = label }
+        }
+        return out
+    }
+
+    /// 可选的课次状态。先后听后台的；码的全集仍是这四个（客户端按它们画颜色与按钮），
+    /// 后台漏给的补在后面 —— 写错顺序也不会让某个状态选不到。
+    static var statuses: [String] {
+        let remote = remoteOrder("status.").filter(bundledStatuses.contains)
+        return remote + bundledStatuses.filter { !remote.contains($0) }
+    }
+
+    static var statusLabels: [String: String] { labels("status.", bundledStatusLabels) }
+
+    /// 徽标上的短名。后端没有这张表的常量，只在 ui.json 的 `status_short.<码>` 里改。
+    static var statusShort: [String: String] { labels("status_short.", bundledStatusShort) }
+
+    /// 理由分类（码，名称）。后台给了就完全按后台的码与先后（后端新增、下架理由都不用发版）；
+    /// 没给用自带的七个，与 templates/_macros.html 的 REASON_CODE_LABELS 同序。
+    static var reasonCodes: [(String, String)] {
+        let bundled = Dictionary(uniqueKeysWithValues: bundledReasons)
+        let remote = remoteOrder("reason.")
+        guard !remote.isEmpty else {
+            return bundledReasons.map { ($0.0, Remote.label("reason.\($0.0)", $0.1)) }
+        }
+        return remote.map { ($0, Remote.label("reason.\($0)", bundled[$0] ?? $0)) }
+    }
+
     static func reasonLabel(_ code: String?) -> String {
         guard let c = code else { return "" }
         return reasonCodes.first { $0.0 == c }?.1 ?? c
     }
 
-    static let bucketLabels: [String: String] = [
-        "active": "可用", "lapsed": "已过期", "exhausted": "已用完", "voided": "已作废",
-    ]
+    /// 课包分类。后端没有这张表的常量，只在 ui.json 的 `bucket.<码>` 里改。
+    static var bucketLabels: [String: String] { labels("bucket.", bundledBuckets) }
 
     /// 后端规则（domain.needs_reason）：源状态非 scheduled 的改动必须填理由。
     /// 客户端据此**提前**把理由框标成必填；服务端仍是唯一判据，这里只做 UX 提示。

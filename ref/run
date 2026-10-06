@@ -8,6 +8,7 @@ BACKEND="${FITCOACH_TEST_BACKEND:-$(cd ../../service && pwd)}"
 TMP=$(mktemp -d)
 cleanup() {
   if [ -n "${PID:-}" ]; then kill "$PID" 2>/dev/null || true; wait "$PID" 2>/dev/null || true; fi
+  if [ -n "${STUB_PID:-}" ]; then kill "$STUB_PID" 2>/dev/null || true; wait "$STUB_PID" 2>/dev/null || true; fi
   rm -rf "$TMP"
 }
 trap cleanup EXIT
@@ -16,7 +17,7 @@ source $HOME/Dev/tools/dev/lib/tools/macapp/xcode_env.sh
 xcode_env_use macosx
 xcrun swiftc -O -swift-version 5 \
   Sources/Models.swift Sources/TimeKit.swift Sources/API.swift \
-  Sources/WatchSnapshot.swift Sources/WatchLink.swift ref/main.swift \
+  Sources/WatchSnapshot.swift Sources/WatchLink.swift Shared/RemoteUI.swift ref/main.swift \
   -o "$TMP/contract-bin"
 
 if [ -n "${FC_BASE:-}" ]; then
@@ -37,7 +38,9 @@ fi
 # exec makes PID the owned server itself; cleanup never matches other processes.
 
 echo "[ref] 起临时后端 :$PORT （库 $TMP/t.db）"
-( cd "$BACKEND" && export FITCOACH_DB="$TMP/t.db" FITCOACH_COACH_AUTH=multi \
+# 后台覆盖项（ui 段）的验收要改后端的 ui.json：给临时后端一份自己的副本，仓库里那份不动。
+cp "$BACKEND/ui.json" "$TMP/ui.json"
+( cd "$BACKEND" && export FITCOACH_DB="$TMP/t.db" FITCOACH_COACH_AUTH=multi FITCOACH_UI_FILE="$TMP/ui.json" \
     TLZ_GATE_SECRET="$("$BACKEND/.venv/bin/python" -c 'import secrets;print(secrets.token_hex(32))')"; \
     exec "$BACKEND/.venv/bin/python" -m uvicorn api:app --host 127.0.0.1 --port "$PORT" ) > "$TMP/srv.log" 2>&1 &
 PID=$!
@@ -51,7 +54,19 @@ curl -sf "http://127.0.0.1:$PORT/healthz" >/dev/null || {
 curl -sf -X POST "http://127.0.0.1:$PORT/register" \
   -d "email=t@e.com&password=Passw0rd!234&display_name=T" -o /dev/null || true
 
-FC_BASE="http://127.0.0.1:$PORT" "$TMP/contract-bin"
+# 假后端：只回「ui 段类型全错」和「不带 ui 键」两种形状，验客户端的容错（ref/stub_broken_ui.py）
+STUB_PORT=$("$BACKEND/.venv/bin/python" -c 'import socket;s=socket.socket();s.bind(("127.0.0.1",0));print(s.getsockname()[1]);s.close()')
+"$BACKEND/.venv/bin/python" ref/stub_broken_ui.py "$STUB_PORT" > "$TMP/stub.log" 2>&1 &
+STUB_PID=$!
+for _ in $(seq 1 20); do
+  curl -sf "http://127.0.0.1:$STUB_PORT/coach/api/ping" >/dev/null && break
+  sleep 0.25
+done
+curl -sf "http://127.0.0.1:$STUB_PORT/coach/api/ping" >/dev/null || {
+  echo "❌ 假后端没起来："; tail -5 "$TMP/stub.log"; exit 1; }
+
+FC_BASE="http://127.0.0.1:$PORT" FC_UI_FILE="$TMP/ui.json" FC_STUB_BASE="http://127.0.0.1:$STUB_PORT" \
+  "$TMP/contract-bin"
 
 # 命令行 fitcoach（cli/）编的是同一份 API.swift / Models.swift / QuickSetup.swift：
 # 场景测试在它自己的隔离后端上跑（凭证、偏好目录都在临时目录），见 cli/test.sh。

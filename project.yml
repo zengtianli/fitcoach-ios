@@ -28,6 +28,8 @@ targets:
       - path: Shared/AppLifecycle.swift
       - path: Shared/AppConfiguration.swift
       - path: Shared/AppLifecycleMobile.swift
+      # 后台下发的词表与说明文字（热更新）的接收端；总部副本，Models.swift 的 Vocab 与 API.swift 用它
+      - path: Shared/RemoteUI.swift
       - path: Sources
       - path: Resources/Assets.xcassets
         buildPhase: resources
@@ -84,6 +86,7 @@ targets:
       - path: Sources/TimeKit.swift
       - path: Sources/API.swift
       - path: Sources/QuickSetup.swift
+      - path: Shared/RemoteUI.swift
       - path: cli
         includes: ["*.swift"]
     settings:
@@ -125,6 +128,8 @@ targets:
       - path: Sources/TimeKit.swift
       # 只为 Vocab 词表（课次状态的中文名）；纯 Foundation，与 iPhone 同一份
       - path: Sources/Models.swift
+      # Vocab 先问后台覆盖项、再用自带词表；手表上没有覆盖项时就是自带的
+      - path: Shared/RemoteUI.swift
       # ⚠ 资产目录必须列进来：漏了手表包零报错地没有图标（成长小金库 2026-10-02 实测）；
       #   AppIcon 里那张 platform: watchos 的 1024 只有手表 actool 认。
       - path: Resources/Assets.xcassets

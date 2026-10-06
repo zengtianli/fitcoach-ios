@@ -15,7 +15,8 @@ enum WatchSnapshotBuilder {
             .map { s in
                 WatchSnapshot.Lesson(id: s.id, startAt: s.start_at, endAt: s.end_at, studentId: s.student_id,
                                      student: s.student_name, place: s.location_name, content: s.content,
-                                     status: s.status, remaining: left[s.student_id])
+                                     status: s.status, remaining: left[s.student_id],
+                                     statusLabel: Vocab.statusShort[s.status])
             }
         let balances = students.rows.filter { $0.n_packages > 0 }
             .sorted { ($0.available_total, $0.name) < ($1.available_total, $1.name) }

@@ -73,14 +73,14 @@ struct StudentsView: View {
                     CardBox {
                         if d.rows.isEmpty {
                             EmptyState(icon: "person.crop.circle.badge.plus",
-                                       title: "还没有学员",
-                                       detail: "先建一个学员，再给他录课包，就能开始排课了。",
+                                       title: T("students.empty.title", "还没有学员"),
+                                       detail: T("students.empty.detail", "先建一个学员，再给他录课包，就能开始排课了。"),
                                        tone: .accent,
                                        action: ("新建学员", { showNew = true }))
                         } else {
                             EmptyState(icon: "magnifyingglass",
-                                       title: "没有匹配的学员",
-                                       detail: "换个关键词试试，或者清空搜索框。",
+                                       title: T("students.nomatch.title", "没有匹配的学员"),
+                                       detail: T("students.nomatch.detail", "换个关键词试试，或者清空搜索框。"),
                                        tone: .neutral)
                         }
                     }

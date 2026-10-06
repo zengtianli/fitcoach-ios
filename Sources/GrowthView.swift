@@ -110,7 +110,7 @@ struct GrowthPanel: View {
                 CardBox {
                     HStack(spacing: 8) {
                         StatBlock(value: "\(d.attendance.rate)%", label: "到课率",
-                                  tone: d.attendance.rate >= 90 ? .ok : .warn)
+                                  tone: d.attendance.rate >= Remote.count("growth.attendance.good.percent", 90, in: 50...100) ? .ok : .warn)
                         StatBlock(value: "\(d.attendance.completed)", label: "已上课")
                         StatBlock(value: "\(d.attendance.no_show)", label: "未到",
                                   tone: d.attendance.no_show > 0 ? .warn : .neutral)
@@ -122,10 +122,10 @@ struct GrowthPanel: View {
                 CardBox {
                     if d.progress.isEmpty {
                         EmptyState(icon: "chart.line.uptrend.xyaxis",
-                                   title: d.metrics.isEmpty ? "还没有体测项目" : "还没有测量记录",
+                                   title: d.metrics.isEmpty ? T("growth.nometrics.title", "还没有体测项目") : T("growth.norecords.title", "还没有测量记录"),
                                    detail: d.metrics.isEmpty
-                                        ? "先到「更多 → 体测项目」建几个项目，再回来录成绩。"
-                                        : "录第一次成绩，之后每次测完都能看到趋势。",
+                                        ? T("growth.nometrics.detail", "先到「更多 → 体测项目」建几个项目，再回来录成绩。")
+                                        : T("growth.norecords.detail", "录第一次成绩，之后每次测完都能看到趋势。"),
                                    tone: .accent,
                                    action: d.metrics.isEmpty ? nil : ("录一次成绩", onRecord))
                     } else {
@@ -246,8 +246,8 @@ struct MetricTrendView: View {
             CardBox {
                 if points.count < 2 {
                     EmptyState(icon: "chart.dots.scatter",
-                               title: "只测过一次",
-                               detail: "再测一次就能看到趋势线。",
+                               title: T("growth.single.title", "只测过一次"),
+                               detail: T("growth.single.detail", "再测一次就能看到趋势线。"),
                                tone: .accent)
                 } else {
                     chart.frame(height: 210)

@@ -185,8 +185,8 @@ struct BalancePanel: View {
 
                 if rows.isEmpty {
                     CardBox {
-                        EmptyState(icon: "person.crop.circle.badge.plus", title: "还没有录课包的学员",
-                                   detail: "到「学员」里建学员、录课包，余额就会出现在这里。", tone: .accent)
+                        EmptyState(icon: "person.crop.circle.badge.plus", title: T("balances.empty.title", "还没有录课包的学员"),
+                                   detail: T("balances.empty.detail", "到「学员」里建学员、录课包，余额就会出现在这里。"), tone: .accent)
                     }
                     .cardRow()
                 }

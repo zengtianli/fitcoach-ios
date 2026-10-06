@@ -23,6 +23,8 @@ struct WatchSnapshot: Codable, Equatable {
         let content: String
         let status: String         // scheduled | completed | no_show | cancelled（Vocab.statuses）
         let remaining: Int?        // 这位学员现在还剩几节可用课时（available_total）
+        /// 状态的短名，iPhone 按后台词表解好带过来（手表自己不联网，拿不到后台覆盖项）；旧快照没有 → 手表用自带的
+        var statusLabel: String? = nil
 
         var start: String { TZ.hm(startAt) }
         var end: String { TZ.hm(endAt) }

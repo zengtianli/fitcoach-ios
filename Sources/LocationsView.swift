@@ -18,8 +18,8 @@ struct LocationsView: View {
                 if d.locations.isEmpty {
                     CardBox {
                         EmptyState(icon: "mappin.and.ellipse",
-                                   title: "还没有上课地点",
-                                   detail: "加一个地点，排课时就能选它。",
+                                   title: T("locations.empty.title", "还没有上课地点"),
+                                   detail: T("locations.empty.detail", "加一个地点，排课时就能选它。"),
                                    tone: .accent,
                                    action: ("加第一个地点", { showNew = true }))
                     }

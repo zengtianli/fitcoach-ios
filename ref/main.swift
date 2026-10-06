@@ -336,6 +336,95 @@ func runContract() async {
                                ["to": "cancelled", "reason": "", "reason_code": ""])
     } catch { ok("手表快照", false, "\(error)") }
 
+    // 后台覆盖项（热更新）：词表、说明文字、阈值由后端的 `ui` 段给，App 自带的只作兜底。
+    // 全部走 API.get 这条生产解码路径。改覆盖文件的两条只在 ref/run 自己起的本地后端上跑（FC_UI_FILE）。
+    print("── 后台覆盖项（ui 段）──")
+    do {
+        let env = ProcessInfo.processInfo.environment
+        let emptyTitle = { T("schedule.empty.title", "这段时间还没有安排") }
+        let reasons = { Vocab.reasonCodes.map { "\($0.0)=\($0.1)" } }
+
+        // App 自带的兜底：把覆盖项拿掉看
+        Remote.ui = nil
+        let bundledStatuses = Vocab.statuses, bundledLabels = Vocab.statusLabels
+        let bundledShort = Vocab.statusShort, bundledBuckets = Vocab.bucketLabels
+        let bundledReasons = reasons(), bundledEmpty = emptyTitle()
+
+        let p = try await api.ping()
+        ok("ping 带 ui 段且解得开", p.ui?.value != nil)
+        ok("  API.get 解到就交给 Remote.ui", Remote.ui != nil && Remote.ui == p.ui?.value)
+        ok("  词表确实是后端给的", Remote.ui?.vocab?["status.no_show"]?.label == bundledLabels["no_show"]
+            && Remote.ui?.vocab?["reason.venue_weather"]?.label == "场地 / 天气"
+            && Remote.order([]).first == "status.scheduled")
+        ok("  覆盖文件为空时：状态、短名、课包分类与自带逐字相同",
+           Vocab.statuses == bundledStatuses && Vocab.statusLabels == bundledLabels
+            && Vocab.statusShort == bundledShort && Vocab.bucketLabels == bundledBuckets)
+        ok("  覆盖文件为空时：理由七码、先后、名称与自带逐字相同", reasons() == bundledReasons,
+           "got \(reasons())")
+        ok("  覆盖文件为空时：说明文字是自带的", emptyTitle() == bundledEmpty && (Remote.ui?.copy ?? [:]).isEmpty)
+
+        // ③ 改动前的模型（没有 ui 字段）解新响应照常
+        struct OldPing: Codable { let ok: Bool; let today: String; let now: String }
+        let rawPing = try await api.getRaw("/coach/api/ping")
+        ok("③ 改动前的模型解新响应照常", (try? JSONDecoder().decode(OldPing.self, from: rawPing))?.ok == true)
+
+        if let uiFile = env["FC_UI_FILE"] {
+            let url = URL(fileURLWithPath: uiFile)
+            // ① 后台写一个键，客户端不改就变（后端每次请求重读，不用重启）
+            try Data(#"""
+            {"copy": {"schedule.empty.title": "今天没有课，歇一歇", "error.http": "服务器开小差了（{code}）"},
+             "vocab": {"status_short.no_show": {"label": "爽约"}, "bucket.lapsed": {"label": "过期未用"},
+                       "status.no_show": {"label": "想改名"}},
+             "order": ["reason.other", "status.cancelled"],
+             "limits": {"request.timeout.seconds": 999, "growth.attendance.good.percent": 80}}
+            """#.utf8).write(to: url)
+            let _: ScheduleResp = try await api.get("/coach/api/schedule", query: ["range": "today"])
+            ok("① 后台写一个键 → 说明文字变了", emptyTitle() == "今天没有课，歇一歇")
+            ok("  带变量的模板照样填", T("error.http", "请求失败（HTTP {code}）", ["code": "502"]) == "服务器开小差了（502）")
+            ok("  短名与课包分类跟着变", Vocab.statusShort["no_show"] == "爽约" && Vocab.bucketLabels["lapsed"] == "过期未用")
+            ok("  状态名只有后端常量一个定义处，覆盖文件改不了", Vocab.statusLabels == bundledLabels)
+            ok("  状态先后听后台的，一个都不少",
+               Vocab.statuses.first == "cancelled" && Set(Vocab.statuses) == Set(bundledStatuses))
+            ok("  理由先后听后台的，七码都在",
+               Vocab.reasonCodes.first?.0 == "other" && Set(reasons()) == Set(bundledReasons))
+            ok("  数字夹在安全范围里", Remote.seconds("request.timeout.seconds", 20, in: 5...60) == 60
+                && Remote.count("growth.attendance.good.percent", 90, in: 50...100) == 80)
+            let form: SessionFormResp = try await api.get("/coach/api/session-form")
+            ok("  session-form 也带同一份", form.ui?.value == Remote.ui && emptyTitle() == "今天没有课，歇一歇")
+
+            // ② 覆盖文件写坏：说明文字回落，词表与数据照常
+            try Data("{ not json".utf8).write(to: url)
+            let sch: ScheduleResp = try await api.get("/coach/api/schedule", query: ["range": "today"])
+            ok("② 覆盖文件写坏 → 课表照常解出", sch.range == "today" && sch.ui?.value != nil)
+            ok("  说明文字回落自带", emptyTitle() == bundledEmpty)
+            ok("  词表仍由后端常量给出", Vocab.statusLabels == bundledLabels && Vocab.statuses == bundledStatuses
+                && reasons() == bundledReasons)
+
+            try Data(#"{"copy": {}, "vocab": {}, "order": [], "limits": {}}"#.utf8).write(to: url)
+            _ = try await api.ping()
+            ok("  还原后回到默认", (Remote.ui?.copy ?? [:]).isEmpty && Vocab.statusShort == bundledShort)
+        } else {
+            print("  （没有 FC_UI_FILE：不是 ref/run 自己起的后端，跳过改覆盖文件的两条）")
+        }
+
+        if let stub = env["FC_STUB_BASE"] {
+            // ② `ui` 段本身形状不对：只丢这一段，其余字段照常；全部回落自带
+            Remote.ui = FeedUI(copy: ["schedule.empty.title": "上一份"])
+            let stubAPI = API(Session(baseURL: stub, coachCookie: "stub"))
+            let bad = try await stubAPI.ping()
+            ok("② ui 段形状不对 → 其余字段照常解出", bad.ok && bad.today == "2026-10-06")
+            ok("  整段回落：文字与词表都是自带", bad.ui != nil && bad.ui?.value == nil && Remote.ui == nil
+                && emptyTitle() == bundledEmpty && Vocab.statusLabels == bundledLabels && reasons() == bundledReasons)
+            // 不带 ui 键的响应（旧后端）不动上一份
+            Remote.ui = FeedUI(copy: ["schedule.empty.title": "上一份"])
+            let old: ScheduleResp = try await stubAPI.get("/coach/api/schedule")
+            ok("  不带 ui 键的响应（旧后端）照常解出，且不动上一份", old.ui == nil && emptyTitle() == "上一份")
+        } else {
+            print("  （没有 FC_STUB_BASE：跳过 ui 段形状不对的那条）")
+        }
+        Remote.ui = nil
+    } catch { ok("后台覆盖项", false, "\(error)") }
+
     report()
 }
 

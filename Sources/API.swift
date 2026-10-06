@@ -19,10 +19,10 @@ enum APIError: LocalizedError {
         switch self {
         case .rejected(let m): return m
         case .needsForce(let w): return w.map(\.message).joined(separator: "；")
-        case .gone: return "登录已失效或记录不存在"
+        case .gone: return T("error.gone", "登录已失效或记录不存在")
         case .unauthorized(let m): return m
-        case .transport(let m): return "网络错误：\(m)"
-        case .decode(let m): return "响应解析失败：\(m)"
+        case .transport(let m): return T("error.transport", "网络错误：{detail}", ["detail": m])
+        case .decode(let m): return T("error.decode", "响应解析失败：{detail}", ["detail": m])
         case .server(_, let m): return m
         }
     }
@@ -115,7 +115,7 @@ final class API {
         let c = URLSessionConfiguration.ephemeral
         c.httpShouldSetCookies = false          // cookie 由我们自己拼，见 Session 注释
         c.httpCookieAcceptPolicy = .never
-        c.timeoutIntervalForRequest = 20
+        c.timeoutIntervalForRequest = Remote.seconds("request.timeout.seconds", 20, in: 5...60)
         c.requestCachePolicy = .reloadIgnoringLocalCacheData
         return URLSession(configuration: c)
     }
@@ -168,14 +168,14 @@ final class API {
         let m = try? JSONDecoder().decode(MutationResp.self, from: data)
         switch code {
         case 404: return .gone
-        case 401: return .unauthorized(m?.error ?? "登录失败")
+        case 401: return .unauthorized(m?.error ?? T("error.login", "登录失败"))
         case 409: return .needsForce(m?.warnings ?? [])
         case 500...599:
             if let e = m?.error, !e.isEmpty { return .server(code, e) }
-            return .server(code, "请求失败（HTTP \(code)）")
+            return .server(code, T("error.http", "请求失败（HTTP {code}）", ["code": "\(code)"]))
         default:
             if let e = m?.error, !e.isEmpty { return .rejected(e) }
-            return .rejected("请求失败（HTTP \(code)）")
+            return .rejected(T("error.http", "请求失败（HTTP {code}）", ["code": "\(code)"]))
         }
     }
 
@@ -190,8 +190,12 @@ final class API {
 
     func get<T: Decodable>(_ path: String, query: [String: String] = [:], student: Bool = false) async throws -> T {
         let data = try await getRaw(path, query: query, student: student)
-        do { return try JSONDecoder().decode(T.self, from: data) }
+        let value: T
+        do { value = try JSONDecoder().decode(T.self, from: data) }
         catch { throw APIError.decode("\(path)：\(error)") }
+        // 响应带 `ui` 段就换上这一份（解不开 = nil = 全部回落自带文案）；不带这个键的响应不动它。
+        if let box = (value as? UICarrier)?.ui { RemoteUISink.adopt(box.value) }
+        return value
     }
 
     // ── 写 ────────────────────────────────────────────────────────────────
@@ -253,8 +257,27 @@ final class API {
         try await post("/coach/api/account/delete", password.map { ["password": $0] } ?? ["confirm": "delete-account"])
     }
 
-    struct Ping: Codable { let ok: Bool; let today: String; let now: String }
+    struct Ping: Codable, UICarrier {
+        let ok: Bool; let today: String; let now: String
+        var ui: Lenient<FeedUI>? = nil
+    }
     func ping() async throws -> Ping { try await get("/coach/api/ping") }
+}
+
+// ── 后台覆盖项（热更新）的落点 ───────────────────────────────────────────────
+
+/// `API.get` 解到带 `ui` 段的响应就调 `adopt`：更新 `Remote.ui`，界面下一次重画用的就是后台的词表与文案。
+/// App 另外挂 `persist` 把最近一份存盘，冷启动、离线时先用它（见 App.swift 的 `RemoteUICache`）；
+/// 命令行不挂，所以它一个字节都不落盘。
+@MainActor
+enum RemoteUISink {
+    static var persist: ((FeedUI?) -> Void)?
+
+    static func adopt(_ ui: FeedUI?) {
+        guard Remote.ui != ui else { return }
+        Remote.ui = ui
+        persist?(ui)
+    }
 }
 
 // ── 便捷：把「四位小数的分」与人看的元互转 ─────────────────────────────────

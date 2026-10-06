@@ -12,6 +12,8 @@ struct FitCoachApp: App {
     @StateObject private var session = Session()
 
     init() {
+        // 后台覆盖项：先读上次存的那份（离线、冷启动也是后台最近写的词表与文案），再接住之后每一份
+        RemoteUICache.restore()
         // 手表来要「今天」时 iPhone 可能是在后台被唤起的：会话代理要在第一时间挂上（其余平台空操作）
         WatchLink.shared.activate()
     }
@@ -44,6 +46,22 @@ struct FitCoachApp: App {
         // Vision Pro 的默认窗口偏扁，字号也比 Mac 大一圈：给侧栏 + 日程 + 课时余额三列留够宽度
         .defaultSize(width: 1360, height: 860)
         #endif
+    }
+}
+
+/// 最近一份后台覆盖项的本机副本（UserDefaults，几百字节）。存坏了、解不开就当没有。
+@MainActor
+enum RemoteUICache {
+    static let key = "fitcoach.remoteUI"
+
+    static func restore(_ defaults: UserDefaults = .standard) {
+        if let data = defaults.data(forKey: key) {
+            Remote.ui = (try? JSONDecoder().decode(Lenient<FeedUI>.self, from: data))?.value
+        }
+        RemoteUISink.persist = { ui in
+            if let ui, let data = try? JSONEncoder().encode(ui) { defaults.set(data, forKey: key) }
+            else { defaults.removeObject(forKey: key) }
+        }
     }
 }
 
@@ -347,7 +365,7 @@ struct TrendProbe: View {
                     // fail-visible：没有这个项目的进度就直说，别停在转圈上假装还在加载
                     EmptyState(icon: "questionmark.circle",
                                title: "metric_id=\(metricId) 没有成长数据",
-                               detail: "这个学员在该项目下还没有测量记录。",
+                               detail: T("growth.metric.missing.detail", "这个学员在该项目下还没有测量记录。"),
                                tone: .warn)
                 }
             } else {

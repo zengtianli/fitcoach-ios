@@ -133,8 +133,8 @@ struct StudentModeView: View {
                     if d.history.isEmpty {
                         CardBox {
                             EmptyState(icon: "figure.run",
-                                       title: "还没有上过课",
-                                       detail: "第一节课上完后，这里会记下每一次训练。",
+                                       title: T("studentmode.sessions.empty.title", "还没有上过课"),
+                                       detail: T("studentmode.sessions.empty.detail", "第一节课上完后，这里会记下每一次训练。"),
                                        tone: .accent)
                         }
                         .cardRow(bottom: 20)

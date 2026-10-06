@@ -63,7 +63,11 @@ enum WatchStyle {
         n <= 1 ? .red : n <= 3 ? .orange : .primary
     }
 
-    static func statusLabel(_ status: String) -> String { Vocab.statusShort[status] ?? status }
+    /// iPhone 带过来的名称优先（那是后台词表解出来的），没有才用手表自带的。
+    static func statusLabel(_ lesson: WatchSnapshot.Lesson) -> String {
+        if let label = lesson.statusLabel, !label.isEmpty { return label }
+        return Vocab.statusShort[lesson.status] ?? lesson.status
+    }
 }
 
 // MARK: - 第一页：今天
@@ -199,7 +203,7 @@ struct WatchStatusGlyph: View {
         Image(systemName: name)
             .font(.footnote.weight(.semibold))
             .foregroundStyle(tint)
-            .accessibilityLabel(lesson.isOpen && lesson.endDate <= now ? "待处理" : WatchStyle.statusLabel(lesson.status))
+            .accessibilityLabel(lesson.isOpen && lesson.endDate <= now ? "待处理" : WatchStyle.statusLabel(lesson))
     }
 }
 
@@ -261,7 +265,7 @@ struct WatchLessonDetail: View {
                     Text(lesson.content).font(.footnote)
                 }
                 HStack(spacing: 6) {
-                    Text(WatchStyle.statusLabel(lesson.status))
+                    Text(WatchStyle.statusLabel(lesson))
                         .font(.caption2.weight(.semibold))
                         .padding(.horizontal, 7).padding(.vertical, 3)
                         .background(Capsule().fill(.white.opacity(0.15)))

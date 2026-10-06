@@ -41,9 +41,9 @@ struct AuditView: View {
                 if d.rows.isEmpty {
                     CardBox {
                         EmptyState(icon: "checkmark.shield",
-                                   title: all ? "还没有任何变更" : "没有需要解释的改动",
-                                   detail: all ? "排课、改状态都会记在这里。"
-                                              : "纠错、通融、补录这类改动才会默认出现。\n打开上面的开关看全部。",
+                                   title: all ? T("audit.all.empty.title", "还没有任何变更") : T("audit.empty.title", "没有需要解释的改动"),
+                                   detail: all ? T("audit.all.empty.detail", "排课、改状态都会记在这里。")
+                                              : T("audit.empty.detail", "纠错、通融、补录这类改动才会默认出现。\n打开上面的开关看全部。"),
                                    tone: .ok)
                     }
                     .cardRow(top: 10)

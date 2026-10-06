@@ -47,6 +47,7 @@ sop:
   - Tests/**
   - ref/*.swift
   - ref/run
+  - ref/stub_broken_ui.py
   - test-contract.py
   - test_check_markdown_drift.py
   - scripts/tests/**

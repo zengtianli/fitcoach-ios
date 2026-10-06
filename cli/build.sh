@@ -1,5 +1,5 @@
 #!/bin/bash
-# 编 fitcoach 命令行：与 App 同一份 Sources/{Models,TimeKit,API,QuickSetup}.swift + cli/*.swift
+# 编 fitcoach 命令行：与 App 同一份 Sources/{Models,TimeKit,API,QuickSetup}.swift + Shared/RemoteUI.swift + cli/*.swift
 # → build/cli/fitcoach（build/ 不进仓）。只编译，不装机、不签名、不碰 /Applications。
 #
 #   bash cli/build.sh            只编
@@ -90,7 +90,7 @@ TMP="$OUT/.fitcoach.$$"
 trap 'rm -f "$TMP"' EXIT
 xcrun swiftc -O -swift-version 5 -parse-as-library -module-name FitCoachCLI \
   "$ROOT/Sources/Models.swift" "$ROOT/Sources/TimeKit.swift" "$ROOT/Sources/API.swift" \
-  "$ROOT/Sources/QuickSetup.swift" "$ROOT"/cli/*.swift \
+  "$ROOT/Sources/QuickSetup.swift" "$ROOT/Shared/RemoteUI.swift" "$ROOT"/cli/*.swift \
   -o "$TMP"
 mv -f "$TMP" "$OUT/fitcoach"
 echo "fitcoach build：$OUT/fitcoach" >&2
