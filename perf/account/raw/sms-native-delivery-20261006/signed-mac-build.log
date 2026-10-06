@@ -1,0 +1,4 @@
+[xcode_env] Xcode.app (Xcode 27.0, iphoneos SDK 27.0)
+✅ spec_lint: 4 个 target 规格干净
+▶ mac    macOS 原生 … ✅ .dd-mac/Build/Products/Release/FitCoach.app
+✅ FitCoach 平台构建门通过 [mac]

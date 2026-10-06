@@ -1,0 +1,16 @@
+用法：fitcoach phone <子命令> [参数] [--json]
+  hints / account              公共短信提示 / 当前账号安全状态
+  send --purpose P [--phone N] --request-id ID --confirm-send [--password-stdin] [--identity-grant-file FILE]
+                               P: register|login|recover|bind|change_old|change_new|identity；发送会计费；未知结果重用同一个 ID，禁自动重发
+  verify --challenge ID --code-stdin [--authenticated]
+                               验证码只从 stdin 第一行读取；返回 0600 授权文件路径，绑定用途需 --authenticated
+  register --grant-file FILE --agreed [--display-name N] [--password-stdin]
+  login --grant-file FILE [--ownership-stdin]
+                               风险验证从 stdin JSON 读 password / recovery_key；失败保留授权文件
+  recover --grant-file FILE --secrets-stdin
+                               stdin JSON: new_password + recovery_key 或原 password；找回始终要求独立归属证明。成功清本机会话，重新登录
+  bind --phone N --grant-file FILE [--old-grant-file FILE] [--identity-grant-file FILE] [--password-stdin]
+                               换绑先验证旧、新号码；密码账号要原密码。保持 coach_id 和业务数据
+  set-password --identity-grant-file FILE --password-stdin
+                               手机新户验证 identity 后设密码；成功更新当前设备 cookie
+  授权、恢复密钥只存命令行私有目录 0600 文件，不输出明文；恢复密钥文件路径只在首次注册/绑定返回，请备份到密码管理器。

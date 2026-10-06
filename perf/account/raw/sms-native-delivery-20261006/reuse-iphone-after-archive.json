@@ -1,0 +1,42 @@
+{
+  "ok": true,
+  "platform": "iphone",
+  "configuration": "Debug",
+  "scheme": "FitCoach",
+  "compilation_conditions": [],
+  "app_path": "/private/tmp/sms-apps-20261006/fitcoach-iphone-final/dd/Build/Products/Debug-iphonesimulator/FitCoach.app",
+  "bundle_id": "cyou.tianli.fitcoachapp",
+  "version": "1.0.1",
+  "build": "6",
+  "executable_sha256": "0c6ea2a5310f16ee3c7dc6521b09e60bf6c4f2dc01f5c7061ed901ef4bfb1a4e",
+  "sdk": "iphonesimulator27.0",
+  "xcode": {
+    "name": "Xcode.app",
+    "version": "27.0",
+    "build": "27A266a",
+    "developer_dir": "/Applications/Xcode.app/Contents/Developer"
+  },
+  "destination": "generic/platform=iOS Simulator",
+  "signing": "unsigned simulator build (CODE_SIGNING_ALLOWED=NO)",
+  "log": "/private/tmp/sms-apps-20261006/fitcoach-iphone-final/build-iphone-Debug.log",
+  "work_dir": "/private/tmp/sms-apps-20261006/fitcoach-iphone-final",
+  "seconds": 64.7,
+  "generated_info_plists": [
+    {
+      "source_path": "src/WatchWidget/Info.plist",
+      "backup_path": "cache-provenance/xcodegen-info.pqxps0f6/WatchWidget/Info.plist",
+      "sha256": "b959462827296bbfada6d19cfbe413759cee03d6dd3710caa758a4a36ecf44d0",
+      "targets": [
+        "FitCoachWatchWidget"
+      ],
+      "reason": "XcodeGen target info.path; absent from original sources"
+    }
+  ],
+  "reuse": {
+    "receipt": "/private/tmp/sms-apps-20261006/fitcoach-iphone-final.json",
+    "receipt_sha256": "8ce564704864a5c470ae2ec08809788be822bf0ca6c8d0c00c23bf483aaa5420",
+    "source_copy": "/private/tmp/sms-apps-20261006/fitcoach-iphone-final/src",
+    "input_sha256": "a4a1c8680903cfda15f80100a489ba9caa413b7c94af01fc17abb10f3431151a",
+    "source_file_count": 86
+  }
+}

@@ -1,0 +1,624 @@
+{
+  "started_at": "2026-10-06T06:48:08.720864+00:00",
+  "cli": "/Applications/上门体育.app/Contents/Resources/bin/fitcoach",
+  "cli_sha256": "971aa8629e9242edda954f5f258adc7f2e9e473ded7d1c6278eb943b5afac782",
+  "backend": "/Users/tianli/Apps/fitcoach/service",
+  "transport": "existing test_phone.lane fake gateway",
+  "real_sms_sent": 0,
+  "commands": [
+    {
+      "command": [
+        "phone",
+        "hints"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "login"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "account"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 4,
+      "expected_exit": 4,
+      "ok": false,
+      "error_code": "rejected"
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "bind"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "account"
+      ],
+      "exit": 6,
+      "expected_exit": 6,
+      "ok": false,
+      "error_code": "auth_failed"
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "bind"
+      ],
+      "exit": 4,
+      "expected_exit": 4,
+      "ok": false,
+      "error_code": "rejected"
+    },
+    {
+      "command": [
+        "phone",
+        "bind"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "account"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "login"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "login"
+      ],
+      "exit": 4,
+      "expected_exit": 4,
+      "ok": false,
+      "error_code": "rejected"
+    },
+    {
+      "command": [
+        "phone",
+        "login"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "recover"
+      ],
+      "exit": 2,
+      "expected_exit": 2,
+      "ok": false,
+      "error_code": "usage"
+    },
+    {
+      "command": [
+        "phone",
+        "recover"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "login"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "account"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "students"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "register"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "account"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "bind"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "account"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "set-password"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "account"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 6,
+      "expected_exit": 6,
+      "ok": false,
+      "error_code": "auth_failed"
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 4,
+      "expected_exit": 4,
+      "ok": false,
+      "error_code": "rejected"
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 4,
+      "expected_exit": 4,
+      "ok": false,
+      "error_code": "rejected"
+    },
+    {
+      "command": [
+        "account"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 1,
+      "expected_exit": 1,
+      "ok": false,
+      "error_code": "server_error"
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 1,
+      "expected_exit": 1,
+      "ok": false,
+      "error_code": "server_error"
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 4,
+      "expected_exit": 4,
+      "ok": false,
+      "error_code": "rejected"
+    }
+  ],
+  "assertions": [
+    "OTP is never printed to stdout",
+    "real hints route uses fixture metadata",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "legacy email account logs into actual service",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "same request_id returns original challenge without second vendor call",
+    "OTP is never printed to stdout",
+    "wrong authenticated OTP preserves healthy coach session",
+    "OTP is never printed to stdout",
+    "verified grants are stored 0600",
+    "OTP is never printed to stdout",
+    "first bind consumes grant and stores recovery key privately",
+    "OTP is never printed to stdout",
+    "real revoked legacy session clears CLI credentials",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "verified grants are stored 0600",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "verified grants are stored 0600",
+    "OTP is never printed to stdout",
+    "missing old-number grant rejects without losing either grant",
+    "OTP is never printed to stdout",
+    "two-number swap consumes both grants",
+    "OTP is never printed to stdout",
+    "swap keeps original coach_id and returns masked new phone",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "verified grants are stored 0600",
+    "OTP is never printed to stdout",
+    "normal same-network SMS login consumes one-time grant",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "verified grants are stored 0600",
+    "OTP is never printed to stdout",
+    "risky SMS login retains grant and previous credential for supplemental proof",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "verified grants are stored 0600",
+    "OTP is never printed to stdout",
+    "recovery requires independent proof before network consume",
+    "OTP is never printed to stdout",
+    "recovery consumes grant and clears this CLI session",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "recovered password logs into original account",
+    "all phone changes preserve original student business data",
+    "other coach remains isolated and unchanged",
+    "OTP is never printed to stdout",
+    "installed CLI still reaches original business list after phone lifecycle",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "verified grants are stored 0600",
+    "OTP is never printed to stdout",
+    "verified SMS registration creates separate password-optional account",
+    "OTP is never printed to stdout",
+    "phone registration session reaches actual account endpoint",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "verified grants are stored 0600",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "verified grants are stored 0600",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "phone-only dual verification swap reuses old grant as identity without password",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "verified grants are stored 0600",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "phone-only account sets password after identity SMS and installs rotated cookie",
+    "OTP is never printed to stdout",
+    "anonymous OTP failure leaves authenticated phone account intact",
+    "OTP is never printed to stdout",
+    "occupied phone conflict preserves current session",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "expired authenticated OTP with healthy ping preserves current session",
+    "OTP is never printed to stdout",
+    "disposable phone-only account deletion clears session and tenant",
+    "deletion removes phone binding without affecting legacy coach",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "unknown delivery retry reuses durable unknown result without resending",
+    "OTP is never printed to stdout",
+    "actual persistent daily budget rejects before fake vendor call"
+  ],
+  "fake_vendor_sends": 12,
+  "fake_vendor_checks": 11,
+  "ok": true,
+  "finished_at": "2026-10-06T06:48:10.930551+00:00",
+  "command_count": 52,
+  "assertion_count": 90
+}

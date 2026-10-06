@@ -1,0 +1,7 @@
+[TestFlight] DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+━━━ /Users/tianli/Apps/fitcoach/ios/01-源程序 ━━━
+✅ spec_lint: 4 个 target 规格干净
+  scheme=FitCoach  bundle=cyou.tianli.fitcoachapp
+  下一个 build = 7（ASC 现拉 +1）
+  归档中 [ios]
+❌ 发包预检失败：<urlopen error _ssl.c:993: The handshake operation timed out>

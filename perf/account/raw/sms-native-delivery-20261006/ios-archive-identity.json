@@ -1,0 +1,71 @@
+{
+  "checked_at": "2026-10-06T14:44:13.093770+08:00",
+  "kind": "formal_ios_archive",
+  "archive": "/private/tmp/ios-testflight/FitCoach-ios.xcarchive",
+  "targets": [
+    {
+      "bundle_id": "cyou.tianli.fitcoachapp",
+      "version": "1.0.1",
+      "build": "7",
+      "DTXcodeBuild": "27A266a",
+      "DTSDKName": "iphoneos27.0",
+      "executable_sha256": "788afa73fae9a409cfdfec669d666a07a44310bcb5ea64c868c67343f3e2ebc3",
+      "team": "B9LJH93LA4",
+      "application_identifier": "B9LJH93LA4.cyou.tianli.fitcoachapp",
+      "keychain_access_groups": [],
+      "profile_allowed_groups": [
+        "B9LJH93LA4.*",
+        "com.apple.token"
+      ],
+      "profile_name": "iOS Team Provisioning Profile: cyou.tianli.fitcoachapp",
+      "profile_expiration": "2027-10-03T18:05:41",
+      "profile_allows_actual_groups": true,
+      "signature_verified": true
+    },
+    {
+      "bundle_id": "cyou.tianli.fitcoachapp.watchkitapp",
+      "version": "1.0.1",
+      "build": "7",
+      "DTXcodeBuild": "27A266a",
+      "DTSDKName": "watchos27.0",
+      "executable_sha256": "bf0b991c82c156fa54c18ef0bb0cfc19ab90fdec51bff11c94d1c1f58d75a259",
+      "team": "B9LJH93LA4",
+      "application_identifier": "B9LJH93LA4.cyou.tianli.fitcoachapp.watchkitapp",
+      "keychain_access_groups": [
+        "B9LJH93LA4.cyou.tianli.fitcoachapp.watch"
+      ],
+      "profile_allowed_groups": [
+        "B9LJH93LA4.*",
+        "com.apple.token"
+      ],
+      "profile_name": "iOS Team Provisioning Profile: *",
+      "profile_expiration": "2027-08-28T15:45:24",
+      "profile_allows_actual_groups": true,
+      "signature_verified": true
+    },
+    {
+      "bundle_id": "cyou.tianli.fitcoachapp.watchkitapp.widget",
+      "version": "1.0.1",
+      "build": "7",
+      "DTXcodeBuild": "27A266a",
+      "DTSDKName": "watchos27.0",
+      "executable_sha256": "325a0c36ca36bb009a8eacf6dc830202fd20a5eb682817bd6c00ea98b5c7919b",
+      "team": "B9LJH93LA4",
+      "application_identifier": "B9LJH93LA4.cyou.tianli.fitcoachapp.watchkitapp.widget",
+      "keychain_access_groups": [
+        "B9LJH93LA4.cyou.tianli.fitcoachapp.watch"
+      ],
+      "profile_allowed_groups": [
+        "B9LJH93LA4.*",
+        "com.apple.token"
+      ],
+      "profile_name": "iOS Team Provisioning Profile: *",
+      "profile_expiration": "2027-08-28T15:45:24",
+      "profile_allows_actual_groups": true,
+      "signature_verified": true
+    }
+  ],
+  "uploaded": false,
+  "sdk_archive_succeeded": true,
+  "keychain_environment_note": "production archive carries signed application identifier and profile-authorized keychain groups; unsigned simulator missing identity is a separate lane environment"
+}

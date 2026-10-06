@@ -1,0 +1,28 @@
+{
+  "name": "phone-account",
+  "ok": true,
+  "screenshot": "/Users/tianli/Apps/fitcoach/ios/01-源程序/perf/account/raw/sms-native-delivery-20261006/iphone-unsigned-phone-account.png",
+  "ready_seconds": 6.089,
+  "ready_signal": "screenshot_stable",
+  "baseline_stable": true,
+  "verdict": {
+    "non_blank": true,
+    "changed_from_baseline": true,
+    "stable": true,
+    "diff_baseline": 0.8094,
+    "diff_prev": 0.0
+  },
+  "errors": [],
+  "launch_args": [
+    "-fitcoach.baseURL",
+    "http://127.0.0.1:53044",
+    "-fitcoach.coachCookie",
+    "<redacted>",
+    "-fitcoach.screen",
+    "phone-account"
+  ],
+  "size": [
+    1206,
+    2622
+  ]
+}

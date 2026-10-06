@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "kind": "unsigned_simulator_phone_form_capture",
+  "app": "/private/tmp/sms-apps-20261006/fitcoach-iphone-final/dd/Build/Products/Debug-iphonesimulator/FitCoach.app",
+  "base_executable_sha256": "0c6ea2a5310f16ee3c7dc6521b09e60bf6c4f2dc01f5c7061ed901ef4bfb1a4e",
+  "base_receipt": "/private/tmp/sms-apps-20261006/fitcoach-iphone-final.json",
+  "rebuilt": false,
+  "signing": "original successful unsigned SDK package",
+  "real_sms_sent": 0,
+  "keychain_consumer_verified": false,
+  "production_account_pass": false,
+  "ui_input_performed": false,
+  "environment": "simulator",
+  "screens": [
+    {
+      "name": "phone-account",
+      "ok": true,
+      "screenshot": "/Users/tianli/Apps/fitcoach/ios/01-源程序/perf/account/raw/sms-native-delivery-20261006/iphone-unsigned-phone-account.png",
+      "ready_seconds": 6.089,
+      "ready_signal": "screenshot_stable",
+      "baseline_stable": true,
+      "verdict": {
+        "non_blank": true,
+        "changed_from_baseline": true,
+        "stable": true,
+        "diff_baseline": 0.8094,
+        "diff_prev": 0.0
+      },
+      "errors": [],
+      "launch_args": [
+        "-fitcoach.baseURL",
+        "http://127.0.0.1:53044",
+        "-fitcoach.coachCookie",
+        "<redacted>",
+        "-fitcoach.screen",
+        "phone-account"
+      ],
+      "size": [
+        1206,
+        2622
+      ]
+    }
+  ],
+  "boot_seconds": 8.4,
+  "install_seconds": 21.7,
+  "fake_vendor_sends": 0,
+  "fake_vendor_checks": 0,
+  "shutdown": true
+}

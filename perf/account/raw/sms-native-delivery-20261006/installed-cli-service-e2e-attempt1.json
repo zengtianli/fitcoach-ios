@@ -1,0 +1,239 @@
+{
+  "started_at": "2026-10-06T06:47:15.436868+00:00",
+  "cli": "/Applications/上门体育.app/Contents/Resources/bin/fitcoach",
+  "cli_sha256": "971aa8629e9242edda954f5f258adc7f2e9e473ded7d1c6278eb943b5afac782",
+  "backend": "/Users/tianli/Apps/fitcoach/service",
+  "transport": "existing test_phone.lane fake gateway",
+  "real_sms_sent": 0,
+  "commands": [
+    {
+      "command": [
+        "phone",
+        "hints"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "login"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "account"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 4,
+      "expected_exit": 4,
+      "ok": false,
+      "error_code": "rejected"
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "bind"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "account"
+      ],
+      "exit": 6,
+      "expected_exit": 6,
+      "ok": false,
+      "error_code": "auth_failed"
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "bind"
+      ],
+      "exit": 4,
+      "expected_exit": 4,
+      "ok": false,
+      "error_code": "rejected"
+    },
+    {
+      "command": [
+        "phone",
+        "bind"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "account"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "send"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    },
+    {
+      "command": [
+        "phone",
+        "login"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "error_code": null
+    }
+  ],
+  "assertions": [
+    "OTP is never printed to stdout",
+    "real hints route uses fixture metadata",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "legacy email account logs into actual service",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "same request_id returns original challenge without second vendor call",
+    "OTP is never printed to stdout",
+    "wrong authenticated OTP preserves healthy coach session",
+    "OTP is never printed to stdout",
+    "verified grants are stored 0600",
+    "OTP is never printed to stdout",
+    "first bind consumes grant and stores recovery key privately",
+    "OTP is never printed to stdout",
+    "real revoked legacy session clears CLI credentials",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "verified grants are stored 0600",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "verified grants are stored 0600",
+    "OTP is never printed to stdout",
+    "missing old-number grant rejects without losing either grant",
+    "OTP is never printed to stdout",
+    "two-number swap consumes both grants",
+    "OTP is never printed to stdout",
+    "swap keeps original coach_id and returns masked new phone",
+    "OTP is never printed to stdout",
+    "OTP is never printed to stdout",
+    "verified grants are stored 0600",
+    "OTP is never printed to stdout",
+    "normal same-network SMS login consumes one-time grant"
+  ],
+  "ok": false,
+  "failure_type": "OperationalError",
+  "finished_at": "2026-10-06T06:47:17.686026+00:00",
+  "command_count": 19,
+  "assertion_count": 33
+}

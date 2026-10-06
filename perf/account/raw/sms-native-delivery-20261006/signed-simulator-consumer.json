@@ -1,0 +1,15 @@
+{
+  "ok": false,
+  "kind": "signed_simulator_consumer_comparison",
+  "app": "/private/tmp/fitcoach-sms-delivery-20261006/signed-simulator/FitCoach.app",
+  "derived_executable_sha256": "3e939bf5079e7dce78dbbc5fda290e383059f094c2706131974fb15ac06c6573",
+  "base_receipt": "/private/tmp/sms-apps-20261006/fitcoach-iphone-final.json",
+  "rebuilt": false,
+  "main_entitlements_match_actual_archive": true,
+  "real_sms_sent": 0,
+  "ui_input_performed": false,
+  "environment": "simulator",
+  "screens": [],
+  "boot_seconds": 8.0,
+  "install_seconds": 22.9
+}

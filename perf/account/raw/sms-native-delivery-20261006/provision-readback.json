@@ -1,0 +1,44 @@
+[
+  {
+    "identifier": "cyou.tianli.fitcoachapp",
+    "registered": true,
+    "bundle_id_record": "27CKS7NTQ4",
+    "profiles": [
+      {
+        "id": "45RL38UBN9",
+        "name": "iOS Team Store Provisioning Profile: cyou.tianli.fitcoachapp.watchkitapp.widget",
+        "profileState": "ACTIVE",
+        "profileType": "IOS_APP_STORE",
+        "expirationDate": "2027-08-29T17:00:20.000+00:00"
+      }
+    ]
+  },
+  {
+    "identifier": "cyou.tianli.fitcoachapp.watchkitapp",
+    "registered": true,
+    "bundle_id_record": "27CKS7NTQ4",
+    "profiles": [
+      {
+        "id": "45RL38UBN9",
+        "name": "iOS Team Store Provisioning Profile: cyou.tianli.fitcoachapp.watchkitapp.widget",
+        "profileState": "ACTIVE",
+        "profileType": "IOS_APP_STORE",
+        "expirationDate": "2027-08-29T17:00:20.000+00:00"
+      }
+    ]
+  },
+  {
+    "identifier": "cyou.tianli.fitcoachapp.watchkitapp.widget",
+    "registered": true,
+    "bundle_id_record": "27CKS7NTQ4",
+    "profiles": [
+      {
+        "id": "45RL38UBN9",
+        "name": "iOS Team Store Provisioning Profile: cyou.tianli.fitcoachapp.watchkitapp.widget",
+        "profileState": "ACTIVE",
+        "profileType": "IOS_APP_STORE",
+        "expirationDate": "2027-08-29T17:00:20.000+00:00"
+      }
+    ]
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "checked_at": "2026-10-06T14:33:01.416699+08:00",
+  "kind": "installed_cli_contract",
+  "script": "cli/test_phone_cli.py",
+  "script_sha256": "68f8b5b37ab0c9c090cf33edbd8562674b581c5ec14b48434115b04a3920f2a4",
+  "entrypoint": "/Applications/上门体育.app/Contents/Resources/bin/fitcoach",
+  "entrypoint_sha256": "971aa8629e9242edda954f5f258adc7f2e9e473ded7d1c6278eb943b5afac782",
+  "invocations": 24,
+  "result": "passed",
+  "version": "1.0.1",
+  "build": "58",
+  "codesign_deep_strict": true,
+  "environment": "installed signed Release CLI plus localhost contract stub, disposable 0600 credential directory",
+  "sms_transport": "isolated_stub",
+  "launched_gui": false
+}

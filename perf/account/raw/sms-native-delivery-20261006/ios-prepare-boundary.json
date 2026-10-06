@@ -1,0 +1,62 @@
+{
+  "checked_at": "2026-10-06T06:48:42.018866+00:00",
+  "archive": "/private/tmp/ios-testflight/FitCoach-ios.xcarchive",
+  "version": "1.0.1",
+  "build": "7",
+  "prepare_only_original_exit": 1,
+  "prepare_only_failure": "post-archive Apple TLS handshake timeout",
+  "sdk_archive_succeeded": true,
+  "later_read_only_preflight_exit": 0,
+  "upload_executed": false,
+  "apple_build7_present": false,
+  "apple_latest_build": 6,
+  "apple_returned_build_count": 9,
+  "apple_readback_rows": [
+    {
+      "build": 6,
+      "state": "VALID",
+      "uploaded_at": "2026-10-03T12:11:12-07:00"
+    },
+    {
+      "build": 5,
+      "state": "VALID",
+      "uploaded_at": "2026-09-09T20:46:46-07:00"
+    },
+    {
+      "build": 4,
+      "state": "VALID",
+      "uploaded_at": "2026-09-08T10:25:59-07:00"
+    },
+    {
+      "build": 3,
+      "state": "VALID",
+      "uploaded_at": "2026-09-05T03:11:55-07:00"
+    },
+    {
+      "build": 3,
+      "state": "VALID",
+      "uploaded_at": "2026-09-09T01:17:52-07:00"
+    },
+    {
+      "build": 2,
+      "state": "VALID",
+      "uploaded_at": "2026-09-01T21:37:44-07:00"
+    },
+    {
+      "build": 2,
+      "state": "VALID",
+      "uploaded_at": "2026-09-07T21:03:07-07:00"
+    },
+    {
+      "build": 1,
+      "state": "VALID",
+      "uploaded_at": "2026-08-29T18:33:53-07:00"
+    },
+    {
+      "build": 1,
+      "state": "VALID",
+      "uploaded_at": "2026-09-05T23:33:53-07:00"
+    }
+  ],
+  "notes": "Verbatim official ASC CLI readback is asc-after-prepare-builds.txt."
+}

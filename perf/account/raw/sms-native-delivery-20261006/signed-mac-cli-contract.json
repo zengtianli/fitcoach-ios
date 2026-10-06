@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-10-06T14:30:20.402265+08:00",
+  "kind": "signed_release_cli_contract",
+  "script": "cli/test_phone_cli.py",
+  "script_sha256": "68f8b5b37ab0c9c090cf33edbd8562674b581c5ec14b48434115b04a3920f2a4",
+  "entrypoint": "/Users/tianli/Apps/fitcoach/ios/01-源程序/.dd-mac/Build/Products/Release/FitCoach.app/Contents/Resources/bin/fitcoach",
+  "entrypoint_sha256": "971aa8629e9242edda954f5f258adc7f2e9e473ded7d1c6278eb943b5afac782",
+  "invocations": 24,
+  "result": "passed",
+  "environment": "real signed Release CLI plus localhost contract stub, disposable 0600 credential directory",
+  "sms_transport": "isolated_stub",
+  "launch_or_install": false
+}

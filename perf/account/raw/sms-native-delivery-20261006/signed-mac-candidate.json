@@ -1,0 +1,17 @@
+{
+  "checked_at": "2026-10-06T14:29:50.296051+08:00",
+  "kind": "signed_release_candidate",
+  "platform": "mac",
+  "app_path": "/Users/tianli/Apps/fitcoach/ios/01-源程序/.dd-mac/Build/Products/Release/FitCoach.app",
+  "version": "1.0.1",
+  "build": "58",
+  "bundle_id": "cyou.tianli.fitcoachapp",
+  "app_executable_sha256": "656a3290c675663843b2ead92821b0efc894e1dcc2c23543275fac22838a2efb",
+  "cli_sha256": "971aa8629e9242edda954f5f258adc7f2e9e473ded7d1c6278eb943b5afac782",
+  "codesign_deep_strict": true,
+  "sandbox_entitlement": true,
+  "sms_cli_help": true,
+  "log": "/private/tmp/fitcoach-sms-delivery-20261006/signed-mac-build.log",
+  "installed": false,
+  "launched": false
+}

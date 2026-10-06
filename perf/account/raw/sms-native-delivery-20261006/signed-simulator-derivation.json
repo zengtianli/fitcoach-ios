@@ -1,0 +1,48 @@
+{
+  "created_at": "2026-10-06T06:48:18.733852+00:00",
+  "kind": "development_signed_derivative",
+  "base_receipt": "/private/tmp/sms-apps-20261006/fitcoach-iphone-final.json",
+  "base_executable_sha256": "0c6ea2a5310f16ee3c7dc6521b09e60bf6c4f2dc01f5c7061ed901ef4bfb1a4e",
+  "base_receipt_sha256": "8ce564704864a5c470ae2ec08809788be822bf0ca6c8d0c00c23bf483aaa5420",
+  "derived_app": "/private/tmp/fitcoach-sms-delivery-20261006/signed-simulator/FitCoach.app",
+  "team": "B9LJH93LA4",
+  "targets": [
+    {
+      "bundle_id": "cyou.tianli.fitcoachapp.watchkitapp.widget",
+      "source_entitlements": "WatchWidget.entitlements",
+      "actual_entitlements": {
+        "application-identifier": "B9LJH93LA4.cyou.tianli.fitcoachapp.watchkitapp.widget",
+        "com.apple.developer.team-identifier": "B9LJH93LA4",
+        "get-task-allow": true,
+        "keychain-access-groups": [
+          "B9LJH93LA4.cyou.tianli.fitcoachapp.watch"
+        ]
+      }
+    },
+    {
+      "bundle_id": "cyou.tianli.fitcoachapp.watchkitapp",
+      "source_entitlements": "Watch.entitlements",
+      "actual_entitlements": {
+        "application-identifier": "B9LJH93LA4.cyou.tianli.fitcoachapp.watchkitapp",
+        "com.apple.developer.team-identifier": "B9LJH93LA4",
+        "get-task-allow": true,
+        "keychain-access-groups": [
+          "B9LJH93LA4.cyou.tianli.fitcoachapp.watch"
+        ]
+      }
+    },
+    {
+      "bundle_id": "cyou.tianli.fitcoachapp",
+      "source_entitlements": "actual formal archive signature",
+      "actual_entitlements": {
+        "application-identifier": "B9LJH93LA4.cyou.tianli.fitcoachapp",
+        "com.apple.developer.team-identifier": "B9LJH93LA4",
+        "com.apple.developer.ubiquity-kvstore-identifier": "B9LJH93LA4.cyou.tianli.fitcoachapp",
+        "get-task-allow": true
+      }
+    }
+  ],
+  "rebuilt": false,
+  "derived_executable_sha256": "3e939bf5079e7dce78dbbc5fda290e383059f094c2706131974fb15ac06c6573",
+  "main_entitlements_match_actual_archive": true
+}

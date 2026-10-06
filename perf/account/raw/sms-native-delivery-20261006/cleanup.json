@@ -1,0 +1,14 @@
+{
+  "checked_at": "2026-10-06T07:01:30.909549+00:00",
+  "temporary_capture_processes": [],
+  "fixture_53044_listener_present": false,
+  "own_simulator_booted": false,
+  "release_candidate_and_archive_preserved": true,
+  "mac_backup_preserved": true,
+  "generated_own_info_preserved": true,
+  "product_source_modified_during_delivery": false,
+  "real_sms_sent_by_this_agent": 0,
+  "git_push_executed": false,
+  "apple_upload_executed": false,
+  "remaining_claims": "raw and local handoff retained until this evidence commit; released immediately afterward"
+}
