@@ -42,7 +42,7 @@ enum Registry {
             "set-password": Spec(values: ["identity-grant-file"], flags: ["password-stdin"], run: PhoneCommands.setPassword),
         ],
         "students": [
-            "list": Spec(run: Commands.studentsList),
+            "list": Spec(values: ["find"], run: Commands.studentsList),
             "show": Spec(run: Commands.studentsShow),
             "link": Spec(flags: ["reveal"], run: Commands.studentsLink),
             "add": Spec(values: ["name", "note"], run: Commands.studentsAdd),
@@ -198,15 +198,15 @@ struct FitCoachCLI {
 
 enum Help {
     static let overview = """
-    用法：fitcoach <命令> [参数]      每个命令都有 --help；读命令加 --json 输出 {"ok": true, …}
+    用法：fitcoach <命令> [参数]      每个命令都有 --help；加 --json 输出一行 JSON（形状见下）
 
     与「上门体育」App、网页 fit.tianli.cyou、小程序同一套 /coach/api/*、同一份数据；业务判据全在后端。
     教练端：
       login          登录并在本机保存凭证：--email E --password-stdin（密码只从 stdin 或终端读）
       logout         删掉本机凭证；服务端数据保留
-      status         登录态、账号与服务端今天/现在
+      status         读回：命令行版本、所连服务器、登录态与账号、服务端今天/现在
       schedule       日程与预警：[--range today|week|overdue] [--date YYYY-MM-DD]
-      students       学员：list · show ID · link ID [--reveal] · add · update ID · issue-link ID · revoke-link ID
+      students       学员：list [--find 关键字] · show ID · link ID [--reveal] · add · update ID · issue-link ID · revoke-link ID
       sessions       课次：options · show ID · add · edit ID · status ID --to S
       packages       课包：add · edit ID · void ID --yes [--dry-run] · void ID --undo
       locations      地点：list · add · update ID
@@ -223,17 +223,58 @@ enum Help {
     学员端：
       student-view   用学员链接读只读视图：--token-stdin（链接或口令只从 stdin 读，不进命令行参数）
 
+    读命令（只读，不改服务器数据；本机凭证只在服务端回 401 判定会话失效时被清掉）：
+      status · schedule · students list|show|link · sessions options|show · locations list · availability show
+      metrics list · growth · audit · student-view · phone hints|account
+      演练：packages void --dry-run · measurements rm --dry-run · account delete --dry-run
+    写命令：
+      本机凭证  login · logout（只动本机凭证文件）· register（同时在服务器新建账号）
+      业务数据  students add|update|issue-link|revoke-link · sessions add|edit|status · packages add|edit|void
+                locations add|update · availability add-rule|rm-rule|add-exception|rm-exception
+                metrics add|update|seed · measurements add|rm · setup
+      账号      password · account delete · phone send|verify|register|login|recover|bind|set-password
+                （phone send 会发真实短信并计费，须带 --confirm-send）
+
     通用参数：--json  --base URL（默认 https://fit.tianli.cyou；或环境变量 FITCOACH_BASE）  --help  --version
     凭证：~/Library/Application Support/FitCoach/cli/credentials.json（0600，按服务器分条；FITCOACH_CLI_HOME 改目录）
-    退出码：0 成功 · 1 网络/服务端 5xx（可稍后重试）/解析 · 2 用法 · 3 未登录或链接失效
-            4 后端拒绝(400，含直接写入时 id 不存在「…不存在」) · 5 需 --force(409) 或 --yes/--confirm 确认
-            6 登录失败/过频(401/429) · 7 要读的记录不存在（读取、先读后改的 update/edit、--dry-run）
+
+    --json 输出（stdout 一行，键按字母序）：
+      成功  {"ok": true, …}        读命令是后端该接口的原字段再加 ok；写命令给新建或改动对象的 id 等
+      失败  {"ok": false, "code": "稳定的英文短码", "error": "给人看的原因"[, "warnings": [{"code": …, "message": …}]]}
+            同时退出码非零；warnings 只在 409 软警告时出现
+      code  usage · signed_out · link_invalid · not_found · rejected · needs_force · needs_confirm
+            auth_failed · login_refused · transport · server_error · decode · failure
+
+    退出码：
+      0  成功（查无结果也算成功）
+      1  网络 / 服务端 5xx（可稍后重试）/ 响应解析 / 本机写凭证失败
+      2  用法错误
+      3  未登录或登录已失效；学员链接无效或已吊销
+      4  后端拒绝（400，--force 也不放行；直接写入时 id 不存在「…不存在」也在这里）
+      5  需要确认：后端 409 软警告加 --force，或本机要求 --yes / --confirm
+      6  登录失败（401）或尝试过于频繁（429）
+      7  要读的记录不存在（读取、先读后改的 update / edit、--dry-run）
+
     示例：
       printf '%s\\n' "$PASSWORD" | fitcoach login --email coach@example.com --password-stdin
       fitcoach schedule --range week --json
       fitcoach sessions add --package 3 --start '2026-10-08 10:00' --minutes 60 --location 1 --json
       fitcoach sessions status 42 --to completed --json
-    只在 App 里：趋势图、分享面板、复制链接、下拉刷新、日期选择器、改服务器地址（命令行用 --base）。
+
+    仅在窗口中（命令不做；括号里是原因或命令行的对应做法）：
+      记住账号和密码（只管登录窗口下次自动填好，存 App 自己的钥匙串；命令行凭证由 login 保存、logout 删除）
+      进入已登录的教练端 / 学员端、切换账号（只是窗口显示哪一端；命令行两端各有命令）
+      隐私政策、联系支持（打开网页）
+      下拉刷新与刷新按钮（命令每次都现读）
+      复制学员链接（写剪贴板；students link ID --reveal 输出到 stdout）
+      分享学员链接（系统分享面板）
+      趋势图（图形；数据点在 growth 的 series）
+      选择 iCloud Drive 更新目录（Mac 版，系统文件选择器授权，要真人选）
+      日期、时间选择器与常用值按钮（命令行直接给 --date / --start / --end / --minutes 等参数）
+    暂无命令（登记在 project.yaml 的 sop.agent_cli）：
+      App 里保存的服务器地址（命令读不到也改不了；命令行自己每次用 --base 或 FITCOACH_BASE）
+      配置与更新：使用 iCloud 记住配置、导出配置、导入配置、检查更新、升级到新版（共享生命周期模块暂无命令入口）
+      手表上快照的更新时间与过期提示（只在手表本机）
     """
 
     static let groups: [String: String] = [
@@ -267,7 +308,8 @@ enum Help {
         """,
         "status": """
         用法：fitcoach status [--base URL] [--json]
-          GET /coach/api/ping：确认登录有效，给出登录邮箱、服务端今天/现在。未登录或已失效退出 3。
+          读回命令，只读。GET /coach/api/ping：确认登录有效，给出命令行版本、所连服务器、登录邮箱、凭证保存时间、
+          服务端今天/现在（--json：version base email saved_at today now）。未登录或已失效退出 3（code signed_out）。
         """,
         "register": """
         用法：fitcoach register --email E --display-name N [--password-stdin] [--json]
@@ -290,7 +332,8 @@ enum Help {
         """,
         "students": """
         用法：fitcoach students <子命令> [参数] [--json]
-          list                          在读 / 停用两组，含余额、到期预警、是否有链接
+          list [--find 关键字]          在读 / 停用两组，含余额、到期预警、是否有链接；
+                                        --find 按姓名筛选（不分大小写的包含，同 App「找学员」，本地筛选）
           show ID                       合计、课包三桶（可用/已过期/已用完/已作废）、上课记录
           link ID [--reveal]            学员链接状态；链接本身是凭证，默认只报 has_link，--reveal 才输出 URL
           add --name N [--note T]       新建学员

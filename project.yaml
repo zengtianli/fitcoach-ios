@@ -20,6 +20,163 @@ sop:
     commands:
     - fitcoach
     app: cyou.tianli.fitcoachapp
+  # 界面功能对照（写法见 app 技能 references/agent-cli.md）：从 Sources/*View.swift、Shared/AppLifecycleMobile.swift、
+  # Watch/ 逐项列出。手机、平板、Vision、手表上没法装命令行，都用 Mac 包里那份 fitcoach 打同一套后端来对应。
+  # human 项与 fitcoach --help 的「仅在窗口中」逐条一致（cli/test_cli.py 核对）。
+  agent_cli:
+    readback: fitcoach status
+    features:
+    # ── 登录页
+    - name: 教练登录（邮箱与密码）
+      command: fitcoach login
+    - name: 记住账号和密码
+      human: 只管登录窗口下次自动填好账号密码，存 App 自己的钥匙串；命令行凭证由 login 保存、logout 删除，两边互不读取
+    - name: 邮箱注册
+      command: fitcoach register
+    - name: 短信登录
+      command: fitcoach phone
+    - name: 手机注册
+      command: fitcoach phone
+    - name: 忘记密码（手机号找回）
+      command: fitcoach phone
+    - name: 获取验证码与填写短信验证码
+      command: fitcoach phone
+    - name: 保存账号恢复密钥
+      command: fitcoach phone
+    - name: 学员查看（粘贴教练发来的链接或口令）
+      command: fitcoach student-view
+    - name: 进入已登录的教练端 / 学员端、切换账号
+      human: 只是切换这个窗口显示教练端还是学员端；命令行两端各有命令，不需要切换
+    - name: 服务器设置（查看与修改服务器地址）
+      missing: App 里保存的服务器地址命令读不到也改不了；命令行只能每次用 --base 或 FITCOACH_BASE 指定自己连哪台
+    - name: 隐私政策、联系支持
+      human: 打开网页，只在窗口里有意义
+    # ── 日程
+    - name: 日程（今天 / 本周 / 过时）
+      command: fitcoach schedule
+    - name: 前一天、后一天、回到今天
+      command: fitcoach schedule
+    - name: 提醒（预警条）
+      command: fitcoach schedule
+    - name: 排课
+      command: fitcoach sessions
+    - name: 排课表单的可选项（学员、课包、地点、当日可排）
+      command: fitcoach sessions
+    - name: 改课
+      command: fitcoach sessions
+    - name: 改状态（已上课 / 未到 / 已取消，理由与强制覆盖）
+      command: fitcoach sessions
+    - name: 查看这一节的变更记录
+      command: fitcoach sessions
+    - name: 课时余额（宽屏日程右栏）
+      command: fitcoach students
+    - name: 下拉刷新与刷新按钮
+      human: 只是让窗口重新取数；命令每次都现读，没有缓存可刷
+    # ── 学员
+    - name: 学员名单（在册 / 已停用）
+      command: fitcoach students
+    - name: 找学员
+      command: fitcoach students
+    - name: 新学员
+      command: fitcoach students
+    - name: 学员详情（合计、课包、课次）
+      command: fitcoach students
+    - name: 改资料（姓名、备注、在册）
+      command: fitcoach students
+    - name: 签发学员链接
+      command: fitcoach students
+    - name: 看链接 / 隐藏
+      command: fitcoach students
+    - name: 复制学员链接
+      human: 写系统剪贴板，只在窗口里有意义；命令行用 students link ID --reveal 输出到 stdout
+    - name: 分享学员链接
+      human: 系统分享面板，要真人选去向
+    - name: 到登录页验证链接
+      command: fitcoach student-view
+    - name: 加课包
+      command: fitcoach packages
+    - name: 改课包
+      command: fitcoach packages
+    - name: 作废 / 撤销作废课包
+      command: fitcoach packages
+    - name: 成长数据（首测、最新、最好、变化、到课率）
+      command: fitcoach growth
+    - name: 趋势图
+      human: 图形只在窗口里；每个数据点在 fitcoach growth 的 series 里
+    - name: 每次测量
+      command: fitcoach growth
+    - name: 录体测成绩
+      command: fitcoach measurements
+    - name: 删除一条测量
+      command: fitcoach measurements
+    - name: 这个学员的变更记录
+      command: fitcoach audit
+    # ── 档期
+    - name: 档期（每周规则 / 例外 / 未来两周）
+      command: fitcoach availability
+    - name: 加每周规则
+      command: fitcoach availability
+    - name: 删除每周规则
+      command: fitcoach availability
+    - name: 加例外（停排 / 加开）
+      command: fitcoach availability
+    - name: 删除例外
+      command: fitcoach availability
+    # ── 管理
+    - name: 体测项目（在用 / 已停用）
+      command: fitcoach metrics
+    - name: 新项目、改项目、停用项目
+      command: fitcoach metrics
+    - name: 使用常用项目
+      command: fitcoach metrics
+    - name: 上课地点（启用中 / 已停用）
+      command: fitcoach locations
+    - name: 新地点、改地点、停用地点
+      command: fitcoach locations
+    - name: 变更记录（显示全部、按学员筛选）
+      command: fitcoach audit
+    # ── 更多
+    - name: 快速开始
+      command: fitcoach setup
+    - name: 手机号与账号安全（当前账号状态）
+      command: fitcoach phone
+    - name: 绑定手机号、换绑
+      command: fitcoach phone
+    - name: 手机账号设置登录密码
+      command: fitcoach phone
+    - name: 修改密码
+      command: fitcoach password
+    - name: 注销账号
+      command: fitcoach account
+    - name: 退出登录
+      command: fitcoach logout
+    # 共享生命周期界面（Shared/AppLifecycleMobile.swift「配置与更新」）：命令层由共享模块统一做，本组件不各自实现
+    - name: 使用 iCloud 记住配置
+      missing: 共享生命周期模块暂无命令入口
+    - name: 导出配置
+      missing: 共享生命周期模块暂无命令入口
+    - name: 导入配置
+      missing: 共享生命周期模块暂无命令入口
+    - name: 检查更新
+      missing: 共享生命周期模块暂无命令入口
+    - name: 升级到新版
+      missing: 共享生命周期模块暂无命令入口
+    - name: 选择 iCloud Drive 更新目录
+      human: Mac 版的系统文件选择器授权（沙盒目录授权只认真人在选择器里点选）
+    # ── 学员端
+    - name: 学员端（剩余课时、下一节课、训练成果、课包、已取消的预约、上课记录）
+      command: fitcoach student-view
+    # ── 手表（只读，数据由 iPhone 递过去）
+    - name: 手表今天的课与下一节
+      command: fitcoach schedule
+    - name: 手表课时余额
+      command: fitcoach students
+    - name: 手表一节详情
+      command: fitcoach sessions
+    - name: 表盘复杂功能「下一节」
+      command: fitcoach schedule
+    - name: 手表快照的更新时间与过期提示
+      missing: 手表本机那份快照的生成时间和是否过期只在手表上，命令读不到
   accept:
     functionality: bash scripts/accept/functionality.sh
     recovery: bash scripts/accept/recovery.sh

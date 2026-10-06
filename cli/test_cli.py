@@ -73,6 +73,23 @@ for group in ["", "login", "logout", "status", "register", "password", "account"
     args = [group, "--help"] if group else ["--help"]
     p = subprocess.run([CLI, *args], capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=60)
     check(p.returncode == 0 and "用法" in p.stdout, f"fitcoach {group} --help → 0".replace("  ", " "))
+# 顶层帮助给智能体的四样：读命令与写命令、--json 形状、退出码表、仅在窗口中的项（project.yaml sop.agent_cli 的 human 项）
+p = subprocess.run([CLI, "--help"], capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=60)
+top = p.stdout
+for needle in ("读命令", "写命令", '{"ok": true', '{"ok": false, "code"', "退出码", "仅在窗口中", "暂无命令"):
+    check(needle in top, f"顶层帮助有「{needle}」")
+for code in range(8):
+    check(any(line.strip().startswith(f"{code}  ") for line in top.splitlines()), f"退出码表有 {code}")
+for sub in ("login", "logout", "status", "schedule", "students", "sessions", "packages", "locations", "availability",
+            "metrics", "growth", "measurements", "audit", "setup", "password", "register", "account", "phone",
+            "student-view"):
+    check(any(line.strip().split(" ")[0] == sub for line in top.splitlines()), f"顶层帮助把 {sub} 列为命令（行首）")
+registry = (ROOT / "project.yaml").read_text()
+humans = [line.split("name:", 1)[1].strip() for line, nxt in zip(registry.splitlines(), registry.splitlines()[1:])
+          if line.strip().startswith("- name:") and nxt.strip().startswith("human:")]
+check(len(humans) >= 5, f"登记里读到 human 项 {len(humans)} 条")
+for name in humans:
+    check(name in top, f"human 项「{name}」列在帮助的「仅在窗口中」")
 p = subprocess.run([CLI, "--version"], capture_output=True, text=True, timeout=60)
 check(p.returncode == 0 and p.stdout.startswith("fitcoach "), "--version → 0")
 d = run("bogus", expect=2)
@@ -143,6 +160,11 @@ lst = run("students", "list")
 check(any(r["id"] == SID for r in lst["rows"]), "只改备注：仍在读（is_active 没被清掉）")
 show = run("students", "show", str(SID))
 check(show["student"]["note"] == "已恢复" and show["student"]["name"] == "测试甲", "备注已改、姓名保留")
+found = run("students", "list", "--find", "测试")
+check([r["id"] for r in found["rows"]] == [SID] and found.get("find") == "测试", "students list --find 按姓名筛出这一位")
+none = run("students", "list", "--find", "查无此人")
+check(none["rows"] == [] and none["inactive"] == [] and none["ok"] is True, "--find 查无结果 → 退出 0、两组皆空")
+check(set(found) - {"find"} == set(lst), "--find 只多一个 find 键，其余字段与不筛选时一致")
 run("students", "update", str(SID), expect=2, label="students update 无字段 → 用法错")
 run("students", "show", "999999", expect=7, label="students show 不存在 → 7")
 d = run("students", "link", str(SID))
@@ -354,6 +376,9 @@ d = run("availability", "rm-exception", str(E))
 check((d.get("deleted") or {}).get("kind") == "block", "rm-exception 输出被删的例外")
 
 section("只读不写状态")
+st = run("status")
+check(st.get("version") and st.get("base") == BASE and st.get("email") == EMAIL and st.get("today"),
+      "status 读回版本、服务器、账号与服务端今天")
 before = cred.stat().st_mtime_ns
 for args in (["status"], ["schedule", "--range", "week"], ["students", "list"], ["audit", "--all"],
              ["availability", "show"], ["metrics", "list"], ["locations", "list"]):

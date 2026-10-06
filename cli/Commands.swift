@@ -165,8 +165,9 @@ enum Commands {
         try a.noPositional()
         guard let credential = c.store.load(c.base) else { throw Failure.signedOut }
         let ping = try await c.coach().ping()
-        Out.success(["base": c.base, "email": credential.email as Any, "saved_at": credential.saved_at,
-                     "today": ping.today, "now": ping.now]) {
+        Out.success(["version": cliVersion, "base": c.base, "email": credential.email as Any,
+                     "saved_at": credential.saved_at, "today": ping.today, "now": ping.now]) {
+            Out.line("fitcoach \(cliVersion)")
             Out.line("已登录 \(credential.email ?? "（未记录邮箱）") @ \(c.base)")
             Out.line("服务端今天 \(ping.today)，现在 \(ping.now)")
         }
@@ -273,11 +274,26 @@ enum Commands {
     static func studentsList(_ a: Args, _ c: Context) async throws {
         try a.noPositional()
         let (resp, raw) = try await fetch(try c.coach(), "/coach/api/students", as: StudentsResp.self)
-        Out.success(raw) {
-            Out.line("在读（\(resp.rows.count)）")
-            for r in resp.rows { Out.line("  " + studentLine(r)) }
-            Out.line("停用（\(resp.inactive.count)）")
-            for r in resp.inactive { Out.line("  " + studentLine(r)) }
+        // --find：与 App「找学员」同一条本地筛选（StudentsView.filter：姓名不分大小写包含），后端不收这个参数。
+        let find = (a.value("find") ?? "").trimmingCharacters(in: .whitespaces)
+        var payload = raw
+        var rows = resp.rows
+        var inactive = resp.inactive
+        if !find.isEmpty {
+            let keep = { (row: Any) in
+                (((row as? [String: Any])?["name"] as? String) ?? "").localizedCaseInsensitiveContains(find)
+            }
+            payload["rows"] = (raw["rows"] as? [Any] ?? []).filter(keep)
+            payload["inactive"] = (raw["inactive"] as? [Any] ?? []).filter(keep)
+            payload["find"] = find
+            rows = rows.filter { $0.name.localizedCaseInsensitiveContains(find) }
+            inactive = inactive.filter { $0.name.localizedCaseInsensitiveContains(find) }
+        }
+        Out.success(payload) {
+            Out.line("在读（\(rows.count)）")
+            for r in rows { Out.line("  " + studentLine(r)) }
+            Out.line("停用（\(inactive.count)）")
+            for r in inactive { Out.line("  " + studentLine(r)) }
         }
     }
 
