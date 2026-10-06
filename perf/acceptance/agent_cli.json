@@ -1,0 +1,522 @@
+{
+  "schema_version": 1,
+  "name": "agent_cli",
+  "app_id": "fitcoach-ios",
+  "command": "~/Dev/.venv/bin/python ~/Apps/chapter/engine/acceptors/agent_cli.py",
+  "exit_code": 1,
+  "status": "failed",
+  "started_at": "2026-10-07T00:54:40.104171+08:00",
+  "finished_at": "2026-10-07T00:54:40.405921+08:00",
+  "input_sha256": "4b4fa1b22f2aa7995f67d1dd3e361f5cf61bda2b06d4cf892f8c7d742186115e",
+  "log": "perf/acceptance/run-dwzla2c7/agent_cli.log",
+  "log_sha256": "77ddca78587c28052f26f2dda2253ce6f23a9d3e135b5559f9b11ac3dee17ee9",
+  "summary": "暂缺 7 项：服务器设置（查看与修改服务器地址）、使用 iCloud 记住配置、导出配置、导入配置、检查更新、升级到新版、手表快照的更新时间与过期提示",
+  "detail": {
+    "summary": "暂缺 7 项：服务器设置（查看与修改服务器地址）、使用 iCloud 记住配置、导出配置、导入配置、检查更新、升级到新版、手表快照的更新时间与过期提示",
+    "passed": false,
+    "registered": true,
+    "digest": "ec42c608d82bfa13ddfeaf9c9bbcab7905708b283282af71ff784e1fb29c5b1a",
+    "form": "ios",
+    "readback": "fitcoach status",
+    "readback_found": true,
+    "readback_run": {
+      "exit_code": 3
+    },
+    "counts": {
+      "total": 71,
+      "command": 56,
+      "human": 8,
+      "missing": 7
+    },
+    "missing": [
+      {
+        "name": "服务器设置（查看与修改服务器地址）",
+        "reason": "App 里保存的服务器地址命令读不到也改不了；命令行只能每次用 --base 或 FITCOACH_BASE 指定自己连哪台"
+      },
+      {
+        "name": "使用 iCloud 记住配置",
+        "reason": "共享生命周期模块暂无命令入口"
+      },
+      {
+        "name": "导出配置",
+        "reason": "共享生命周期模块暂无命令入口"
+      },
+      {
+        "name": "导入配置",
+        "reason": "共享生命周期模块暂无命令入口"
+      },
+      {
+        "name": "检查更新",
+        "reason": "共享生命周期模块暂无命令入口"
+      },
+      {
+        "name": "升级到新版",
+        "reason": "共享生命周期模块暂无命令入口"
+      },
+      {
+        "name": "手表快照的更新时间与过期提示",
+        "reason": "手表本机那份快照的生成时间和是否过期只在手表上，命令读不到"
+      }
+    ],
+    "human": [
+      {
+        "name": "记住账号和密码",
+        "reason": "只管登录窗口下次自动填好账号密码，存 App 自己的钥匙串；命令行凭证由 login 保存、logout 删除，两边互不读取"
+      },
+      {
+        "name": "进入已登录的教练端 / 学员端、切换账号",
+        "reason": "只是切换这个窗口显示教练端还是学员端；命令行两端各有命令，不需要切换"
+      },
+      {
+        "name": "隐私政策、联系支持",
+        "reason": "打开网页，只在窗口里有意义"
+      },
+      {
+        "name": "下拉刷新与刷新按钮",
+        "reason": "只是让窗口重新取数；命令每次都现读，没有缓存可刷"
+      },
+      {
+        "name": "复制学员链接",
+        "reason": "写系统剪贴板，只在窗口里有意义；命令行用 students link ID --reveal 输出到 stdout"
+      },
+      {
+        "name": "分享学员链接",
+        "reason": "系统分享面板，要真人选去向"
+      },
+      {
+        "name": "趋势图",
+        "reason": "图形只在窗口里；每个数据点在 fitcoach growth 的 series 里"
+      },
+      {
+        "name": "选择 iCloud Drive 更新目录",
+        "reason": "Mac 版的系统文件选择器授权（沙盒目录授权只认真人在选择器里点选）"
+      }
+    ],
+    "problems": [],
+    "commands": {
+      "fitcoach": {
+        "link": "~/.local/bin/fitcoach",
+        "exit_code": 0,
+        "has_json": true,
+        "has_exit_codes": true,
+        "summary": "用法：fitcoach <命令> [参数]      每个命令都有 --help；加 --json 输出一行 JSON（形状见下）",
+        "error": null
+      }
+    },
+    "features": [
+      {
+        "name": "教练登录（邮箱与密码）",
+        "kind": "command",
+        "value": "fitcoach login",
+        "found": true
+      },
+      {
+        "name": "记住账号和密码",
+        "kind": "human",
+        "value": "只管登录窗口下次自动填好账号密码，存 App 自己的钥匙串；命令行凭证由 login 保存、logout 删除，两边互不读取"
+      },
+      {
+        "name": "邮箱注册",
+        "kind": "command",
+        "value": "fitcoach register",
+        "found": true
+      },
+      {
+        "name": "短信登录",
+        "kind": "command",
+        "value": "fitcoach phone",
+        "found": true
+      },
+      {
+        "name": "手机注册",
+        "kind": "command",
+        "value": "fitcoach phone",
+        "found": true
+      },
+      {
+        "name": "忘记密码（手机号找回）",
+        "kind": "command",
+        "value": "fitcoach phone",
+        "found": true
+      },
+      {
+        "name": "获取验证码与填写短信验证码",
+        "kind": "command",
+        "value": "fitcoach phone",
+        "found": true
+      },
+      {
+        "name": "保存账号恢复密钥",
+        "kind": "command",
+        "value": "fitcoach phone",
+        "found": true
+      },
+      {
+        "name": "学员查看（粘贴教练发来的链接或口令）",
+        "kind": "command",
+        "value": "fitcoach student-view",
+        "found": true
+      },
+      {
+        "name": "进入已登录的教练端 / 学员端、切换账号",
+        "kind": "human",
+        "value": "只是切换这个窗口显示教练端还是学员端；命令行两端各有命令，不需要切换"
+      },
+      {
+        "name": "服务器设置（查看与修改服务器地址）",
+        "kind": "missing",
+        "value": "App 里保存的服务器地址命令读不到也改不了；命令行只能每次用 --base 或 FITCOACH_BASE 指定自己连哪台"
+      },
+      {
+        "name": "隐私政策、联系支持",
+        "kind": "human",
+        "value": "打开网页，只在窗口里有意义"
+      },
+      {
+        "name": "日程（今天 / 本周 / 过时）",
+        "kind": "command",
+        "value": "fitcoach schedule",
+        "found": true
+      },
+      {
+        "name": "前一天、后一天、回到今天",
+        "kind": "command",
+        "value": "fitcoach schedule",
+        "found": true
+      },
+      {
+        "name": "提醒（预警条）",
+        "kind": "command",
+        "value": "fitcoach schedule",
+        "found": true
+      },
+      {
+        "name": "排课",
+        "kind": "command",
+        "value": "fitcoach sessions",
+        "found": true
+      },
+      {
+        "name": "排课表单的可选项（学员、课包、地点、当日可排）",
+        "kind": "command",
+        "value": "fitcoach sessions",
+        "found": true
+      },
+      {
+        "name": "改课",
+        "kind": "command",
+        "value": "fitcoach sessions",
+        "found": true
+      },
+      {
+        "name": "改状态（已上课 / 未到 / 已取消，理由与强制覆盖）",
+        "kind": "command",
+        "value": "fitcoach sessions",
+        "found": true
+      },
+      {
+        "name": "查看这一节的变更记录",
+        "kind": "command",
+        "value": "fitcoach sessions",
+        "found": true
+      },
+      {
+        "name": "课时余额（宽屏日程右栏）",
+        "kind": "command",
+        "value": "fitcoach students",
+        "found": true
+      },
+      {
+        "name": "下拉刷新与刷新按钮",
+        "kind": "human",
+        "value": "只是让窗口重新取数；命令每次都现读，没有缓存可刷"
+      },
+      {
+        "name": "学员名单（在册 / 已停用）",
+        "kind": "command",
+        "value": "fitcoach students",
+        "found": true
+      },
+      {
+        "name": "找学员",
+        "kind": "command",
+        "value": "fitcoach students",
+        "found": true
+      },
+      {
+        "name": "新学员",
+        "kind": "command",
+        "value": "fitcoach students",
+        "found": true
+      },
+      {
+        "name": "学员详情（合计、课包、课次）",
+        "kind": "command",
+        "value": "fitcoach students",
+        "found": true
+      },
+      {
+        "name": "改资料（姓名、备注、在册）",
+        "kind": "command",
+        "value": "fitcoach students",
+        "found": true
+      },
+      {
+        "name": "签发学员链接",
+        "kind": "command",
+        "value": "fitcoach students",
+        "found": true
+      },
+      {
+        "name": "看链接 / 隐藏",
+        "kind": "command",
+        "value": "fitcoach students",
+        "found": true
+      },
+      {
+        "name": "复制学员链接",
+        "kind": "human",
+        "value": "写系统剪贴板，只在窗口里有意义；命令行用 students link ID --reveal 输出到 stdout"
+      },
+      {
+        "name": "分享学员链接",
+        "kind": "human",
+        "value": "系统分享面板，要真人选去向"
+      },
+      {
+        "name": "到登录页验证链接",
+        "kind": "command",
+        "value": "fitcoach student-view",
+        "found": true
+      },
+      {
+        "name": "加课包",
+        "kind": "command",
+        "value": "fitcoach packages",
+        "found": true
+      },
+      {
+        "name": "改课包",
+        "kind": "command",
+        "value": "fitcoach packages",
+        "found": true
+      },
+      {
+        "name": "作废 / 撤销作废课包",
+        "kind": "command",
+        "value": "fitcoach packages",
+        "found": true
+      },
+      {
+        "name": "成长数据（首测、最新、最好、变化、到课率）",
+        "kind": "command",
+        "value": "fitcoach growth",
+        "found": true
+      },
+      {
+        "name": "趋势图",
+        "kind": "human",
+        "value": "图形只在窗口里；每个数据点在 fitcoach growth 的 series 里"
+      },
+      {
+        "name": "每次测量",
+        "kind": "command",
+        "value": "fitcoach growth",
+        "found": true
+      },
+      {
+        "name": "录体测成绩",
+        "kind": "command",
+        "value": "fitcoach measurements",
+        "found": true
+      },
+      {
+        "name": "删除一条测量",
+        "kind": "command",
+        "value": "fitcoach measurements",
+        "found": true
+      },
+      {
+        "name": "这个学员的变更记录",
+        "kind": "command",
+        "value": "fitcoach audit",
+        "found": true
+      },
+      {
+        "name": "档期（每周规则 / 例外 / 未来两周）",
+        "kind": "command",
+        "value": "fitcoach availability",
+        "found": true
+      },
+      {
+        "name": "加每周规则",
+        "kind": "command",
+        "value": "fitcoach availability",
+        "found": true
+      },
+      {
+        "name": "删除每周规则",
+        "kind": "command",
+        "value": "fitcoach availability",
+        "found": true
+      },
+      {
+        "name": "加例外（停排 / 加开）",
+        "kind": "command",
+        "value": "fitcoach availability",
+        "found": true
+      },
+      {
+        "name": "删除例外",
+        "kind": "command",
+        "value": "fitcoach availability",
+        "found": true
+      },
+      {
+        "name": "体测项目（在用 / 已停用）",
+        "kind": "command",
+        "value": "fitcoach metrics",
+        "found": true
+      },
+      {
+        "name": "新项目、改项目、停用项目",
+        "kind": "command",
+        "value": "fitcoach metrics",
+        "found": true
+      },
+      {
+        "name": "使用常用项目",
+        "kind": "command",
+        "value": "fitcoach metrics",
+        "found": true
+      },
+      {
+        "name": "上课地点（启用中 / 已停用）",
+        "kind": "command",
+        "value": "fitcoach locations",
+        "found": true
+      },
+      {
+        "name": "新地点、改地点、停用地点",
+        "kind": "command",
+        "value": "fitcoach locations",
+        "found": true
+      },
+      {
+        "name": "变更记录（显示全部、按学员筛选）",
+        "kind": "command",
+        "value": "fitcoach audit",
+        "found": true
+      },
+      {
+        "name": "快速开始",
+        "kind": "command",
+        "value": "fitcoach setup",
+        "found": true
+      },
+      {
+        "name": "手机号与账号安全（当前账号状态）",
+        "kind": "command",
+        "value": "fitcoach phone",
+        "found": true
+      },
+      {
+        "name": "绑定手机号、换绑",
+        "kind": "command",
+        "value": "fitcoach phone",
+        "found": true
+      },
+      {
+        "name": "手机账号设置登录密码",
+        "kind": "command",
+        "value": "fitcoach phone",
+        "found": true
+      },
+      {
+        "name": "修改密码",
+        "kind": "command",
+        "value": "fitcoach password",
+        "found": true
+      },
+      {
+        "name": "注销账号",
+        "kind": "command",
+        "value": "fitcoach account",
+        "found": true
+      },
+      {
+        "name": "退出登录",
+        "kind": "command",
+        "value": "fitcoach logout",
+        "found": true
+      },
+      {
+        "name": "使用 iCloud 记住配置",
+        "kind": "missing",
+        "value": "共享生命周期模块暂无命令入口"
+      },
+      {
+        "name": "导出配置",
+        "kind": "missing",
+        "value": "共享生命周期模块暂无命令入口"
+      },
+      {
+        "name": "导入配置",
+        "kind": "missing",
+        "value": "共享生命周期模块暂无命令入口"
+      },
+      {
+        "name": "检查更新",
+        "kind": "missing",
+        "value": "共享生命周期模块暂无命令入口"
+      },
+      {
+        "name": "升级到新版",
+        "kind": "missing",
+        "value": "共享生命周期模块暂无命令入口"
+      },
+      {
+        "name": "选择 iCloud Drive 更新目录",
+        "kind": "human",
+        "value": "Mac 版的系统文件选择器授权（沙盒目录授权只认真人在选择器里点选）"
+      },
+      {
+        "name": "学员端（剩余课时、下一节课、训练成果、课包、已取消的预约、上课记录）",
+        "kind": "command",
+        "value": "fitcoach student-view",
+        "found": true
+      },
+      {
+        "name": "手表今天的课与下一节",
+        "kind": "command",
+        "value": "fitcoach schedule",
+        "found": true
+      },
+      {
+        "name": "手表课时余额",
+        "kind": "command",
+        "value": "fitcoach students",
+        "found": true
+      },
+      {
+        "name": "手表一节详情",
+        "kind": "command",
+        "value": "fitcoach sessions",
+        "found": true
+      },
+      {
+        "name": "表盘复杂功能「下一节」",
+        "kind": "command",
+        "value": "fitcoach schedule",
+        "found": true
+      },
+      {
+        "name": "手表快照的更新时间与过期提示",
+        "kind": "missing",
+        "value": "手表本机那份快照的生成时间和是否过期只在手表上，命令读不到"
+      }
+    ]
+  },
+  "run_id": "run-dwzla2c7",
+  "evidence_file": "perf/acceptance/run-dwzla2c7/agent_cli.json"
+}
