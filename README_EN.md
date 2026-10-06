@@ -10,7 +10,7 @@
 
 ![Swift](https://img.shields.io/badge/Swift-5-F05138?logo=swift&logoColor=white) ![SwiftUI](https://img.shields.io/badge/SwiftUI-0D84FF?logo=swift&logoColor=white) ![Platform](https://img.shields.io/badge/iOS%2018.0%2B%20·%20macOS%2015.0%2B-000?logo=apple) ![TestFlight](https://img.shields.io/badge/TestFlight-内测中-0D84FF) ![License](https://img.shields.io/badge/License-MIT-green)
 
-The mobile client of a production system built for a real coach, sharing one backend and one dataset with the web and mini-program clients. Before release, the contract assertions (57 today) were exercised against a real temporary backend. This even uncovered a misleading green result: when the intended port was occupied, tests hit another server and all passed—a green more dangerous than a red.
+The mobile client of a production system built for a real coach, sharing one backend and one dataset with the web client. Before release, the contract assertions (57 today) were exercised against a real temporary backend. This even uncovered a misleading green result: when the intended port was occupied, tests hit another server and all passed—a green more dangerous than a red.
 
 <table><tr>
 <td align="center" width="25%"><img src="docs/screenshots/01-01-schedule.png" alt="Schedule: overdue lessons awaiting action are flagged (sample data)"><br><sub>Schedule: overdue lessons awaiting action are flagged (sample data)</sub></td>
@@ -36,7 +36,7 @@ The mobile client of a production system built for a real coach, sharing one bac
 
 The iOS version is being prepared for App Store release and is not yet available for public download; the source code and product introduction are public.
 
-The backend is `fit.tianli.cyou` (registration gives you your own ledger), sharing the same data with the web and mini-program clients. Clone and run it; after login, the data is yours.
+The backend is `fit.tianli.cyou` (registration gives you your own ledger), sharing the same data with the web client. Clone and run it; after login, the data is yours.
 
 ## Build
 
@@ -53,7 +53,7 @@ See [DEVELOPING.md](DEVELOPING.md) for development details (regression, validati
 
 ## Command line (for agents)
 
-The app is for people; the `fitcoach` command line is for agents. It compiles the app's own `Sources/Models.swift`, `TimeKit.swift`, `API.swift` and `QuickSetup.swift` together with `cli/*.swift` into a macOS command-line tool that calls the same `/coach/api/*` endpoints. It reads and changes the same data as the app, the web client and the mini program; business rules stay in the backend only.
+The app is for people; the `fitcoach` command line is for agents. It compiles the app's own `Sources/Models.swift`, `TimeKit.swift`, `API.swift` and `QuickSetup.swift` together with `cli/*.swift` into a macOS command-line tool that calls the same `/coach/api/*` endpoints. It reads and changes the same data as the app and the web client; business rules stay in the backend only.
 
 Where it lives: the Mac build of the app compiles it into the bundle as `上门体育.app/Contents/Resources/bin/fitcoach` (the `FitCoachCLI` target in `project.yml`, macOS only; the iOS app does not carry it). With the Mac app installed, `bash cli/build.sh --link-app` points `~/.local/bin/fitcoach` into the bundle; without it, use the repo entry.
 

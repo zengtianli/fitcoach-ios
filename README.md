@@ -8,7 +8,7 @@
 
 ![Swift](https://img.shields.io/badge/Swift-5-F05138?logo=swift&logoColor=white) ![SwiftUI](https://img.shields.io/badge/SwiftUI-0D84FF?logo=swift&logoColor=white) ![Platform](https://img.shields.io/badge/iOS%2018.0%2B%20·%20macOS%2015.0%2B-000?logo=apple) ![TestFlight](https://img.shields.io/badge/TestFlight-内测中-0D84FF) ![License](https://img.shields.io/badge/License-MIT-green)
 
-给一位真实教练做的生产系统手机端，与网页端、小程序端共用同一后端、同一份数据。上线前契约断言（现为 57 项）对着临时后端真打真测——还因此发现过「端口被占时打到另一台服务器上全绿」这种比红更危险的绿。
+给一位真实教练做的生产系统手机端，与网页端共用同一后端、同一份数据。上线前契约断言（现为 57 项）对着临时后端真打真测——还因此发现过「端口被占时打到另一台服务器上全绿」这种比红更危险的绿。
 
 <table><tr>
 <td align="center" width="25%"><img src="docs/screenshots/01-01-schedule.png" alt="日程：过时未处理的课会被点名（示例数据）"><br><sub>日程：过时未处理的课会被点名（示例数据）</sub></td>
@@ -34,7 +34,7 @@
 
 iOS 版正在准备 App Store 发布，暂未开放公开下载；源码与产品介绍可公开查看。
 
-后端 `fit.tianli.cyou`（注册即得自己的账本），与网页端、小程序端同一份数据。clone 下来能跑，登录后是你自己的数据。
+后端 `fit.tianli.cyou`（注册即得自己的账本），与网页端同一份数据。clone 下来能跑，登录后是你自己的数据。
 
 ## 构建
 
@@ -51,7 +51,7 @@ xcodebuild -scheme FitCoach -destination 'generic/platform=iOS Simulator' build
 
 ## 命令行（给智能体用）
 
-App 给人用，`fitcoach` 命令行给智能体用。它把 App 自己的 `Sources/Models.swift`、`TimeKit.swift`、`API.swift`、`QuickSetup.swift` 与 `cli/*.swift` 编成一个 macOS 命令行，打同一套 `/coach/api/*`：读到、改到的就是 App、网页、小程序里的同一份数据，业务判据仍只在后端。
+App 给人用，`fitcoach` 命令行给智能体用。它把 App 自己的 `Sources/Models.swift`、`TimeKit.swift`、`API.swift`、`QuickSetup.swift` 与 `cli/*.swift` 编成一个 macOS 命令行，打同一套 `/coach/api/*`：读到、改到的就是 App、网页里的同一份数据，业务判据仍只在后端。
 
 放在哪：Mac 版 App 构建时把它编进包里，`上门体育.app/Contents/Resources/bin/fitcoach`（`project.yml` 的 `FitCoachCLI` 目标，只对 macOS 生效，iOS 包不带）。装好 Mac 版后用 `bash cli/build.sh --link-app` 把 `~/.local/bin/fitcoach` 链进包里；没装 Mac 版时用仓库入口。
 
