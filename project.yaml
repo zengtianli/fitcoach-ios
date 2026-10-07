@@ -48,7 +48,7 @@ sop:
     - name: 进入已登录的教练端 / 学员端、切换账号
       human: 只是切换这个窗口显示教练端还是学员端；命令行两端各有命令，不需要切换
     - name: 服务器设置（查看与修改服务器地址）
-      missing: App 里保存的服务器地址命令读不到也改不了；命令行只能每次用 --base 或 FITCOACH_BASE 指定自己连哪台
+      missing: 服务器地址（fitcoach.baseURL）在可随 iCloud 迁移的配置清单里，本机装着的 Mac 版读写同一个 iCloud 键值存储，Mac 版自己那份就在这台 Mac 上，够得着但没有命令。需要 fitcoach 加 config status / export / import（转调 Mac 版 App 里的共用配置命令）；手机那份要两边都开「使用 iCloud 记住配置」才跟得到。命令行自己连哪台仍用 --base 或 FITCOACH_BASE
     - name: 隐私政策、联系支持
       human: 打开网页，只在窗口里有意义
     # ── 日程
@@ -150,17 +150,29 @@ sop:
       command: fitcoach account
     - name: 退出登录
       command: fitcoach logout
-    # 共享生命周期界面（Shared/AppLifecycleMobile.swift「配置与更新」）：命令层由共享模块统一做，本组件不各自实现
+    # 共享生命周期界面（Shared/AppLifecycleMobile.swift「配置与更新」）：命令层由共享模块统一做，本组件不各自实现。
+    # 手机、平板、Vision 上的那份只在设备本机，记 device；Mac 版就装在本机（fitcoach 所在的那个 App），
+    # 同一面板的状态在这台 Mac 上，够得着但还没有命令，另列为 missing。
     - name: 使用 iCloud 记住配置
-      missing: 共享生命周期模块暂无命令入口
+      device: 手机、平板、Vision 上「配置与更新」面板里的开关，存在那台设备的本机偏好里，设备不上报；命令与后端够不到
     - name: 导出配置
-      missing: 共享生命周期模块暂无命令入口
+      device: 手机、平板、Vision 上导出的是那台设备的本机偏好，经设备上的系统文件面板存到本人选的位置；命令与后端读不到设备里那份
     - name: 导入配置
-      missing: 共享生命周期模块暂无命令入口
+      device: 手机、平板、Vision 上写的是那台设备的本机偏好，文件经设备上的系统文件面板选取；命令与后端写不到设备里那份
     - name: 检查更新
-      missing: 共享生命周期模块暂无命令入口
+      device: 手机、平板、Vision 上拿本机已装版本去比 App Store 上的版本，结论只显示在那台设备上，不留存也不上报；命令与后端读不到
     - name: 升级到新版
-      missing: 共享生命周期模块暂无命令入口
+      device: 手机、平板、Vision 上是「前往 App Store」，由系统在那台设备上安装；命令与后端替它装不了
+    - name: 使用 iCloud 记住配置（Mac 版）
+      missing: Mac 版的开关在这台 Mac 上，够得着但没有命令。需要 fitcoach 加 config sync（转调 Mac 版 App 里的共用配置命令；沙盒加 iCloud 键值存储的同步要由 App 自己的可执行文件来跑）
+    - name: 导出配置（Mac 版）
+      missing: 需要 fitcoach 加 config status / config export（转调 Mac 版 App 里的共用配置命令）
+    - name: 导入配置（Mac 版）
+      missing: 需要 fitcoach 加 config import（转调 Mac 版 App 里的共用配置命令）
+    - name: 检查更新（Mac 版）
+      missing: 需要 fitcoach 加 update check（转调 Mac 版 App 里的共用更新命令；Mac 版读的是 iCloud Drive 里的私有发行记录，目录授权只在 App 自己手里）
+    - name: 升级到新版（Mac 版）
+      missing: 需要 fitcoach 加 update install（转调 Mac 版 App 里的共用更新命令）；现在只能在面板里点「打开发行包」
     - name: 选择 iCloud Drive 更新目录
       human: Mac 版的系统文件选择器授权（沙盒目录授权只认真人在选择器里点选）
     # ── 学员端
@@ -176,7 +188,7 @@ sop:
     - name: 表盘复杂功能「下一节」
       command: fitcoach schedule
     - name: 手表快照的更新时间与过期提示
-      missing: 手表本机那份快照的生成时间和是否过期只在手表上，命令读不到
+      device: 快照由 iPhone 生成后递给手表，存在手表本机钥匙串里，不跨设备也不上报；它的生成时间和是否过期只在那块手表上，命令与后端读不到
   accept:
     functionality: bash scripts/accept/functionality.sh
     recovery: bash scripts/accept/recovery.sh
