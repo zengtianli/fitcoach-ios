@@ -25,7 +25,7 @@ sop:
   # human 项都列在 fitcoach --help 的「仅在窗口中」里（cli/test_cli.py 核对）。「记住账号和密码」2026-10-07 改记 device，
   # 帮助里仍把它列在「仅在窗口中」（帮助在 Mac 包里，这一轮不改）。
   # 本机登录态（记住的账号密码、退出登录）：手机、平板、Vision 上的那份只在设备本机，记 device；Mac 版就装在本机，它那份在
-  # 这台 Mac 上，够得着但还没有命令，另列「（Mac 版）」留 missing（与「配置与更新」面板同一口径，不让 device 盖住够得着的缺口）。
+  # 这台 Mac 上，够得着，另列「（Mac 版）」：2026-10-07 起由 fitcoach config / update / app 转调 Mac 版 App 的可执行文件（装机版 1.0.1 (65) 起有）；装机版上只读验证跑通的记 command，没跑通的留 missing（与「配置与更新」面板同一口径，不让 device 盖住够得着的缺口）。
   agent_cli:
     readback: fitcoach status
     features:
@@ -35,7 +35,8 @@ sop:
     - name: 记住账号和密码
       device: 记住的账号密码存在那台设备上 App 自己的钥匙串里，属性是仅限本设备（不随 iCloud 钥匙串走），设备不上报，命令与后端读不到也改不了；命令行凭证由 fitcoach login 另存一份，两边互不读取。范围是手机、平板、Vision；Mac 版另列
     - name: 记住账号和密码（Mac 版）
-      missing: Mac 版记住的那份在这台 Mac 上 App 自己的钥匙串里，够得着但没有命令。需要 fitcoach 加读回与清除它的命令（如 app saved-login status / clear，转调 Mac 版 App 的可执行文件：钥匙串项只有 App 自己读得到；清除须 --yes，不输出密码）
+      # 读回 app saved-login status（只有服务器与账号名，不带密码）；清除 app saved-login clear --yes [--all]。由 Mac 版 App 自己的可执行文件读写它的钥匙串
+      command: fitcoach app saved-login
     - name: 邮箱注册
       command: fitcoach register
     - name: 短信登录
@@ -53,7 +54,9 @@ sop:
     - name: 进入已登录的教练端 / 学员端、切换账号
       human: 只是切换这个窗口显示教练端还是学员端；命令行两端各有命令，不需要切换
     - name: 服务器设置（查看与修改服务器地址）
-      missing: 服务器地址（fitcoach.baseURL）在可随 iCloud 迁移的配置清单里，本机装着的 Mac 版读写同一个 iCloud 键值存储，Mac 版自己那份就在这台 Mac 上，够得着但没有命令。需要 fitcoach 加 config status / export / import（转调 Mac 版 App 里的共用配置命令）；手机那份要两边都开「使用 iCloud 记住配置」才跟得到。命令行自己连哪台仍用 --base 或 FITCOACH_BASE
+      # 看：config status / config export -o -（values 里的 defaults.fitcoach.baseURL）；改：改导出文件里的这一项再 config import FILE --yes。
+      # 命令行自己连哪台仍用 --base 或 FITCOACH_BASE，这三组命令不接受 --base
+      command: fitcoach config import
     - name: 隐私政策、联系支持
       human: 打开网页，只在窗口里有意义
     # ── 日程
@@ -156,7 +159,8 @@ sop:
     - name: 退出登录
       device: App 的登录态就是那台设备本机偏好里的会话 Cookie（fitcoach.coachCookie），退出只清本机这一份，不请求服务端，服务端也不留会话记录，设备不上报；fitcoach logout 删的是命令行自己那份凭证，两边互不读取，够不到设备里那份。范围是手机、平板、Vision；Mac 版另列
     - name: 退出登录（Mac 版）
-      missing: Mac 版的会话 Cookie 在这台 Mac 上 App 的沙盒偏好里，够得着但没有命令。需要 fitcoach 加 app logout（转调 Mac 版 App 清它自己的登录态，须 --yes）；fitcoach logout 只删命令行自己的凭证，替不了这一步
+      # 清 Mac 版 App 自己的教练登录态（须 --yes）；fitcoach logout 只删命令行自己的凭证，是另一份
+      command: fitcoach app logout
     # 共享生命周期界面（Shared/AppLifecycleMobile.swift「配置与更新」）：命令层由共享模块统一做，本组件不各自实现。
     # 手机、平板、Vision 上的那份只在设备本机，记 device；Mac 版就装在本机（fitcoach 所在的那个 App），
     # 同一面板的状态在这台 Mac 上，够得着但还没有命令，另列为 missing。
@@ -171,15 +175,15 @@ sop:
     - name: 升级到新版
       device: 手机、平板、Vision 上是「前往 App Store」，由系统在那台设备上安装；命令与后端替它装不了
     - name: 使用 iCloud 记住配置（Mac 版）
-      missing: Mac 版的开关在这台 Mac 上，够得着但没有命令。需要 fitcoach 加 config sync（转调 Mac 版 App 里的共用配置命令；沙盒加 iCloud 键值存储的同步要由 App 自己的可执行文件来跑）
+      command: fitcoach config sync
     - name: 导出配置（Mac 版）
-      missing: 需要 fitcoach 加 config status / config export（转调 Mac 版 App 里的共用配置命令）
+      command: fitcoach config export
     - name: 导入配置（Mac 版）
-      missing: 需要 fitcoach 加 config import（转调 Mac 版 App 里的共用配置命令）
+      command: fitcoach config import
     - name: 检查更新（Mac 版）
-      missing: 需要 fitcoach 加 update check（转调 Mac 版 App 里的共用更新命令；Mac 版读的是 iCloud Drive 里的私有发行记录，目录授权只在 App 自己手里）
+      missing: 命令已在装机版里（fitcoach update check），但这台 Mac 的 App 还没有被授权读 iCloud Drive 更新目录：装机版上实跑返回 check_incomplete「请先选择 iCloud Drive 更新目录」，读到发行记录这一步没有跑通（隔离测试里读得到）。授权要真人在「配置与更新」面板里用系统文件选择器选一次目录（见下一行 human）；选过后 fitcoach update check --json 读到发行记录，即改记 command（fitcoach update check）
     - name: 升级到新版（Mac 版）
-      missing: 需要 fitcoach 加 update install（转调 Mac 版 App 里的共用更新命令）；现在只能在面板里点「打开发行包」
+      missing: 命令已在装机版里（fitcoach update install；沙盒包不自行替换：命令核对发行包身份、大小与 SHA256 后给出发行包位置，替换由安装脚本完成，与面板「打开发行包」做到同一步）。但它先要读发行记录，这台 Mac 的 App 还没有被授权读 iCloud Drive 更新目录：装机版上 --dry-run 与缺 --yes 都返回 check_incomplete，只有错参数退出 2 跑通。真人在面板里选过更新目录后，update install --dry-run / 缺 --yes 跑通，即改记 command（fitcoach update install）
     - name: 选择 iCloud Drive 更新目录
       human: Mac 版的系统文件选择器授权（沙盒目录授权只认真人在选择器里点选）
     # ── 学员端
