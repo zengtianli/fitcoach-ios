@@ -22,7 +22,10 @@ sop:
     app: cyou.tianli.fitcoachapp
   # 界面功能对照（写法见 app 技能 references/agent-cli.md）：从 Sources/*View.swift、Shared/AppLifecycleMobile.swift、
   # Watch/ 逐项列出。手机、平板、Vision、手表上没法装命令行，都用 Mac 包里那份 fitcoach 打同一套后端来对应。
-  # human 项与 fitcoach --help 的「仅在窗口中」逐条一致（cli/test_cli.py 核对）。
+  # human 项都列在 fitcoach --help 的「仅在窗口中」里（cli/test_cli.py 核对）。「记住账号和密码」2026-10-07 改记 device，
+  # 帮助里仍把它列在「仅在窗口中」（帮助在 Mac 包里，这一轮不改）。
+  # 本机登录态（记住的账号密码、退出登录）：手机、平板、Vision 上的那份只在设备本机，记 device；Mac 版就装在本机，它那份在
+  # 这台 Mac 上，够得着但还没有命令，另列「（Mac 版）」留 missing（与「配置与更新」面板同一口径，不让 device 盖住够得着的缺口）。
   agent_cli:
     readback: fitcoach status
     features:
@@ -30,7 +33,9 @@ sop:
     - name: 教练登录（邮箱与密码）
       command: fitcoach login
     - name: 记住账号和密码
-      human: 只管登录窗口下次自动填好账号密码，存 App 自己的钥匙串；命令行凭证由 login 保存、logout 删除，两边互不读取
+      device: 记住的账号密码存在那台设备上 App 自己的钥匙串里，属性是仅限本设备（不随 iCloud 钥匙串走），设备不上报，命令与后端读不到也改不了；命令行凭证由 fitcoach login 另存一份，两边互不读取。范围是手机、平板、Vision；Mac 版另列
+    - name: 记住账号和密码（Mac 版）
+      missing: Mac 版记住的那份在这台 Mac 上 App 自己的钥匙串里，够得着但没有命令。需要 fitcoach 加读回与清除它的命令（如 app saved-login status / clear，转调 Mac 版 App 的可执行文件：钥匙串项只有 App 自己读得到；清除须 --yes，不输出密码）
     - name: 邮箱注册
       command: fitcoach register
     - name: 短信登录
@@ -149,7 +154,9 @@ sop:
     - name: 注销账号
       command: fitcoach account
     - name: 退出登录
-      command: fitcoach logout
+      device: App 的登录态就是那台设备本机偏好里的会话 Cookie（fitcoach.coachCookie），退出只清本机这一份，不请求服务端，服务端也不留会话记录，设备不上报；fitcoach logout 删的是命令行自己那份凭证，两边互不读取，够不到设备里那份。范围是手机、平板、Vision；Mac 版另列
+    - name: 退出登录（Mac 版）
+      missing: Mac 版的会话 Cookie 在这台 Mac 上 App 的沙盒偏好里，够得着但没有命令。需要 fitcoach 加 app logout（转调 Mac 版 App 清它自己的登录态，须 --yes）；fitcoach logout 只删命令行自己的凭证，替不了这一步
     # 共享生命周期界面（Shared/AppLifecycleMobile.swift「配置与更新」）：命令层由共享模块统一做，本组件不各自实现。
     # 手机、平板、Vision 上的那份只在设备本机，记 device；Mac 版就装在本机（fitcoach 所在的那个 App），
     # 同一面板的状态在这台 Mac 上，够得着但还没有命令，另列为 missing。
