@@ -146,6 +146,11 @@ struct FitCoachCLI {
             exit(ExitCode.usage.rawValue)
         }
 
+        // config / update / app：读写的是 Mac 版 App 自己保存的东西，转给 App 的可执行文件（cli/AppRelay.swift）。
+        if AppRelay.verbs.contains(head) {
+            AppRelay.run(Array(argv[index...]) + (leading.contains("--json") ? ["--json"] : []) + leading.filter { $0 == "--base" || $0.hasPrefix("--base=") })
+        }
+
         var rest = Array(argv[(index + 1)...])
         let phoneSubcommand = head == "phone" ? rest.first : nil
         let spec: Spec
@@ -222,10 +227,15 @@ enum Help {
       phone          手机账号：hints · account · send · verify · register · login · recover · bind · set-password
     学员端：
       student-view   用学员链接读只读视图：--token-stdin（链接或口令只从 stdin 读，不进命令行参数）
+    Mac 版 App 自己保存的东西（转给已装的 Mac 版「上门体育」的可执行文件去做，不开窗口；各有 --help）：
+      config         「配置与更新」里的配置：status · export -o FILE · import FILE --yes · sync on|off --yes
+      update         「配置与更新」里的更新：check · install --yes [--dry-run]
+      app            App 的登录：saved-login status · saved-login clear --yes [--all] · logout --yes
 
     读命令（只读，不改服务器数据；本机凭证只在服务端回 401 判定会话失效时被清掉）：
       status · schedule · students list|show|link · sessions options|show · locations list · availability show
       metrics list · growth · audit · student-view · phone hints|account
+      config status · update check · app saved-login status（读 Mac 版 App 自己保存的；update install --dry-run 是演练）
       演练：packages void --dry-run · measurements rm --dry-run · account delete --dry-run
     写命令：
       本机凭证  login · logout（只动本机凭证文件）· register（同时在服务器新建账号）
@@ -234,6 +244,8 @@ enum Help {
                 metrics add|update|seed · measurements add|rm · setup
       账号      password · account delete · phone send|verify|register|login|recover|bind|set-password
                 （phone send 会发真实短信并计费，须带 --confirm-send）
+      Mac 版 App  config export（只写你指定的那个文件）· config import · config sync · update install
+                app saved-login clear · app logout（都要 --yes；改的是 App 那一份，命令行凭证不动）
 
     通用参数：--json  --base URL（默认 https://fit.tianli.cyou；或环境变量 FITCOACH_BASE）  --help  --version
     凭证：~/Library/Application Support/FitCoach/cli/credentials.json（0600，按服务器分条；FITCOACH_CLI_HOME 改目录）
@@ -245,6 +257,9 @@ enum Help {
       code  usage · signed_out · link_invalid · not_found · rejected · needs_force · needs_confirm
             auth_failed · login_refused · transport · server_error · decode · failure
 
+            config / update / app 是共用命令层的形状（多行）：成功 {"ok": true, "command": "config status", …}；
+            失败 {"ok": false, "command": …, "error": {"code", "message"}}，字段见各自 --help
+
     退出码：
       0  成功（查无结果也算成功）
       1  网络 / 服务端 5xx（可稍后重试）/ 响应解析 / 本机写凭证失败
@@ -254,6 +269,7 @@ enum Help {
       5  需要确认：后端 409 软警告加 --force，或本机要求 --yes / --confirm
       6  登录失败（401）或尝试过于频繁（429）
       7  要读的记录不存在（读取、先读后改的 update / edit、--dry-run）
+      config / update / app 只用三个：0 成功 · 1 未完成（原因在 error.code）· 2 用法错误或缺 --yes
 
     示例：
       printf '%s\\n' "$PASSWORD" | fitcoach login --email coach@example.com --password-stdin
@@ -262,7 +278,7 @@ enum Help {
       fitcoach sessions status 42 --to completed --json
 
     仅在窗口中（命令不做；括号里是原因或命令行的对应做法）：
-      记住账号和密码（只管登录窗口下次自动填好，存 App 自己的钥匙串；命令行凭证由 login 保存、logout 删除）
+      勾选「记住账号和密码」并登录（要真人在登录窗口输密码；读回与清除有命令：app saved-login status / clear）
       进入已登录的教练端 / 学员端、切换账号（只是窗口显示哪一端；命令行两端各有命令）
       隐私政策、联系支持（打开网页）
       下拉刷新与刷新按钮（命令每次都现读）
@@ -272,12 +288,88 @@ enum Help {
       选择 iCloud Drive 更新目录（Mac 版，系统文件选择器授权，要真人选）
       日期、时间选择器与常用值按钮（命令行直接给 --date / --start / --end / --minutes 等参数）
     暂无命令（登记在 project.yaml 的 sop.agent_cli）：
-      App 里保存的服务器地址（命令读不到也改不了；命令行自己每次用 --base 或 FITCOACH_BASE）
-      配置与更新：使用 iCloud 记住配置、导出配置、导入配置、检查更新、升级到新版（共享生命周期模块暂无命令入口）
       手表上快照的更新时间与过期提示（只在手表本机）
+      手机、平板、Vision 上的「配置与更新」、记住的账号密码与登录态（只在那台设备本机；上面 config / update / app 管的是这台 Mac 上的 Mac 版）
     """
 
     static let groups: [String: String] = [
+        "config": """
+        用法：fitcoach config [status] [--json]
+              fitcoach config export -o <file.json> [--force] [--json]
+              fitcoach config import <file.json> --yes [--json]
+              fitcoach config sync on|off --yes [--dry-run] [--json]
+        Mac 版「上门体育」里「配置与更新」面板的配置一组，与面板读写同一份设置。由已装的 Mac 版 App 自己的可执行文件执行
+        （偏好在 App 的沙盒容器里，iCloud 键值存储的同步只有 App 自己能跑）；不开窗口、不抢焦点、不弹框。
+        可迁移的配置只有一项：fitcoach.baseURL（App 连哪台服务器，即登录页「服务器设置」）。
+          读它      config status --json 的 keys[] 里是 defaults.fitcoach.baseURL（没改过默认服务器时不出现）；值在 config export -o - 输出的 values 里
+          改它      把导出文件 values 里的 defaults.fitcoach.baseURL 改好，再 config import <file> --yes（必须是 https 地址，否则回到默认服务器）。
+                    服务器换了，App 里的登录态随之清掉（登录属于签发它的那台服务器），要重新登录
+          区别      --base / FITCOACH_BASE 只管命令行自己这一次连哪台，不读也不改 App 这一份；这三组命令不接受 --base
+        读（不写任何文件或状态）:
+          config status              「使用 iCloud 记住配置」开关、开关下面那句同步状态、当前可迁移的配置项、App 是否在运行
+        写:
+          config export -o <file>    导出配置：与面板「导出配置」同一份文件；不改设置，只写你指定的那个文件（--force 覆盖；-o - 输出到标准输出，不写文件）
+          config import <file> --yes 导入配置：先备份原配置再覆盖，与面板「导入配置」相同
+          config sync on|off --yes   拨动「使用 iCloud 记住配置」（--dry-run 只看会不会变；用 fitcoach config status 回读）
+        --json：成功 {"ok": true, "command": "config status", …}；失败 {"ok": false, "command": …, "error": {"code", "message"}}，退出码非零。
+          config status  → has_settings, sync_enabled, sync_status{text, at, from, live}, keys[], app_running, problem
+          config export  → path, bytes, keys[]
+          config import  → imported, path, sync_enabled, app_running, sync{completed, status}（仅同步开着时）
+          config sync    → action, changed, sync_enabled, status, app_running, check_with；--dry-run 给 would_change
+        退出码与 error.code：
+          0  成功
+          1  操作未完成：not_found（没有这个文件）· import_rejected（导入被拒，原配置保留）· export_failed（导出未完成）·
+             sync_incomplete（开关已打开，首次同步未完成）· no_settings · app_missing（没装 Mac 版）· app_outdated（装着的 Mac 版没有命令入口）· failed
+          2  用法错误或缺确认参数：usage · confirmation_required（import、sync 缺 --yes）· file_exists（导出目标已存在，缺 --force）
+        仅在窗口中：打开「配置与更新」面板；用系统文件面板选导出位置或要导入的文件（命令直接给路径）
+        """,
+        "update": """
+        用法：fitcoach update check [--json]
+              fitcoach update install --yes [--dry-run] [--json]
+        Mac 版「上门体育」里「配置与更新」面板的更新一组。由已装的 Mac 版 App 自己的可执行文件执行：发行记录在 iCloud Drive 的
+        私有更新目录里，目录的访问授权只在 App 手里（第一次要真人在面板里用系统文件选择器选一次目录，命令替不了）。
+        读（不写任何文件或状态）:
+          update check               检查更新：当前版本、此渠道最新版本、有没有新版、怎么升级
+          update install --dry-run   只看会做什么
+        写:
+          update install --yes       升级到新版：与面板「打开发行包」同一条路做到打开之前——核对发行包身份、大小与 SHA256，给出它的位置。
+                                     沙盒里的 App 换不了自己，所以有新版时以 manual_install 结束（退出 1，package 是核对过的发行包）；
+                                     不弹窗、不替换 App。没有新版时退出 0，installed 为 false
+        --json：成功 {"ok": true, "command": "update check", …}；失败 {"ok": false, "command": …, "error": {"code", "message"}}。
+          update check   → current{version, build}, source{kind, channel, access}, latest{version, build, channel, package, sha256, size_bytes, installation},
+                           update_available, state（update_available | up_to_date | ahead_of_channel）, message, upgrade{in_app, button, how, download_url, command}, app_running
+          update install → installed, state, message, current, latest, source, app_running；--dry-run 给 dry_run, would_install{from, to}, installation, will_quit_app, will_relaunch；
+                           manual_install 时另有 package, package_verified
+        退出码与 error.code：
+          0  成功（update install 没有新版时也是 0）
+          1  check_incomplete（没读到发行记录，或还没授权更新目录）· manual_install（发行包已核对，要手动安装）·
+             upgrade_failed（发行包未通过核对，当前 App 未动）· app_missing · app_outdated · failed
+          2  usage · confirmation_required（update install 缺 --yes）
+        仅在窗口中：选择 iCloud Drive 更新目录（系统文件选择器授权，要真人选）；解开发行包并放进「应用程序」
+        """,
+        "app": """
+        用法：fitcoach app saved-login status [--json]
+              fitcoach app saved-login clear --yes [--all] [--json]
+              fitcoach app logout --yes [--json]
+        这台 Mac 上 Mac 版「上门体育」自己的登录：登录窗口「记住账号和密码」存进 App 钥匙串的那份，和 App 的登录态。
+        由已装的 Mac 版 App 自己的可执行文件执行（钥匙串条目和沙盒偏好只有它读得到）；不开窗口、不弹框。任何输出都不带密码。
+        与命令行自己的凭证是两份、互不读取：fitcoach login / logout 只管命令行凭证文件，动不了 App；这里的命令只管 App，动不了命令行凭证。
+        读:
+          app saved-login status         当前服务器有没有记住、各服务器记的是哪个账号（只有服务器与账号名）
+        写:
+          app saved-login clear --yes    清掉当前服务器记住的账号和密码（--all 清所有服务器）；登录态不动，下次登录窗口不再自动填
+          app logout --yes               退出 App 的教练登录（窗口里「退出」的同一件事）；服务器数据、学员链接、记住的账号密码都不动。
+                                         App 开着时窗口随即回到登录页
+        --json：成功 {"ok": true, "command": "app logout", …}；失败 {"ok": false, "command": …, "error": {"code", "message"}}。
+          app saved-login status → server, saved, entries[{server, email}], count, password_shown（恒为 false）, app_running
+          app saved-login clear  → cleared[], count, remaining, server, app_running, check_with
+          app logout             → logged_out, had_session, session_left, student_link_kept, app_running
+        退出码与 error.code：
+          0  成功（本来就没有记住 / 没有登录也是 0，未改动）
+          1  keychain_unavailable（读不到 App 钥匙串）· app_missing · app_outdated · failed
+          2  usage · confirmation_required（clear、logout 缺 --yes）
+        仅在窗口中：登录（要真人输密码或验证码；勾选「记住账号和密码」后由登录窗口存入）
+        """,
         "phone": """
         用法：fitcoach phone <子命令> [参数] [--json]
           hints / account              公共短信提示 / 当前账号安全状态

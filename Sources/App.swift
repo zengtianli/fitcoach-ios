@@ -3,7 +3,18 @@ import SwiftUI
 import UIKit
 #endif
 
+/// 进程入口。Mac 版的可执行文件同时是 `fitcoach` 转调的命令入口（config / update / app，见 AppCommand）：
+/// 认出命令就在这里做完退出，不建任何窗口；其余照常进界面。
 @main
+enum FitCoachMain {
+    @MainActor static func main() {
+        #if os(macOS)
+        if let code = AppCommand.run(Array(CommandLine.arguments.dropFirst())) { exit(code) }
+        #endif
+        FitCoachApp.main()
+    }
+}
+
 struct FitCoachApp: App {
     #if os(macOS)
     // 平台验收车道的静默启动（-lane_quiet）；不传参数时什么都不做（Shared/LaneSignal.swift）
@@ -33,6 +44,18 @@ struct FitCoachApp: App {
                     session.baseURL = base
                     session.showingLogin = true
                 }
+                #if os(macOS)
+                // 窗口开着时跟上 `fitcoach` 命令做的事（AppCommand）：导入或同步改了配置、退出登录。
+                // 验证车道与演示启动不跟（它们不碰正式配置）。
+                .task {
+                    guard !ProcessInfo.processInfo.arguments.contains(where: { $0.hasPrefix("-lane_") || $0.hasPrefix("-fitcoach.") }) else { return }
+                    AppLifecycleCLI.follow(MobileProductLifecycle.configuration)
+                }
+                .onChange(of: session.baseURL) { _, base in MobileProductLifecycle.appliedBase = base }
+                .onReceive(DistributedNotificationCenter.default().publisher(for: AppCommand.followName)) { note in
+                    if note.object as? String == "logout", session.coachCookie != nil { session.signOut() }
+                }
+                #endif
                 .environmentObject(session)
                 .tint(.accentColor)   // 主题色 SSOT=products.yaml theme → AccentColor.colorset（theme_sync.py 派生）
                 #if !os(visionOS)

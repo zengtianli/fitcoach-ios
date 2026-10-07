@@ -28,6 +28,11 @@ targets:
       - path: Shared/AppLifecycle.swift
       - path: Shared/AppConfiguration.swift
       - path: Shared/AppLifecycleMobile.swift
+      # Mac 版可执行文件里的命令入口（Sources/AppCommand.swift，`fitcoach config|update|app` 转调到它）用的共用命令层；
+      # 两个文件整体包在 #if os(macOS) 里，iPhone / iPad / Vision 编出来是空的。AppLifecycleUI 只为它带的安装器类型而编，
+      # 不调 install，不加菜单。
+      - path: Shared/AppLifecycleUI.swift
+      - path: Shared/AppLifecycleCLI.swift
       # 后台下发的词表与说明文字（热更新）的接收端；总部副本，Models.swift 的 Vocab 与 API.swift 用它
       - path: Shared/RemoteUI.swift
       - path: Sources
