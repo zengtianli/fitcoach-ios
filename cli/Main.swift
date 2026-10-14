@@ -326,12 +326,15 @@ enum Help {
         "update": """
         用法：fitcoach update check [--json]
               fitcoach update install --yes [--dry-run] [--json]
+              fitcoach update options [--auto-check on|off] [--interval 1..720] [--yes] [--json]
         Mac 版「上门体育」里「配置与更新」面板的更新一组。由已装的 Mac 版 App 自己的可执行文件执行：发行记录在 iCloud Drive 的
         私有更新目录里，目录的访问授权只在 App 手里（第一次要真人在面板里用系统文件选择器选一次目录，命令替不了）。
         读（不写任何文件或状态）:
           update check               检查更新：当前版本、此渠道最新版本、有没有新版、怎么升级
           update install --dry-run   只看会做什么
+          update options             读回自动检查开关和检查间隔
         写:
+          update options --auto-check on|off --interval 1..720 --yes  保存与设置面板共用的更新选项
           update install --yes       升级到新版：与面板「打开发行包」同一条路做到打开之前——核对发行包身份、大小与 SHA256，给出它的位置。
                                      沙盒里的 App 换不了自己，所以有新版时以 manual_install 结束（退出 1，package 是核对过的发行包）；
                                      不弹窗、不替换 App。没有新版时退出 0，installed 为 false
@@ -349,12 +352,14 @@ enum Help {
         """,
         "app": """
         用法：fitcoach app saved-login status [--json]
+              fitcoach app shortcuts status [--json]
               fitcoach app saved-login clear --yes [--all] [--json]
               fitcoach app logout --yes [--json]
         这台 Mac 上 Mac 版「上门体育」自己的登录：登录窗口「记住账号和密码」存进 App 钥匙串的那份，和 App 的登录态。
         由已装的 Mac 版 App 自己的可执行文件执行（钥匙串条目和沙盒偏好只有它读得到）；不开窗口、不弹框。任何输出都不带密码。
         与命令行自己的凭证是两份、互不读取：fitcoach login / logout 只管命令行凭证文件，动不了 App；这里的命令只管 App，动不了命令行凭证。
         读:
+          app shortcuts status           应用刷新快捷键的开关、按键、作用域与说明
           app saved-login status         当前服务器有没有记住、各服务器记的是哪个账号（只有服务器与账号名）
         写:
           app saved-login clear --yes    清掉当前服务器记住的账号和密码（--all 清所有服务器）；登录态不动，下次登录窗口不再自动填

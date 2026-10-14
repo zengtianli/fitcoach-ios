@@ -201,6 +201,7 @@ sop:
     - name: 手表快照的更新时间与过期提示
       device: 快照由 iPhone 生成后递给手表，存在手表本机钥匙串里，不跨设备也不上报；它的生成时间和是否过期只在那块手表上，命令与后端读不到
   accept:
+    product_basics: /Users/tianli/Dev/.venv/bin/python scripts/accept/product_basics.py
     functionality: bash scripts/accept/functionality.sh
     recovery: bash scripts/accept/recovery.sh
     privacy: bash scripts/accept/privacy.sh
@@ -212,6 +213,31 @@ sop:
     launch_mac: bash scripts/accept/launch.sh mac
     launch_watch: bash scripts/accept/launch.sh watch
     launch_vision: bash scripts/accept/launch.sh vision
+  product_basics:
+    schema_version: 1
+    features:
+      settings:
+        entry: Mac 菜单「配置与更新…」与 ⌘,；iOS 登录页底部或更多→配置与更新
+        readback: fitcoach config status --json
+      shortcuts:
+        entry: Mac 配置与更新→应用快捷键；默认⌘R刷新日程和学员；iOS触屏不注册全局按键
+        readback: fitcoach app shortcuts status --json
+      icloud:
+        entry: 配置与更新→使用 iCloud 记住配置；默认关闭，仅白名单配置
+        readback: fitcoach config status --json
+      updates:
+        entry: 配置与更新→检查更新；Mac 私有目录只读校验，iOS 前往本 App Store 页面
+        readback: fitcoach update check --json；fitcoach update options --json
+    inputs:
+    - scripts/accept/product_basics.py
+    - scripts/build_product_basics.py
+    - Sources/ProductSettings.swift
+    - Sources/ProductBasicsSelfTest.swift
+    - Sources/MobileProductLifecycle.swift
+    - Sources/AppCommand.swift
+    - Sources/App.swift
+    - Shared/App*.swift
+    - project.yml
   ui:
   - Sources/**
   - Shared/**
@@ -263,7 +289,7 @@ sop:
     mac:
       input_normalization: {proof: perf/input-normalizations/finder-mac.json, sha256: 932492222d1da66ecb8d462061bdffb66e21c6275d1e634a8d312e10e540437e}
       source_mode: replace
-      source: [Sources/**, Shared/PlatformCompat.swift, Shared/LaneSignal.swift, Shared/AppLifecycle.swift, Shared/AppConfiguration.swift, Shared/AppLifecycleMobile.swift, Resources/Assets.xcassets/**, project.yml, Mac.entitlements, cli/*.swift]
+      source: [Sources/**, Shared/**, Resources/Assets.xcassets/**, project.yml, Mac.entitlements, cli/*.swift]
       # 不登记商店截图：Mac 不发行、不上推广页；静默线的进程内离屏渲染画不出侧栏选中材质（选中行成黑块），
       # 上屏窗口截图又不许自动化做（不上屏、不进 Dock）。Mac 上架前由本人决定怎么截。
       distribution: none
@@ -280,7 +306,7 @@ sop:
     vision:
       input_normalization: {proof: perf/input-normalizations/finder-vision.json, sha256: 12258be953aab1689d90c89b47605b9552a4225ec06bc39506097f8440e2af00}
       source_mode: replace
-      source: [Sources/**, Shared/PlatformCompat.swift, Shared/LaneSignal.swift, Shared/AppLifecycle.swift, Shared/AppConfiguration.swift, Shared/AppLifecycleMobile.swift, Resources/Assets.xcassets/**, project.yml]
+      source: [Sources/**, Shared/**, Resources/Assets.xcassets/**, project.yml]
       simulator: {device_type: Apple-Vision-Pro-4K}
       store_shots: shots/appstore/vision/*.png
       budget: {memory_mb: 60, cpu: 0.5}

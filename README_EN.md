@@ -126,7 +126,9 @@ Sizes are read back for this exact distribution build. The physical device is no
 
 New builds include a “Configuration and Updates” button below the main interface. The installed version and build come from the app bundle.
 
-Settings sync is optional and off by default. It transfers only the service address. Settings can be exported as JSON and imported from Files. Restoring an address clears this device's old server credentials and requires a new login. Roles and session tokens are excluded.
+Settings sync is optional and off by default. It transfers the service address, Mac application shortcut and update options. Settings can be exported as JSON and imported from Files. Service addresses must use HTTPS without embedded credentials; invalid input preserves the current settings. Changing servers clears this device's old server credentials and requires a new login. Roles and session tokens are excluded.
+
+On Mac, open Configuration and Updates from the application menu or ⌘,. The default application shortcut, ⌘R, refreshes schedules and students; settings can disable, restore or change it. Reserved editing keys and menu conflicts are rejected. Automatic checks at launch are optional and off by default. iOS uses touch controls and the App Store update path.
 
 The iPhone and iPad update check reads the App Store release and opens this app's system store page. Network failures remain visible. App-version checking is separate from refreshing study materials or backend data.
 

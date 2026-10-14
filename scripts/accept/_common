@@ -31,8 +31,9 @@ accept_compile() {
 
 accept_start_backend() {
   local backend="${FITCOACH_TEST_BACKEND:-$(cd ../../service && pwd)}"
-  [ -x "$backend/.venv/bin/python" ] || { echo 'FAIL: local test backend or venv missing' >&2; return 1; }
-  "$backend/.venv/bin/python" - "$backend" "$ACCEPT_TMP" >"$ACCEPT_TMP/server.log" 2>&1 <<'PY' &
+  local test_python="${FITCOACH_TEST_PYTHON:-$backend/.venv/bin/python}"
+  [ -x "$test_python" ] || { echo 'FAIL: local test backend or venv missing; set FITCOACH_TEST_PYTHON' >&2; return 1; }
+  "$test_python" - "$backend" "$ACCEPT_TMP" >"$ACCEPT_TMP/server.log" 2>&1 <<'PY' &
 import os, secrets, socket, sys
 from pathlib import Path
 backend, scratch = sys.argv[1:]

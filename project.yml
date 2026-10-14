@@ -33,6 +33,7 @@ targets:
       # 不调 install，不加菜单。
       - path: Shared/AppLifecycleUI.swift
       - path: Shared/AppLifecycleCLI.swift
+      - path: Shared/AppShortcuts.swift
       # 后台下发的词表与说明文字（热更新）的接收端；总部副本，Models.swift 的 Vocab 与 API.swift 用它
       - path: Shared/RemoteUI.swift
       - path: Sources

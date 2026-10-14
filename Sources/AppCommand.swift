@@ -28,6 +28,14 @@ enum AppCommand {
     static func run(_ arguments: [String]) -> Int32? {
         guard let verb = arguments.first, verbs.contains(verb) else { return nil }
         if verb == "config" { return config(arguments) }
+        if verb == "update", arguments.dropFirst().first == "options" {
+            if arguments.contains(where: { ["--auto-download", "--auto-install", "--channel", "--skip", "--remind"].contains($0) }) {
+                let message = "此沙盒版只支持自动检查和检查间隔；安装由用户从已核对的发行包完成。"
+                emit(["ok": false, "command": "update options", "error": ["code": "usage", "message": message]], text: message, json: arguments.contains("--json"))
+                return 2
+            }
+            return AppLifecycleCLI.run(arguments, product: product)
+        }
         let json = arguments.contains("--json")
         let name = arguments.prefix(3).filter { !$0.hasPrefix("-") }.joined(separator: " ")
         do {
@@ -37,6 +45,10 @@ enum AppCommand {
             case ("update", ["check"]): out = try updateCheck()
             case ("update", ["install"]): out = try updateInstall(parsed)
             case ("app", ["protocol"]): out = (["protocol": relayMarker], relayMarker)
+            case ("app", ["shortcuts", "status"]):
+                let shortcuts = AppShortcuts(action: {})
+                out = (["enabled": shortcuts.enabled, "key": shortcuts.binding.key, "modifiers": shortcuts.binding.modifiers.rawValue,
+                        "scope": "application", "description": shortcuts.descriptionText], shortcuts.descriptionText)
             case ("app", ["saved-login", "status"]): out = try savedLoginStatus()
             case ("app", ["saved-login", "clear"]): out = try savedLoginClear(parsed)
             case ("app", ["logout"]): out = try logout(parsed)
@@ -62,7 +74,7 @@ enum AppCommand {
     }
 
     static let syntax = "用法：\(command) config status | export -o <file> | import <file> --yes | sync on|off --yes；"
-        + "\(command) update check | install --yes [--dry-run]；\(command) app saved-login status | clear --yes [--all]；"
+        + "\(command) update check | install --yes [--dry-run] | options；\(command) app shortcuts status；\(command) app saved-login status | clear --yes [--all]；"
         + "\(command) app logout --yes（都可加 --json）"
 
     // MARK: config

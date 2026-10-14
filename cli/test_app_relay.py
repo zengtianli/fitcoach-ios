@@ -152,9 +152,10 @@ with tempfile.TemporaryDirectory(prefix="fitcoach-relay-") as scratch:
     check("defaults.fitcoach.baseURL" in d.get("keys", []), "config status 的 keys 有 defaults.fitcoach.baseURL", str(d))
     insecure = tmp / "insecure.json"
     insecure.write_text(json.dumps({**moved, "values": {"defaults.fitcoach.baseURL": "http://plain.example.org"}}))
-    run("config", "import", str(insecure), "--yes", "--json", label="导入非 https 的服务器地址 → 退出 0")
+    _, invalid = run("config", "import", str(insecure), "--yes", "--json", expect=1, label="导入非 https 的服务器地址 → 拒绝并保留原配置")
+    check(code(invalid) == "import_rejected", "非法服务器地址在写入前被拒绝", str(invalid))
     p, _ = run("config", "export", "-o", "-", want_json=False, label="读回 → 退出 0")
-    check(json.loads(p.stdout).get("values", {}).get("defaults.fitcoach.baseURL") == "https://fit.tianli.cyou", "非 https 的地址不被采用，回到默认服务器", p.stdout)
+    check(json.loads(p.stdout).get("values", {}).get("defaults.fitcoach.baseURL") == "https://fit.example.org", "非 https 的地址不被采用，保留原服务器", p.stdout)
     run("config", "import", str(incoming), "--yes", "--json", label="再导入一次合法地址 → 退出 0")
 
     _, d = run("config", "sync", "on", "--json", expect=2)
@@ -172,6 +173,15 @@ with tempfile.TemporaryDirectory(prefix="fitcoach-relay-") as scratch:
     check(json.loads(p.stdout).get("values", {}).get("defaults.fitcoach.baseURL") == "https://fit.example.org", "拨开关没有动服务器地址", p.stdout)
     _, d = run("config", "status", "--no-such", "--json", expect=2)
     check(code(d) == "usage", "未知参数 → usage", str(d))
+
+    _, shortcut = run("app", "shortcuts", "status", "--json")
+    check(shortcut.get("enabled") is True and shortcut.get("key") == "r" and shortcut.get("scope") == "application", "真实 App 读回默认应用快捷键", str(shortcut))
+    _, options = run("update", "options", "--auto-check", "on", "--interval", "48", "--yes", "--json")
+    check(options.get("options", {}).get("automaticCheck") is True, "更新自动检查选项保存", str(options))
+    _, options = run("update", "options", "--json")
+    check(options.get("options", {}).get("intervalHours") == 48 and options.get("options", {}).get("automaticCheck") is True, "新进程读回更新选项", str(options))
+    _, rejected = run("update", "options", "--auto-install", "on", "--yes", "--json", expect=2)
+    check(code(rejected) == "usage", "沙盒版拒绝不可执行的自动安装选项", str(rejected))
 
     print("update（面板同一条读取与校验）")
     _, d = run("update", "check", "--json", expect=1)

@@ -31,7 +31,7 @@ EOF
   xcrun swiftc -Onone -swift-version 5 -parse-as-library -D APP_LIFECYCLE_KVS -module-name FitCoach \
     -target "$(uname -m)-apple-macos15.0" -suppress-warnings \
     Shared/PlatformCompat.swift Shared/LaneSignal.swift Shared/AppLifecycle.swift Shared/AppConfiguration.swift \
-    Shared/AppLifecycleMobile.swift Shared/AppLifecycleUI.swift Shared/AppLifecycleCLI.swift Shared/RemoteUI.swift \
+    Shared/AppLifecycleMobile.swift Shared/AppLifecycleUI.swift Shared/AppLifecycleCLI.swift Shared/AppShortcuts.swift Shared/RemoteUI.swift \
     Sources/*.swift -o "$APP/Contents/MacOS/FitCoach"
 fi
 [ -x "$APP/Contents/MacOS/FitCoach" ] || { echo "FAIL: 没有 $APP/Contents/MacOS/FitCoach（去掉 --no-build 先编）" >&2; exit 1; }

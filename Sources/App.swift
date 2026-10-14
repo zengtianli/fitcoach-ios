@@ -8,6 +8,10 @@ import UIKit
 @main
 enum FitCoachMain {
     @MainActor static func main() {
+        if ProductBasicsSelfTest.requested {
+            ProductBasicsSelfTest.launch()
+            return
+        }
         #if os(macOS)
         if let code = AppCommand.run(Array(CommandLine.arguments.dropFirst())) { exit(code) }
         #endif
@@ -32,7 +36,7 @@ struct FitCoachApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
-                .appLifecycleMobile(productID: "fitcoach-ios", channel: MobileProductLifecycle.channel,
+                .fitcoachSettings(channel: MobileProductLifecycle.channel,
                                     configuration: MobileProductLifecycle.configuration,
                                     placement: session.isCoach && !session.showingLogin ? .settings : .footer)
                 .onReceive(NotificationCenter.default.publisher(for: Notification.Name("FitCoachPortableConfigurationApplied"))) { note in
@@ -51,11 +55,11 @@ struct FitCoachApp: App {
                     guard !ProcessInfo.processInfo.arguments.contains(where: { $0.hasPrefix("-lane_") || $0.hasPrefix("-fitcoach.") }) else { return }
                     AppLifecycleCLI.follow(MobileProductLifecycle.configuration)
                 }
-                .onChange(of: session.baseURL) { _, base in MobileProductLifecycle.appliedBase = base }
                 .onReceive(DistributedNotificationCenter.default().publisher(for: AppCommand.followName)) { note in
                     if note.object as? String == "logout", session.coachCookie != nil { session.signOut() }
                 }
                 #endif
+                .onChange(of: session.baseURL) { _, base in MobileProductLifecycle.appliedBase = base }
                 .environmentObject(session)
                 .tint(.accentColor)   // 主题色 SSOT=products.yaml theme → AccentColor.colorset（theme_sync.py 派生）
                 #if !os(visionOS)
@@ -65,6 +69,7 @@ struct FitCoachApp: App {
         #if os(macOS)
         // Mac 默认窗口太窄，摆不下侧栏 + 日程看板
         .defaultSize(width: 1180, height: 780)
+        .commands { FitCoachSettingsCommands() }
         #elseif os(visionOS)
         // Vision Pro 的默认窗口偏扁，字号也比 Mac 大一圈：给侧栏 + 日程 + 课时余额三列留够宽度
         .defaultSize(width: 1360, height: 860)
@@ -236,7 +241,7 @@ struct MoreView: View {
             CardBox { PrivacySupportLinks() }.cardRow()
 
             GroupTitle(text: "应用", icon: "gearshape").cardRow(top: 14, bottom: 2)
-            CardBox { AppLifecycleMobileEntry() }.cardRow()
+            CardBox { FitCoachSettingsEntry() }.cardRow()
 
             GroupTitle(text: "服务器", icon: "server.rack").cardRow(top: 14, bottom: 2)
             CardBox {

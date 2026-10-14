@@ -3,8 +3,10 @@
 # 默认自己起一台干净的本地 fitcoach（临时 DB，跑完删），所以可重复、不脏任何库。
 # 打线上/别处：FC_BASE=https://… FC_EMAIL=… FC_PASS=… ./ref/run
 set -euo pipefail
+export PYTHONDONTWRITEBYTECODE=1
 cd "$(dirname "$0")/.."
 BACKEND="${FITCOACH_TEST_BACKEND:-$(cd ../../service && pwd)}"
+TEST_PY="${FITCOACH_TEST_PYTHON:-$BACKEND/.venv/bin/python}"
 TMP=$(mktemp -d)
 cleanup() {
   if [ -n "${PID:-}" ]; then kill "$PID" 2>/dev/null || true; wait "$PID" 2>/dev/null || true; fi
@@ -26,7 +28,7 @@ if [ -n "${FC_BASE:-}" ]; then
 fi
 
 [ -d "$BACKEND" ] || { echo "❌ 找不到后端 $BACKEND —— 无法起本地实例；要打别处请给 FC_BASE" >&2; exit 1; }
-PORT=${FC_PORT:-$("$BACKEND/.venv/bin/python" -c 'import socket;s=socket.socket();s.bind(("127.0.0.1",0));print(s.getsockname()[1]);s.close()')}
+PORT=${FC_PORT:-$("$TEST_PY" -c 'import socket;s=socket.socket();s.bind(("127.0.0.1",0));print(s.getsockname()[1]);s.close()')}
 # fail-closed：端口已被占用就停手。
 # 2026-08-27 实测：上一轮遗留的 uvicorn 还占着 8799，新实例起不来，healthz 打到
 # **旧那台**上，于是 harness 对着一个陈旧的库全绿。哑掉的守卫和它要防的 bug 同类。
@@ -41,8 +43,8 @@ echo "[ref] 起临时后端 :$PORT （库 $TMP/t.db）"
 # 后台覆盖项（ui 段）的验收要改后端的 ui.json：给临时后端一份自己的副本，仓库里那份不动。
 cp "$BACKEND/ui.json" "$TMP/ui.json"
 ( cd "$BACKEND" && export FITCOACH_DB="$TMP/t.db" FITCOACH_COACH_AUTH=multi FITCOACH_UI_FILE="$TMP/ui.json" \
-    TLZ_GATE_SECRET="$("$BACKEND/.venv/bin/python" -c 'import secrets;print(secrets.token_hex(32))')"; \
-    exec "$BACKEND/.venv/bin/python" -m uvicorn api:app --host 127.0.0.1 --port "$PORT" ) > "$TMP/srv.log" 2>&1 &
+    TLZ_GATE_SECRET="$("$TEST_PY" -c 'import secrets;print(secrets.token_hex(32))')"; \
+    exec "$TEST_PY" -m uvicorn api:app --host 127.0.0.1 --port "$PORT" ) > "$TMP/srv.log" 2>&1 &
 PID=$!
 for _ in $(seq 1 40); do
   curl -sf "http://127.0.0.1:$PORT/healthz" >/dev/null && break
@@ -55,8 +57,8 @@ curl -sf -X POST "http://127.0.0.1:$PORT/register" \
   -d "email=t@e.com&password=Passw0rd!234&display_name=T" -o /dev/null || true
 
 # 假后端：只回「ui 段类型全错」和「不带 ui 键」两种形状，验客户端的容错（ref/stub_broken_ui.py）
-STUB_PORT=$("$BACKEND/.venv/bin/python" -c 'import socket;s=socket.socket();s.bind(("127.0.0.1",0));print(s.getsockname()[1]);s.close()')
-"$BACKEND/.venv/bin/python" ref/stub_broken_ui.py "$STUB_PORT" > "$TMP/stub.log" 2>&1 &
+STUB_PORT=$("$TEST_PY" -c 'import socket;s=socket.socket();s.bind(("127.0.0.1",0));print(s.getsockname()[1]);s.close()')
+"$TEST_PY" ref/stub_broken_ui.py "$STUB_PORT" > "$TMP/stub.log" 2>&1 &
 STUB_PID=$!
 for _ in $(seq 1 20); do
   curl -sf "http://127.0.0.1:$STUB_PORT/coach/api/ping" >/dev/null && break
