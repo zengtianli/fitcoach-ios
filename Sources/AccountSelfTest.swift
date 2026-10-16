@@ -131,6 +131,9 @@ extension EnvironmentValues {
             let key = bind.state?()["key"] ?? ""
             try check("phone_binding.recovery_key_gate", !key.isEmpty && session.coachCookie == cookie)
             await bind.action?("continue")
+            try check("phone_binding.unsaved_key_blocks_continue", session.coachCookie == cookie)
+            bind.fill?(["saved": "true"])
+            await bind.action?("continue")
             try check("phone_binding.rotated_cookie", session.coachCookie != cookie && bind.state?()["phone_hint"]?.hasSuffix("8000") == true)
             let swap = try await mount(PhoneSecurityView(), session, name: "phone-change")
             await swap.action?("load"); swap.fill?(["password": originalPW])

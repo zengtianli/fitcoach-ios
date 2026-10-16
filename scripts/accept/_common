@@ -25,8 +25,21 @@ accept_compile() {
   source "$HOME/Dev/tools/dev/lib/tools/macapp/xcode_env.sh"
   xcode_env_use macosx
   ACCEPT_BIN="$ACCEPT_TMP/accept-$(uuidgen)"
+  # The shared contract harness exercises iPhone -> Watch snapshots too. Keep
+  # this dependency in the common compiler so a clean checkout is sufficient;
+  # callers that already list the same file must not compile it twice.
+  local sources=(Sources/Models.swift Sources/TimeKit.swift Sources/API.swift Shared/RemoteUI.swift
+                 Sources/WatchSnapshot.swift Sources/WatchLink.swift)
+  local file existing found
+  for file in "$@"; do
+    found=0
+    for existing in "${sources[@]}"; do
+      [ "$file" != "$existing" ] || found=1
+    done
+    [ "$found" = 1 ] || sources+=("$file")
+  done
   xcrun swiftc -O -swift-version 5 -parse-as-library \
-    Sources/Models.swift Sources/TimeKit.swift Sources/API.swift Shared/RemoteUI.swift "$@" -o "$ACCEPT_BIN"
+    "${sources[@]}" -o "$ACCEPT_BIN"
 }
 
 accept_start_backend() {

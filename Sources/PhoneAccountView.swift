@@ -298,6 +298,7 @@ struct PhoneSecurityView: View {
                 if let v = values["identityCode"] { identity.code = v; identity.grant = nil }
                 if let v = values["password"] { password = v }
                 if let v = values["newPassword"] { newPassword = v; repeated = v }
+                if let v = values["saved"] { saved = v == "true" }
             }, action: { action in
                 switch action {
                 case "load": await load()
@@ -307,7 +308,7 @@ struct PhoneSecurityView: View {
                 case "sendIdentity": await identity.send(API(session), purpose: "identity")
                 case "confirmIdentity": await confirmIdentity()
                 case "submit": await bind()
-                case "continue": await finishBinding()
+                case "continue": if saved { await finishBinding() }
                 case "setPassword": await setPassword()
                 default: break
                 }
