@@ -32,6 +32,9 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from test_runtime import backend_python
+
 SERVICE = Path(os.environ.get("FITCOACH_TEST_BACKEND") or Path(__file__).resolve().parents[4] / "service")
 NO_FIXTURE = 78
 EMAIL = "demo@example.com"      # seed.py 建的未认领演示账号
@@ -115,9 +118,13 @@ def post_form(url: str, fields: dict) -> dict:
 
 
 def start(work: Path) -> dict:
-    py = SERVICE / ".venv/bin/python"
-    if not (SERVICE / "seed.py").is_file() or not py.exists():
-        print(f"后端源码或 venv 不在 {SERVICE}", file=sys.stderr)
+    if not (SERVICE / "seed.py").is_file():
+        print(f"后端源码不在 {SERVICE}", file=sys.stderr)
+        sys.exit(NO_FIXTURE)
+    try:
+        py = backend_python(SERVICE)
+    except RuntimeError as error:
+        print(str(error), file=sys.stderr)
         sys.exit(NO_FIXTURE)
     stop(work)
     work.mkdir(parents=True, exist_ok=True)

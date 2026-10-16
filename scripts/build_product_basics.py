@@ -13,11 +13,12 @@ import sim_lane
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--platform', choices=('mac', 'iphone'), required=True)
+    parser.add_argument('--work-dir', type=Path, help='existing shared lane DerivedData, outside this repository')
     args = parser.parse_args()
     target = ROOT / 'build/accept' / (args.platform + '-build-receipt.json')
     target.parent.mkdir(parents=True, exist_ok=True)
     previous = json.loads(target.read_text()) if target.is_file() else {}
-    work = Path(previous['work_dir']) if previous.get('work_dir') else None
+    work = args.work_dir or (Path(previous['work_dir']) if previous.get('work_dir') else None)
     result = sim_lane.build(ROOT, 'FitCoach', args.platform, work_dir=work)
     # Xcode Debug can put all Swift code in *.debug.dylib while the main executable is a stable stub.
     # Bind the entire real bundle, not just that stub's SHA from the generic lane receipt.

@@ -201,6 +201,9 @@ sop:
     - name: 手表快照的更新时间与过期提示
       device: 快照由 iPhone 生成后递给手表，存在手表本机钥匙串里，不跨设备也不上报；它的生成时间和是否过期只在那块手表上，命令与后端读不到
   accept:
+    media_playback: /Users/tianli/Dev/.venv/bin/python scripts/accept/media_playback.py
+    native_ui: /Users/tianli/Dev/.venv/bin/python scripts/accept/native_ui.py
+    account_lifecycle: /Users/tianli/Dev/.venv/bin/python scripts/accept/account_lifecycle.py
     product_basics: /Users/tianli/Dev/.venv/bin/python scripts/accept/product_basics.py
     functionality: bash scripts/accept/functionality.sh
     recovery: bash scripts/accept/recovery.sh
@@ -263,13 +266,22 @@ sop:
   - test-contract.py
   - test_check_markdown_drift.py
   - scripts/tests/**
+  - scripts/test_runtime.py
   - scripts/accept/**
   - scripts/demo/**
   - cli/test.sh
   - cli/test_cli.py
   - Package.swift
   media:
-  - shots
+  # 全部图像/视频纳入；QA 数据库和进程日志不是媒体，后台写入不应作废播放证据。
+  - shots/**/*.png
+  - shots/**/*.jpg
+  - shots/**/*.jpeg
+  - shots/**/*.webp
+  - shots/**/*.mp4
+  - shots/**/*.mov
+  - shots/**/*.webm
+  - shots/**/*.m4v
   release: perf/asc-release.json
   # 一个 App 五条平台线（用户 2026-10-02：同名、同图标、同数据；「我都有，但你用模拟器好了」）。
   # 模拟器验收、证据标 environment=simulator；Mac 线是本组件自己的 macOS 目的地（本机原生、静默）。手表 / Vision / Mac
@@ -290,8 +302,8 @@ sop:
       input_normalization: {proof: perf/input-normalizations/finder-mac.json, sha256: 932492222d1da66ecb8d462061bdffb66e21c6275d1e634a8d312e10e540437e}
       source_mode: replace
       source: [Sources/**, Shared/**, Resources/Assets.xcassets/**, project.yml, Mac.entitlements, cli/*.swift]
-      # 不登记商店截图：Mac 不发行、不上推广页；静默线的进程内离屏渲染画不出侧栏选中材质（选中行成黑块），
-      # 上屏窗口截图又不许自动化做（不上屏、不进 Dock）。Mac 上架前由本人决定怎么截。
+      # 固定 launch_mac 通过后取真实日程/余额内容（原片与裁切坐标保留），补边到商店规格；不送审。
+      store_shots: shots/appstore/mac/*.png
       distribution: none
     watch:
       input_normalization: {proof: perf/input-normalizations/finder-watch.json, sha256: bb2ea22b27ca985664b813490ae7e10c80dd04afbe014c93b83d6e6bc4e81f0b}

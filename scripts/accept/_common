@@ -26,12 +26,13 @@ accept_compile() {
   xcode_env_use macosx
   ACCEPT_BIN="$ACCEPT_TMP/accept-$(uuidgen)"
   xcrun swiftc -O -swift-version 5 -parse-as-library \
-    Sources/Models.swift Sources/TimeKit.swift Sources/API.swift "$@" -o "$ACCEPT_BIN"
+    Sources/Models.swift Sources/TimeKit.swift Sources/API.swift Shared/RemoteUI.swift "$@" -o "$ACCEPT_BIN"
 }
 
 accept_start_backend() {
   local backend="${FITCOACH_TEST_BACKEND:-$(cd ../../service && pwd)}"
-  local test_python="${FITCOACH_TEST_PYTHON:-$backend/.venv/bin/python}"
+  local test_python
+  test_python="$(python3 scripts/test_runtime.py)" || return $?
   [ -x "$test_python" ] || { echo 'FAIL: local test backend or venv missing; set FITCOACH_TEST_PYTHON' >&2; return 1; }
   "$test_python" - "$backend" "$ACCEPT_TMP" >"$ACCEPT_TMP/server.log" 2>&1 <<'PY' &
 import os, secrets, socket, sys

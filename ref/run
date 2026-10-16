@@ -6,7 +6,7 @@ set -euo pipefail
 export PYTHONDONTWRITEBYTECODE=1
 cd "$(dirname "$0")/.."
 BACKEND="${FITCOACH_TEST_BACKEND:-$(cd ../../service && pwd)}"
-TEST_PY="${FITCOACH_TEST_PYTHON:-$BACKEND/.venv/bin/python}"
+TEST_PY="$(python3 scripts/test_runtime.py)"
 TMP=$(mktemp -d)
 cleanup() {
   if [ -n "${PID:-}" ]; then kill "$PID" 2>/dev/null || true; wait "$PID" 2>/dev/null || true; fi

@@ -30,4 +30,9 @@ read -r url cookie < <(printf '%s' "$info" | "$py" -c 'import json,sys; d=json.l
 echo "演示后端 ${url}（演示教练，临时库）"
 
 "$py" "$SOP_PLATFORM_LAUNCH" --arg=-fitcoach.baseURL --arg="$url" --arg=-fitcoach.coachCookie --arg="$cookie"
-exit $?
+code=$?
+[ "$code" = 0 ] || exit "$code"
+if [ "$lane" = mac ]; then
+  "$py" scripts/media/mac_store_shot.py || exit $?
+fi
+exit 0
