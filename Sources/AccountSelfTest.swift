@@ -52,7 +52,7 @@ extension EnvironmentValues {
         NSApplication.shared.setActivationPolicy(.prohibited)
         NSApp.mainMenu = NSMenu()
         let hosting = NSHostingView(rootView: AccountTestRoot())
-        let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 600, height: 840), styleMask: [.titled], backing: .buffered, defer: false)
+        let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1180, height: 780), styleMask: [.titled], backing: .buffered, defer: false)
         w.isReleasedWhenClosed = false; w.contentView = hosting; window = w
         Task { await run(); exit(checks.values.allSatisfy { $0 } ? 0 : 1) }
         RunLoop.main.run()
@@ -92,7 +92,8 @@ extension EnvironmentValues {
             guard let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { throw URLError(.cannotDecodeContentData) }
             view.cacheDisplay(in: view.bounds, to: bitmap)
             try bitmap.representation(using: .png, properties: [:])!.write(to: root.appendingPathComponent(name + ".png"))
-            try check(name + ".offscreen", !w.isVisible && NSApp.activationPolicy() == .prohibited)
+            try check(name + ".offscreen", !w.isVisible && NSApp.activationPolicy() == .prohibited
+                      && bitmap.pixelsWide == 1180 && bitmap.pixelsHigh == 780)
         }
         #else
         if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene, let window = scene.windows.first {
@@ -208,7 +209,13 @@ extension EnvironmentValues {
 }
 private struct AccountTestRoot: View {
     @ObservedObject var presentation = AccountTestPresentation.shared
-    var body: some View { presentation.page.preferredColorScheme(.light).background(Color.white) }
+    var body: some View {
+        presentation.page.preferredColorScheme(.light)
+        #if os(macOS)
+            .frame(width: 1180, height: 780)
+        #endif
+            .background(Color.white)
+    }
 }
 #if os(iOS)
 private struct AccountTestApp: App {

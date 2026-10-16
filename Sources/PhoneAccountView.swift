@@ -291,6 +291,7 @@ struct PhoneSecurityView: View {
         .task { await load() }
         #if DEBUG
         .task {
+            if probe != nil { await load() }
             probe?.connect(fill: { values in
                 if let v = values["phone"] { phone.phone = v; phone.invalidate() }
                 if let v = values["code"] { phone.code = v; phone.grant = nil }
