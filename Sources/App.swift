@@ -8,7 +8,7 @@ import UIKit
 @main
 enum FitCoachMain {
     @MainActor static func main() {
-        #if DEBUG
+        #if DEBUG && (os(macOS) || os(iOS))
         if AccountSelfTest.requested { AccountSelfTest.launch(); return }
         #endif
         if ProductBasicsSelfTest.requested {

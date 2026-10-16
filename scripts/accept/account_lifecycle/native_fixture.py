@@ -102,10 +102,18 @@ def main():
                     frame = launched.pop('frame')
                     if frame: shutil.copyfile(frame.path, a.out / 'simulator.png')
                     (a.out / 'launch.json').write_text(json.dumps(launched, ensure_ascii=False, indent=2))
-                    container = sim_lane.run(['xcrun', 'simctl', 'get_app_container', device['udid'], identity, 'data']).stdout.strip()
-                    shutil.copytree(Path(container) / 'Documents/account-self-test', a.out, dirs_exist_ok=True)
-                    session.terminate(identity)
-                    sim_lane.run(['xcrun', 'simctl', 'uninstall', device['udid'], identity])
+                    try:
+                        if launched['ready_signal'] != 'os_log' or launched['errors'] or frame is None:
+                            raise RuntimeError('Native account suite did not complete with a rendered frame: ' +
+                                               json.dumps(launched['errors'], ensure_ascii=False))
+                        container = sim_lane.run(['xcrun', 'simctl', 'get_app_container', device['udid'], identity, 'data']).stdout.strip()
+                        source = Path(container) / 'Documents/account-self-test'
+                        if not (source / 'native.json').is_file():
+                            raise RuntimeError('Native account completion report missing; refusing a first-screen-only result')
+                        shutil.copytree(source, a.out, dirs_exist_ok=True)
+                    finally:
+                        session.terminate(identity)
+                        sim_lane.run(['xcrun', 'simctl', 'uninstall', device['udid'], identity])
             report = json.loads((a.out / 'native.json').read_text())
             report['binding'] = {'receipt': str(a.receipt), 'receipt_sha256': hashlib.sha256(a.receipt.read_bytes()).hexdigest(),
                                  'product_artifacts': built.get('product_artifacts'), 'source': built['reuse'], 'platform': a.platform,
@@ -117,6 +125,11 @@ def main():
             (a.out / 'native.json').write_text(json.dumps({'checks': {}, 'status': 'deferred', 'error': str(exc),
                 'sms_transport': 'fake', 'real_sms_sent': 0}, ensure_ascii=False, indent=2) + '\n')
             return 75
+        except (RuntimeError, OSError, subprocess.SubprocessError) as exc:
+            # Keep a structured failure even when the app never produces its report.
+            (a.out / 'native.json').write_text(json.dumps({'checks': {}, 'status': 'failed', 'error': str(exc),
+                'sms_transport': 'fake', 'real_sms_sent': 0}, ensure_ascii=False, indent=2) + '\n')
+            return 1
         finally:
             server.should_exit = True; thread.join(timeout=10)
             gen.close(); mp.undo()

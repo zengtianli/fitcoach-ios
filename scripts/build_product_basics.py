@@ -29,4 +29,8 @@ def main():
     print(json.dumps({'receipt': str(target), 'app': result['app_path'], 'seconds': result['seconds']}, ensure_ascii=False), flush=True)
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except sim_lane.Busy as exc:
+        print(str(exc), file=sys.stderr)
+        raise SystemExit(75)

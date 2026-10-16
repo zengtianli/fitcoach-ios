@@ -54,7 +54,16 @@ struct LoginView: View {
             .sheet(isPresented: $showServer) { ServerSheet() }
             .sheet(isPresented: $showRegister, onDismiss: restore) { RegisterView() }
             .sheet(item: $phoneMode) { mode in PhoneAccountView(mode: mode) }
-            .task { restore(); LaneSignal.ready("login") }
+            .task {
+                restore()
+                #if DEBUG
+                // The account suite emits its completion signal after native.json is written.
+                // A mounted login page is only its first step, not the finished suite.
+                if probe == nil { LaneSignal.ready("login") }
+                #else
+                LaneSignal.ready("login")
+                #endif
+            }
             .onChange(of: session.baseURL) { _, _ in restore() }
             .onChange(of: mode) { _, _ in focused = nil; err = nil }
             #if DEBUG

@@ -15,7 +15,9 @@ import uuid
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from test_runtime import backend_python
-from product_basics import owner_snapshot
+from product_basics import current_build, owner_snapshot
+sys.path.insert(0, str(Path.home() / 'Dev/tools/dev/lib/tools/macapp/ios'))
+import sim_lane
 
 
 def main():
@@ -26,7 +28,13 @@ def main():
     service = Path(os.environ.get('FITCOACH_TEST_BACKEND') or ROOT.parents[1] / 'service').resolve()
     runtime = backend_python(service)
     # Original build entry; no installed binary, production preference or account changes.
-    subprocess.run(['bash', 'cli/build.sh'], cwd=ROOT, check=True)
+    try:
+        # Only the custom CLI compilation uses this slot; native builds own theirs.
+        with sim_lane.BuildSlot('fitcoach-ios:account-cli', wait=0):
+            subprocess.run(['bash', 'cli/build.sh'], cwd=ROOT, check=True)
+    except sim_lane.Busy as exc:
+        print('CLI candidate build deferred: ' + str(exc))
+        return 75
     cli = ROOT / 'build/cli/fitcoach'
     env = {**os.environ, 'PYTHONDONTWRITEBYTECODE': '1', 'FITCOACH_TEST_BACKEND': str(service),
            'FITCOACH_ACCOUNT_RAW': str(raw), 'FITCOACH_ACCOUNT_CLI': str(cli)}
@@ -37,12 +45,12 @@ def main():
     native = {}
     for platform in ('mac', 'iphone'):
         receipt = ROOT / f'build/accept/{platform}-build-receipt.json'
-        sys.path.insert(0, str(Path.home() / 'Dev/tools/dev/lib/tools/macapp/ios'))
-        import sim_lane
         try:
-            sim_lane.reuse_build(receipt, 'fitcoach-ios', ROOT, platform, 'FitCoach', 'Debug')
-        except sim_lane.LaneError:
-            subprocess.run([sys.executable, 'scripts/build_product_basics.py', '--platform', platform], cwd=ROOT, check=True)
+            current_build(platform, receipt, prepare=True)
+        except (sim_lane.Busy, sim_lane.LaneError, RuntimeError) as exc:
+            native[platform] = {'passed': False, 'exit_code': 75 if isinstance(exc, sim_lane.Busy) else 1,
+                                'checks': {}, 'error': str(exc)}
+            break
         target = raw / platform
         result = subprocess.run([str(runtime), 'scripts/accept/account_lifecycle/native_fixture.py',
             '--platform', platform, '--receipt', str(receipt), '--out', str(target)], cwd=ROOT, env=env)

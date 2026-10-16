@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Real product executable + headless iPhone simulator. Default target is the installed Mac app.
+"""Real current-source candidate + headless iPhone simulator; never installs the Mac app.
 
-Candidate: --app PATH --receipt PATH, or FITCOACH_BASICS_APP/FITCOACH_BASICS_RECEIPT.
+Explicit target: --app PATH --receipt PATH, or FITCOACH_BASICS_APP/FITCOACH_BASICS_RECEIPT.
 Receipt is the original shared sim_lane build receipt, not a claim that a candidate is installed.
 """
 import argparse
@@ -27,6 +27,26 @@ def sha(path):
 def bundle_files(app):
     return {str(path.relative_to(app)): sha(path) for path in sorted(app.rglob('*')) if path.is_file()}
 
+def current_build(platform, receipt, *, prepare=False):
+    def read():
+        built = sim_lane.reuse_build(receipt, 'fitcoach-ios', ROOT, platform, scheme='FitCoach')
+        artifacts = built.get('product_artifacts')
+        if not artifacts or artifacts != bundle_files(Path(built['app_path'])):
+            raise sim_lane.LaneError('Current bundle files differ from the full build receipt')
+        return built
+
+    try:
+        return read()
+    except sim_lane.LaneError:
+        if not prepare or receipt != ROOT / f'build/accept/{platform}-build-receipt.json':
+            raise
+    result = subprocess.run([sys.executable, 'scripts/build_product_basics.py', '--platform', platform], cwd=ROOT)
+    if result.returncode == 75:
+        raise sim_lane.Busy(f'{platform} candidate build deferred by the shared build slot')
+    if result.returncode:
+        raise RuntimeError(f'{platform} candidate build failed (exit {result.returncode})')
+    return read()
+
 def write(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
@@ -43,7 +63,7 @@ def owner_snapshot():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--app', type=Path, default=os.environ.get('FITCOACH_BASICS_APP', '/Applications/上门体育.app'))
+    parser.add_argument('--app', type=Path, default=os.environ.get('FITCOACH_BASICS_APP'))
     parser.add_argument('--receipt', type=Path, default=os.environ.get('FITCOACH_BASICS_RECEIPT', ROOT / 'build/accept/mac-build-receipt.json'))
     parser.add_argument('--ios-receipt', type=Path, default=ROOT / 'build/accept/iphone-build-receipt.json')
     args = parser.parse_args()
@@ -61,14 +81,14 @@ def main():
     suite = 'test.tianli.fitcoach.basics.' + uuid.uuid4().hex
     try:
         for platform, receipt in (('mac', args.receipt), ('iphone', args.ios_receipt)):
-            result = sim_lane.reuse_build(receipt, 'fitcoach-ios', ROOT, platform, scheme='FitCoach')
+            result = current_build(platform, receipt, prepare=args.app is None)
             artifacts = result.get('product_artifacts')
             assert artifacts and artifacts == bundle_files(Path(result['app_path'])), 'Current bundle files differ from the build receipt'
             binding[platform] = {'receipt': str(receipt.resolve()), 'receipt_sha256': sha(receipt),
                                  'app': result['app_path'], 'executable_sha256': result['executable_sha256'],
                                  'artifact_files': artifacts,
                                  'source': result['reuse'], 'signing': result['signing']}
-        app = args.app.resolve()
+        app = (args.app or Path(binding['mac']['app'])).resolve()
         info = plistlib.loads((app / 'Contents/Info.plist').read_bytes())
         executable = app / 'Contents/MacOS' / info['CFBundleExecutable']
         checks['settings.current_source_binary'] = bundle_files(app) == binding['mac']['artifact_files'] and info['CFBundleIdentifier'] == 'cyou.tianli.fitcoachapp'
