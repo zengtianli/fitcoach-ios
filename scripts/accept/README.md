@@ -49,3 +49,14 @@ iPhone 用共享无窗口模拟器，并保留渲染原片和完整候选文件 
 
 `media_playback` 薄入口只展开本仓登记的完整媒体 glob，然后交给 Chapter 原生解码/播放验收，
 避免旧播放器把 glob 当不存在的文件而漏掉本地视频；QA 数据库/进程日志不作为媒体输入。
+
+审核账号的只读连通核验：
+
+```bash
+~/Dev/.venv/bin/python scripts/accept/review_access.py --out build/review-access.json
+```
+
+仅从原受保护配置加载专用审核凭据，对默认HTTPS服务做一次邮箱登录及教练业务GET，
+拒绝重定向，手动拼接会话cookie；没有短信请求、数据修改或自动重试，输出不含凭据和业务内容。
+登录失败后先读HTTP或网络原因，不循环试密码。此命令只证明运行时的API访问范围，
+不生成Chapter验收通过标志，也不代替隔离原生页面、正式Store包或审核排队证据。
