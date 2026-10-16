@@ -103,9 +103,14 @@ def main():
         ios_app = Path(binding['iphone']['app'])
         device = sim_lane.ensure_device('iphone')
         ios_info = sim_lane.bundle_info(ios_app)
-        with sim_lane.Session('iphone', device['udid'], label='fitcoach-ios:product-basics', lock_wait=0, load_wait=0) as session:
-            session.install(ios_app)
-            for flag, stem in (('--ui-self-test', 'ios-ui'), ('--ui-self-test-readback', 'ios-readback')):
+        for flag, stem in (('--ui-self-test', 'ios-ui'), ('--ui-self-test-readback', 'ios-readback')):
+            # A completed shutdown is the boundary between the two real processes.
+            # Re-launching immediately after terminate can wedge CoreSimulator's
+            # --terminate-running-process request for 120s. Keep the same persistent
+            # test device/data, release the original lane normally, then cold boot.
+            with sim_lane.Session('iphone', device['udid'], label='fitcoach-ios:product-basics:' + stem, lock_wait=0, load_wait=0) as session:
+                if flag == '--ui-self-test':
+                    session.install(ios_app)
                 launched = session.launch(ios_info['bundle_id'], [flag], 'log', 90, None, ios_info['executable'], functional_thin=True)
                 frame = launched.pop('frame')
                 launched['ok'] = (launched['ready_signal'] == 'os_log' and launched['verdict']['non_blank'] is True
