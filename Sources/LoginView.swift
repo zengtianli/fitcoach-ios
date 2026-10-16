@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct LoginView: View {
+    #if DEBUG
+    @Environment(\.accountPageProbe) private var probe
+    #endif
     @EnvironmentObject var session: Session
     @State private var mode = 0
     @State private var email = ""
@@ -54,6 +57,15 @@ struct LoginView: View {
             .task { restore(); LaneSignal.ready("login") }
             .onChange(of: session.baseURL) { _, _ in restore() }
             .onChange(of: mode) { _, _ in focused = nil; err = nil }
+            #if DEBUG
+            .task {
+                probe?.connect(fill: { values in
+                    if let v = values["email"] { email = v }
+                    if let v = values["password"] { password = v }
+                    remember = false
+                }, action: { _ in await doLogin() }, state: { ["error": err ?? "", "password": password] })
+            }
+            #endif
         }
     }
 

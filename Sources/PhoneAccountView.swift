@@ -93,6 +93,9 @@ private struct RecoveryKeySection: View {
 }
 
 struct PhoneAccountView: View {
+    #if DEBUG
+    @Environment(\.accountPageProbe) private var probe
+    #endif
     enum Mode: String, Identifiable { case login, register, recover; var id: String { rawValue } }
     @EnvironmentObject var session: Session
     @Environment(\.dismiss) private var dismiss
@@ -162,6 +165,27 @@ struct PhoneAccountView: View {
             .toolbar { if result?.recovery_key == nil { ToolbarItem(placement: .cancellationAction) { Button("取消") { dismiss() }.disabled(busy || flow.busy) } } }
             .interactiveDismissDisabled(busy || flow.busy || result?.recovery_key != nil)
             .task { if let r = try? await API(session).accountHints() { flow.hints = r.hints } }
+            #if DEBUG
+            .task {
+                probe?.connect(fill: { values in
+                    if let v = values["phone"] { flow.phone = v; flow.invalidate() }
+                    if let v = values["code"] { flow.code = v; flow.grant = nil }
+                    if let v = values["password"] { password = v; repeated = v }
+                    if let v = values["ownership"] { recoveryKey = v }
+                    if let v = values["oldPassword"] { recoveryPassword = v }
+                    if let v = values["agreed"] { agreed = v == "true" }
+                    if let v = values["saved"] { saved = v == "true" }
+                }, action: { action in
+                    if action == "send" { await flow.send(API(session), purpose: mode.rawValue) }
+                    if action == "submit" { await submit() }
+                    if action == "continue", saved { finish() }
+                }, state: {
+                    ["error": error ?? flow.error ?? "", "grant": flow.grant ?? "",
+                     "key": result?.recovery_key ?? "", "message": message ?? "",
+                     "challenge": flow.challenge ?? "", "password": password]
+                })
+            }
+            #endif
         }
     }
     private func submit() async {
@@ -198,6 +222,9 @@ struct PhoneAccountView: View {
 
 /// 当前账号绑定、双号换绑和手机号新户设置密码；始终消费原 coach_id 下的账号授权。
 struct PhoneSecurityView: View {
+    #if DEBUG
+    @Environment(\.accountPageProbe) private var probe
+    #endif
     @EnvironmentObject var session: Session
     @StateObject private var phone = PhoneChallenge()
     @StateObject private var old = PhoneChallenge()
@@ -262,6 +289,36 @@ struct PhoneSecurityView: View {
         .interactiveDismissDisabled(busy || result?.recovery_key != nil)
         .navigationBarBackButtonHidden(busy || result?.recovery_key != nil)
         .task { await load() }
+        #if DEBUG
+        .task {
+            probe?.connect(fill: { values in
+                if let v = values["phone"] { phone.phone = v; phone.invalidate() }
+                if let v = values["code"] { phone.code = v; phone.grant = nil }
+                if let v = values["oldCode"] { old.code = v; old.grant = nil }
+                if let v = values["identityCode"] { identity.code = v; identity.grant = nil }
+                if let v = values["password"] { password = v }
+                if let v = values["newPassword"] { newPassword = v; repeated = v }
+            }, action: { action in
+                switch action {
+                case "load": await load()
+                case "send": await phone.send(API(session), purpose: hasPhone ? "change_new" : "bind", password: password, identity: old.grant ?? identity.grant ?? "")
+                case "sendOld": await old.send(API(session), purpose: "change_old", password: password, identity: identity.grant ?? "")
+                case "confirmOld": await confirmOld()
+                case "sendIdentity": await identity.send(API(session), purpose: "identity")
+                case "confirmIdentity": await confirmIdentity()
+                case "submit": await bind()
+                case "continue": await finishBinding()
+                case "setPassword": await setPassword()
+                default: break
+                }
+            }, state: {
+                ["error": error ?? phone.error ?? old.error ?? identity.error ?? "",
+                 "key": result?.recovery_key ?? "", "grant": phone.grant ?? "",
+                 "phone_hint": account?.phone_hint ?? "", "has_password": account?.has_password == true ? "true" : "false",
+                 "message": message ?? ""]
+            })
+        }
+        #endif
     }
     private func load() async {
         do { account = try await API(session).accountInfo(); phone.hints = account!.hints; old.hints = account!.hints; identity.hints = account!.hints; error = nil }

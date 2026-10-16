@@ -4,6 +4,9 @@ import SwiftUI
 /// 判据全在后端 tenancy.change_password —— 这里不做任何强度校验，
 /// 客户端多一份规则就会和后端漂移（后端放行的被本地拦下，或反过来）。
 struct PasswordView: View {
+    #if DEBUG
+    @Environment(\.accountPageProbe) private var probe
+    #endif
     @EnvironmentObject var session: Session
     @Environment(\.dismiss) private var dismiss
 
@@ -61,6 +64,14 @@ struct PasswordView: View {
         }
         .navigationTitle("修改密码")
         .navigationBarTitleDisplayMode(.inline)
+        #if DEBUG
+        .task {
+            probe?.connect(fill: { values in
+                if let v = values["oldPassword"] { old = v }
+                if let v = values["password"] { new1 = v; new2 = v }
+            }, action: { _ in await submit() }, state: { ["error": err ?? "", "done": done ? "true" : "false", "password": new1] })
+        }
+        #endif
     }
 
     private func submit() async {

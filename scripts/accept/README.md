@@ -27,9 +27,17 @@
 避免将手工执行结果冒充固定验收证据。
 
 `account_lifecycle` 由 `scripts/accept/account_lifecycle.py` 执行：先沿 `cli/build.sh`
-编当前源码，再复用后端现有 `test_phone.lane` 做隔离注册、登录、找回、改密、换绑、
-退出、注销及滥用防护回归，原始断言记录附 SHA。它明确标记 fake SMS；缺真实短信和
-原生页面完整链路时返回失败，不把 CLI 回归当成原生验收，也不读取正式账号。
+编当前 CLI 与原 sim_lane 候选，再复用后端现有 `test_phone.lane` 做隔离注册、登录、
+找回、改密、换绑、退出、注销及滥用防护回归。实际产品的 `--account-self-test` 挂载真实
+SwiftUI 页面，以测试专用 Environment 挂钩直接调用原按钮动作、读取真实 State；Mac 离屏，
+iPhone 用共享无窗口模拟器，并保留渲染原片和完整候选文件 SHA。入口仅 DEBUG、测试 bundle id
+和 127.0.0.1 同时成立时可运行；使用不落盘 Session，测试身份绕过正式 Keychain，Release 不含该入口。
+原始断言附 SHA，并明确标记 fake SMS、0 条真实发送；真实收信未完成时总验收仍失败，
+不会把本机隔离链路或 CLI 回归冒充苹果设备实测或真实短信投递。环境推迟退出75并保留原始原因。
+
+`scripts/perf/prepare_builds.py` 只调用总部原 SDK 缓存和 `sim_lane.build` 构建槽，
+预备资源补测的真实 Release 回执；不启动模拟器、不采样、不写资源通过证据，
+输出 `build/perf/current-builds.json` 与摘要，可交回 Chapter 原队列按原门槛消费。
 
 `launch_mac` 通过后，`scripts/media/mac_store_shot.py` 只从本轮真实离屏原片生成
 商店规格副本，保留原片 SHA 和实际日程/余额内容的裁切坐标；它不重建侧栏界面，也不上传或送审。

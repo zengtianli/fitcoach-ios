@@ -8,6 +8,9 @@ import UIKit
 @main
 enum FitCoachMain {
     @MainActor static func main() {
+        #if DEBUG
+        if AccountSelfTest.requested { AccountSelfTest.launch(); return }
+        #endif
         if ProductBasicsSelfTest.requested {
             ProductBasicsSelfTest.launch()
             return

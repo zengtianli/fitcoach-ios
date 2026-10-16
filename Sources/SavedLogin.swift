@@ -3,6 +3,13 @@ import Security
 
 /// 密码只存本机钥匙串，各服务器分别保存，避免切换地址时带出凭证。
 enum SavedLogin {
+    #if DEBUG
+    // Only the disposable, re-identified native test bundle can bypass the real Keychain.
+    private static var isolated: Bool {
+        Bundle.main.bundleIdentifier?.hasPrefix("test.tianli.fitcoach.account.") == true
+            && CommandLine.arguments.contains("--account-self-test")
+    }
+    #endif
     struct Credentials: Codable, Equatable {
         let email: String
         let password: String
@@ -17,6 +24,9 @@ enum SavedLogin {
          kSecAttrAccount as String: serverKey(server)]
     }
     static func load(server: String) throws -> Credentials? {
+        #if DEBUG
+        if isolated { return nil }
+        #endif
         var q = query(server)
         q[kSecReturnData as String] = true
         q[kSecMatchLimit as String] = kSecMatchLimitOne
@@ -27,6 +37,9 @@ enum SavedLogin {
         return try JSONDecoder().decode(Credentials.self, from: data)
     }
     static func save(_ credentials: Credentials, server: String) throws {
+        #if DEBUG
+        if isolated { return }
+        #endif
         let data = try JSONEncoder().encode(credentials)
         let q = query(server)
         let update = SecItemUpdate(q as CFDictionary, [kSecValueData as String: data] as CFDictionary)
@@ -39,6 +52,9 @@ enum SavedLogin {
         guard status == errSecSuccess else { throw StoreError(status: status) }
     }
     static func remove(server: String) throws {
+        #if DEBUG
+        if isolated { return }
+        #endif
         let status = SecItemDelete(query(server) as CFDictionary)
         guard status == errSecSuccess || status == errSecItemNotFound else { throw StoreError(status: status) }
     }

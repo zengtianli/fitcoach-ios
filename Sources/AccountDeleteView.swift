@@ -4,6 +4,9 @@ import SwiftUI
 /// App Store 5.1.1(v) 要求「能在 app 内注册就必须能在 app 内删号」—— 这一屏就是为它存在的，
 /// 别把它做成「发邮件申请」或「跳网页」。
 struct AccountDeleteView: View {
+    #if DEBUG
+    @Environment(\.accountPageProbe) private var probe
+    #endif
     @EnvironmentObject var session: Session
     @Environment(\.dismiss) private var dismiss
 
@@ -43,6 +46,11 @@ struct AccountDeleteView: View {
         } message: {
             Text("删除后邮箱可以重新注册，但数据不会回来。")
         }
+        #if DEBUG
+        .task {
+            probe?.connect(fill: { _ in }, action: { _ in await submit() }, state: { ["error": err ?? ""] })
+        }
+        #endif
     }
 
     private func submit() async {
